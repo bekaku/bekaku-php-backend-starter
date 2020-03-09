@@ -60,7 +60,7 @@ $GLOBALS_PROJECT_PATH = "/github/$GLOBALS_PROJECT_NAME/";//path after your web s
 $GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/my-app/data";//path for access from public
 $GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/xampp/htdocs/githup/my-app/data/";//real path of 'data' folder
 ```
-If you Move your data folders to outside DocumentRoot. You can map Alias directory at 'apacheFolder\conf\httpd.conf' Or /etc/apache2/apache2.conf from ubuntu.
+If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` from ubuntu.
 
 Windows
 ```
@@ -86,5 +86,10 @@ Ubuntu
     </Directory>
 </IfModule>
 ```
-
-
+Connection
+```php
+    'secure' => false,
+    'url' => 'localhost',//your server's domain or ip
+    'url_port' => '80',//your http port
+    'ssl_port' => '443',//your https port
+```php
