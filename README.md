@@ -58,7 +58,7 @@ $GLOBALS_PROJECT_NAME = "my-app";/your application path name
 $GLOBALS_PROJECT_PATH = "/github/$GLOBALS_PROJECT_NAME/";//path after your web server DocumentRoot 
 
 $GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/my-app/data";//path for access from public
-$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/xampp/htdocs/githup/my-app/data/";//real path of 'data' folder
+$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/xampp/htdocs/github/my-app/data/";//real path of 'data' folder
 ```
 If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` from ubuntu.
 
@@ -93,3 +93,17 @@ Connection
     'url_port' => '80',//your http port
     'ssl_port' => '443',//your https port
 ```
+
+ Config your MessageUtils path at `my-app`/application/util/MessageUtils.php 
+ ```php
+    $configPath=null;
+    if(AppUtil::getCurrentOS() == SystemConstant::OS_WIN){
+       $configPath = 'D:/xampp/htdocs/github/my-app/data/configuration/app.php';
+     }else if(AppUtil::getCurrentOS() == SystemConstant::OS_LINUX){
+       $configPath = '/var/github/my-app/data/configuration/app.php';
+     }else if(AppUtil::getCurrentOS() == SystemConstant::OS_OSX){
+        $configPath = '/Users/bekaku/github/my-app/data/configuration/app.php';
+      }else{
+        ControllerUtil::displayError('Config file not found.');
+    }
+ ```
