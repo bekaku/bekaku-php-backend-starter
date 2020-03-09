@@ -1,0 +1,29 @@
+#RewriteEngine on
+
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#http://www.example.com/index.php?module=news  to http://www.example.com/news
+#RewriteRule ^(.*)$ index.php?module=$1 [L,QSA]
+#END BACKUP
+
+#Options +FollowSymLinks
+#Options +Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+#1
+#http://www.example.com/index.php?module=news  to http://www.example.com/news
+#profile mode http://www.example.com/index.php?module=bekaku => http://www.example.com/bekaku
+RewriteRule ^([a-zA-Z0-9]+)$ index.php?module=$1 [L,QSA]
+RewriteRule ^([a-zA-Z0-9]+)/$ index.php?module=$1 [L,QSA]
+#2
+#profile mode http://xxx.com/index.php?modules=bekaku&module_param2=shop  => http://xxx.com/bekaku/shop
+#profile mode http://xxx.com/index.php?modules=bekaku&module_param2=photos  => http://xxx.com/bekaku/photos
+#profile mode http://xxx.com/index.php?modules=bekaku&module_param2=topics  => http://xxx.com/bekaku/topics
+#profile mode http://xxx.com/index.php?modules=bekaku&module_param2=following  => http://xxx.com/bekaku/following
+#profile mode http://xxx.com/index.php?modules=bekaku&module_param2=followers  => http://xxx.com/bekaku/followers
+#profile mode http://xxx.com/index.php?modules=profile&module_param2=edit  => http://xxx.com/profile/edit
+RewriteRule ^([a-zA-Z0-9]+)/([a-zA-Z0-9_-]+)$ index.php?module=$1&module_param2=$2 [L,QSA]
+RewriteRule ^([a-zA-Z0-9]+)/([a-zA-Z0-9_-]+)/$ index.php?module=$1&module_param2=$2 [L,QSA]
+

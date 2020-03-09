@@ -1,0 +1,43 @@
+{
+	"th": {
+		"common": {
+			"dog": "หมา",
+			"dog_plural": "หมาๆ",
+			"cat": "แมว __count__ ตัว ชื่อ __count2__",
+			"cat_plural": "__count__ cats",
+			"thedoglovers":["The Dog Lovers by Spike Milligan",
+							"So they bought you",
+							"And kept you in a",
+							"Very good home",
+							"Cental heating",
+							"TV",
+							"A deep freeze",
+							"A very good home-",
+							"No one to take you",
+							"For that lovely long run-",
+							"But otherwise",
+							"'A very good home'",
+							"They fed you Pal and Chun",
+							"But not that lovely long run,",
+							"Until, mad with energy and boredom",
+							"You escaped- and ran and ran and ran",
+							"Under a car.",
+							"Today they will cry for you-",
+							"Tomorrow they will but another dog."]
+		},
+		"category": {
+            "navigation": "เมนู",
+            "ui-element" :"UI Element",
+            "forms":"Forms",
+            "tables":"Tables",
+            "chart-and-maps":"Chart And Maps",
+            "pages":"Pages",
+            "app":"App",
+            "extension":"Extension",
+            "other":"Other",
+            "support":"Support"
+        },
+		"app_name": "ชื่อระบบ __count__"
+	}
+
+}
