@@ -9,6 +9,7 @@
 namespace application\controller;
 
 use application\core\AppController;
+use application\util\AppUtil;
 use application\util\FilterUtils;
 use application\util\JWT;
 use application\util\SystemConstant;

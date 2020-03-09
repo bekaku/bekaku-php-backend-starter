@@ -1,22 +1,22 @@
 <?php
 $GLOBALS_PROJECT_NAME = "bekaku-php-backend-starter";
-$GLOBALS_PROJECT_PATH = "/githup/php/$GLOBALS_PROJECT_NAME/";
+$GLOBALS_PROJECT_PATH = "/github/php/$GLOBALS_PROJECT_NAME/";
 
-$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/githup/php/$GLOBALS_PROJECT_NAME/data";
-$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/php_htdocs/githup/php/$GLOBALS_PROJECT_NAME/data/";
-// windows D:/php_htdocs/githup/php/bekaku-php-backend-starter/data/, production linux /var/bekaku-php-backend-starter/data/, ,mac -> /Users/bekaku/bekaku-php-backend-starter/data/
+$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/php/bekaku-php-backend-starter/data";
+$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/php_htdocs/github/php/bekaku-php-backend-starter/data/";
+// windows D:/php_htdocs/github/php/bekaku-php-backend-starter/data/, production linux /var/bekaku-php-backend-starter/data/, ,mac -> /Users/bekaku/bekaku-php-backend-starter/data/
 
 
 return array(
     'secret_api_key' => '432646294A404E635266556A586E327235753778214125442A472D4B61506453',//Encription hex key 256bit https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx
-    'app_name' => 'begagu.com',
+    'app_name' => 'begagu',
     'locale' => 'th',
     /*
     |--------------------------------------------------------------------------
     | Production Mode
     |--------------------------------------------------------------------------
     */
-    'production_mode' => true,
+    'production_mode' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ return array(
     */
     'log' => array(
         'log_threshold' => 4,
-        'log_path' => $GLOBALS_PROJECT_APP_DATA_UPLOAD.'/logs/',
+        'log_path' => $GLOBALS_PROJECT_APP_DATA_UPLOAD . '/logs/',
         'log_date_format' => 'Y-m-d H:i:s',
         'can_log' => true,
     ),
@@ -49,9 +49,23 @@ return array(
     ),
     'mail_notify_list' => array(
         array(
-            'address' => 'baekaku@gmail.com',
-            'name' => 'baekaku'
+            'address' => 'xxx@gmail.com',
+            'name' => 'bekaku'
         ),
+    ),
+
+    /*
+  |--------------------------------------------------------------------------
+  | Custom Env for send mail
+  |--------------------------------------------------------------------------
+  */
+    'app_mail' => array(
+        'host' => '',
+        'smtp_auth' => true,
+        'username' => '',
+        'password' => '',
+        'smtp_secure' => 'ssl',
+        'port' => 465,
     ),
     /*
     |--------------------------------------------------------------------------
@@ -119,7 +133,7 @@ return array(
     | Session And Cookie
     |--------------------------------------------------------------------------
     */
-    'cookie_time' => (3600*24*30), // 30 days,
+    'cookie_time' => (3600 * 24 * 30), // 30 days,
 
 
     /*
@@ -129,41 +143,41 @@ return array(
     */
     'db_default_driver' => 'mysql',
     'mysql' => array(
-        'driver'    => 'mysql',
-        'host'      => 'localhost',
-        'database'  => 'bekaku_php',
-        'username'  => 'root',
-        'password'  => '',
-        'charset'   => 'utf8',
+        'driver' => 'mysql',
+        'host' => 'localhost',
+        'database' => 'bekaku_php',
+        'username' => 'root',
+        'password' => '',
+        'charset' => 'utf8',
         'collation' => 'utf8_general_ci',
-        'prefix'    => '',
-		'port'    => '3306',
+        'prefix' => '',
+        'port' => '3306',
         //'port'    => '13537',
-        'strict'    => false,
+        'strict' => false,
     ),
     'sqlite' => array(
-        'driver'   => 'sqlite',
+        'driver' => 'sqlite',
         'database' => 'D:/database.sqlite',//path of sqlite
-        'prefix'   => '',
+        'prefix' => '',
     ),
     'pgsql' => array(
-        'driver'   => 'pgsql',
-        'host'     => '',
+        'driver' => 'pgsql',
+        'host' => '',
         'database' => '',
         'username' => '',
         'password' => '',
-        'charset'  => 'utf8',
-        'prefix'   => '',
-        'schema'   => 'public',
+        'charset' => 'utf8',
+        'prefix' => '',
+        'schema' => 'public',
     ),
     'sqlsrv' => array(
-        'driver'   => 'sqlsrv',
-        'host'     => 'localhost',
+        'driver' => 'sqlsrv',
+        'host' => 'localhost',
         'database' => '',
         'username' => '',
         'password' => '',
-        'charset'  => 'utf8',
-        'prefix'   => '',
+        'charset' => 'utf8',
+        'prefix' => '',
     ),
 
     /*
@@ -171,30 +185,30 @@ return array(
     | admin == members must be registered by an administrator
     | root  == only the root user can register members
     */
-    'can_register'   => 'any',
-    'default_role'   => 'member',
+    'can_register' => 'any',
+    'default_role' => 'member',
     /*
     | Is this a secure connection?  The default is FALSE, but the use of an
     | HTTPS connection for logging in is recommended.
     | If you are using an HTTPS connection, change this to TRUE
     */
-    'secure'   => false,
-    'cdn_online'   => false,
+    'secure' => false,
+    'cdn_online' => false,
 
-    'base_paging_param'   => 'page',
-    'base_module_name'   => 'module',
-    'url'   => 'localhost',
+    'base_paging_param' => 'page',
+    'base_module_name' => 'module',
+    'url' => 'localhost',
     'url_port' => '80',
     'ssl_port' => '443',
-    'url_rewriting_project_path'   => $GLOBALS_PROJECT_PATH,
-    'base_project_path'   => $GLOBALS_PROJECT_PATH,
-    'base_project_resources_path'   => $GLOBALS_PROJECT_PATH.'resources',
+    'url_rewriting_project_path' => $GLOBALS_PROJECT_PATH,
+    'base_project_path' => $GLOBALS_PROJECT_PATH,
+    'base_project_resources_path' => $GLOBALS_PROJECT_PATH . 'resources',
 
     /*
      | can use "index.php" will be like "index.php?module=login" or "" empty string will be like "?module=login"
      | config .htaccess for xample.com/login for hide 'index.php?module='
      */
-    'base_index_name'   => 'index.php',
-    'base_data_path'   => $GLOBALS_PROJECT_APP_DATA_UPLOAD,
-    'base_data_display'   => $GLOBALS_PROJECT_APP_DATA_DISPLAY,
+    'base_index_name' => 'index.php',
+    'base_data_path' => $GLOBALS_PROJECT_APP_DATA_UPLOAD,
+    'base_data_display' => $GLOBALS_PROJECT_APP_DATA_DISPLAY,
 );

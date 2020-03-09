@@ -26,7 +26,7 @@ class MessageUtils
             // }
              $configPath=null;
             if(AppUtil::getCurrentOS() == SystemConstant::OS_WIN){
-                $configPath = 'D:/php_htdocs/githup/php/bekaku-php-backend-starter/data/configuration/app.php';
+                $configPath = 'D:/php_htdocs/github/php/bekaku-php-backend-starter/data/configuration/app.php';
             }else if(AppUtil::getCurrentOS() == SystemConstant::OS_LINUX){
                 $configPath = '/var/bekaku-php-backend-starter/data/configuration/app.php';
             }else if(AppUtil::getCurrentOS() == SystemConstant::OS_OSX){

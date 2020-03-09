@@ -582,20 +582,6 @@ class AppUtil
 
     public static function tolink($text)
     {//split url type from message
-
-        /*
-        $text = @html_entity_decode($text);
-        $text = " ".$text;
-        $text = @eregi_replace('(((f|ht){1}tp://)[-a-zA-Z0-9@:%_\+.~#?&//=]+)',
-                '<a target="_blank" href="\\1">\\1</a>', $text);
-        $text = @eregi_replace('(((f|ht){1}tps://)[-a-zA-Z0-9@:%_\+.~#?&//=]+)',
-                '<a target="_blank" href="\\1">\\1</a>', $text);
-        $text = @eregi_replace('([[:space:]()[{}])(www.[-a-zA-Z0-9@:%_\+.~#?&//=]+)',
-        '\\1<a target="_blank" href="http://\\2">\\2</a>', $text);
-        $text = @eregi_replace('([_\.0-9a-z-]+@([0-9a-z][0-9a-z-]+\.)+[a-z]{2,3})',
-        '<a target="_blank" href="mailto:\\1">\\1</a>', $text);
-        return $text;
-        */
         return preg_replace(
             array(
                 '/(?(?=<a[^>]*>.+<\/a>)
@@ -622,7 +608,7 @@ class AppUtil
     }
 
 
-    public static function tiny_url($url)
+    public static function tinyUrl($url)
     {
         $ch = curl_init();
         $timeout = 5;
@@ -634,190 +620,17 @@ class AppUtil
         return $data;
     }
 
-    public static function vdoAutoEmbed($url)
-    {//echo AppUtil::getAutoEmbed($video_url);
-
-        if (file_exists(__SITE_PATH . '/application/util/autoembed/AutoEmbed.class.php')) {
-            require_once __SITE_PATH . '/application/util/autoembed/AutoEmbed.class.php';
-        }
-
-
-        $autoEmbed = new \AutoEmbed();
-        $resualt = $autoEmbed->parseUrl($url);
-        if ($resualt) {
-            return $autoEmbed->getEmbedCode();//display vdo
-        } else {
-            return "vdo Not Found";
-        }
-
-    }
-
-    public static function getAutoEmbedDetail($url)
-    {
-
-        $autoEmbed = new AutoEmbed();
-        return $autoEmbed->getStub();
-
-    }
 
     /*
      * YOUTUBE PLUGIN
      */
-    public static function getYoutubeThumbnail($youtube_url, $type)
+    public static function getYoutubeThumbnail($youtube_url, $type=0)
     {
         //0.jpg,2.jpg,hq1.jpg, hq2.jpg, hq3.jpg , hqdefault.jpg,default.jpg
         $yu_id = explode('www.youtube.com/watch?v=', $youtube_url);
         $thumb = "http://img.youtube.com/vi/" . $yu_id[1] . "/" . $type . ".jpg";
         return $thumb;
     }
-
-    public static function getYoutubeDatail($_vid)
-    {
-        // get video ID from $_GET
-        //$vid = stripslashes($_GET['a']);
-        $vid = stripslashes($_vid);
-        $string = $vid;
-        $url = parse_url($string);
-        parse_str($url['query']);
-        //set video data feed URL
-        // print_r($url);
-        //$v = $_GET['v'];
-        $feedURL = 'http://gdata.youtube.com/feeds/api/videos/' . $_vid;
-
-
-        // read feed into SimpleXML object
-        $entry = simplexml_load_file($feedURL);
-        $video = AppUtil::parseVideoEntry($entry);
-        $info['thumbnail'] = stripslashes($video->thumbnailURL);//0.jpg,2.jpg,hq1.jpg, hq2.jpg, hq3.jpg , hqdefault.jpg,default.jpg
-        $info['title'] = (stripslashes($video->title));
-        $info['description'] = (stripslashes($video->description));
-        $info['duration'] = (stripslashes($video->length));
-
-
-        return $info;
-
-
-    }
-
-    // function to parse a video <entry>
-    private static function parseVideoEntry($entry)
-    {
-        $obj = new stdClass;
-        // get nodes in media: namespace for media information
-        $media = $entry->children('http://search.yahoo.com/mrss/');
-        $obj->title = $media->group->title;
-        $obj->description = $media->group->description;
-
-        $yt = $media->children('http://gdata.youtube.com/schemas/2007');
-        $attrs = $yt->duration->attributes();
-        $obj->length = $attrs['seconds'];
-
-        // return object to caller
-        return $obj;
-    }
-
-    public static function embedYoutube($youtube_url)
-    {
-        $yu_id = null;
-        $yu_id[] = explode('www.youtube.com/watch?v=', $youtube_url);
-        $out_put = "
-			<iframe type=\"text/html\" width=\"100%\" height=\"100%\"
-			src=\"http://www.youtube.com/embed/" . $yu_id[1] . "\" frameborder=\"0\">
-			</iframe>
-		";
-        return $out_put;
-
-    }
-
-
-    /*
-	*VIMEO
-	*/
-    public static function getVimeoInfo($v_id)
-    {
-
-        $explode_id = explode("http://vimeo.com/", $v_id);
-        $id = $explode_id[1];
-        if (!function_exists('curl_init')) die('CURL is not installed!');
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://vimeo.com/api/v2/video/$id.php");
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $output = unserialize(curl_exec($ch));
-        $output = $output[0];
-        curl_close($ch);
-        //return $output;
-        $info['thumbnail'] = $output['thumbnail_medium'];
-        $info['title'] = $output['title'];
-        $info['description'] = $output['description'];
-        $info['duration'] = $output['duration'];
-
-        return $info;
-
-        /*
-        id
-        title
-        description
-        url
-        upload_date
-        mobile_url
-        thumbnail_small
-        thumbnail_medium
-        thumbnail_large
-        user_name
-        user_url
-        user_portrait_small
-        user_portrait_medium
-        user_portrait_large
-        user_portrait_huge
-        stats_number_of_likes
-        stats_number_of_plays
-        stats_number_of_comments
-        duration
-        width
-        height
-        tags
-        */
-    }
-
-    public static function getMetacafeInfo($v_id)
-    {
-        $expl = explode("http://www.metacafe.com/watch/", $v_id);
-        $expl1 = $expl[1];
-        $final_explode = explode("/", $expl1);
-        $thumb = 'http://www.metacafe.com/thumb/' . $final_explode[0] . '.jpg';
-        return $thumb;
-    }
-
-    public static function getUserPictureName($userId)
-    {
-
-        $somePath = MessageUtils::getConfig('edr_tomcat_student_picture_real_path');
-        $dir = opendir($somePath);
-
-        $imgName = "";
-        //looping through filenames
-        while (false !== ($file = readdir($dir))) {
-            if (!self::isEmpty($file)) {
-                $splitName = explode("@", $file);
-                if (count($splitName) > 0) {
-                    if ("_" . $userId == $splitName[0]) {
-                        $imgName = $file;
-                        break;
-                    }
-                }
-            }
-        }
-        return $imgName;
-    }
-
-    public static function getTeachingSubjectGroup($studentCode)
-    {
-
-        return substr($studentCode, 0, 6);
-    }
-
     public static function uniqueMultidimArray($array, $key)
     {
         $temp_array = array();
@@ -863,8 +676,6 @@ class AppUtil
      */
     public static function findObjectInArray($arrayList, $keyValueSearch, $fieldName)
     {
-
-
         $item = null;
         $positionExits = array_search($keyValueSearch, array_column($arrayList, $fieldName));
 //        echoln(count($arrayList).' keyValueSearch=>'.$keyValueSearch.', position =>'.$positionExits);

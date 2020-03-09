@@ -70,6 +70,8 @@ class SystemConstant
     const CONTENT_TYPE_IMAGE_JPEG = "Content-Type: image/jpeg";
     const CONTENT_TYPE_APPLICATION_ZIP = "Content-Type: application/zip";
     const CONTENT_TYPE_APPLICATION_PDF = "Content-Type: application/pdf";
+    const CONTENT_TYPE_APPLICATION_URLENCODED = "Content-Type: application/x-www-form-urlencoded; charset=utf-8";
+
 
     const CONTENT_TYPE_AUDIO_MPEG = "Content-Type: audio/mpeg";
 
@@ -83,7 +85,6 @@ class SystemConstant
 
     //Api Client
     const API_NAME_ATT = "apiClient";
-    const THAIPOST_MAIN_URL = "https://r_dservice.thailandpost.com/webservice";
     //OS
     const OS_UNKNOWN = 1;
     const OS_WIN = 2;
