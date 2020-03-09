@@ -51,11 +51,12 @@ Config your database connection at `my-app`/data/configuration/app.php
     ),
 ```
 ## Configuration
- Application Path
+ Config your application path at `my-app`/data/configuration/app.php 
+ 
  ```php
 $GLOBALS_PROJECT_NAME = "my-app";/your application path name
-$GLOBALS_PROJECT_PATH = "/githup/$GLOBALS_PROJECT_NAME/";//path after your web server root path 
+$GLOBALS_PROJECT_PATH = "/githup/$GLOBALS_PROJECT_NAME/";//path after your web server DocumentRoot path 
 
-$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/githup/$GLOBALS_PROJECT_NAME/data";
-$GLOBALS_PROJECT_APP_DATA_UPLOAD = "C:/xampp/htdocs/$GLOBALS_PROJECT_NAME/data/";
+$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/githup/my-app/data";//path for access from public
+$GLOBALS_PROJECT_APP_DATA_UPLOAD = "C:/xampp/htdocs/githup/my-app/data/";//real path of 'data' folder
 ```
