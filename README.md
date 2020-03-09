@@ -55,9 +55,9 @@ Config your database connection at `my-app`/data/configuration/app.php
  
  ```php
 $GLOBALS_PROJECT_NAME = "my-app";/your application path name
-$GLOBALS_PROJECT_PATH = "/githup/$GLOBALS_PROJECT_NAME/";//path after your web server DocumentRoot 
+$GLOBALS_PROJECT_PATH = "/github/$GLOBALS_PROJECT_NAME/";//path after your web server DocumentRoot 
 
-$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/githup/my-app/data";//path for access from public
+$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/my-app/data";//path for access from public
 $GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/xampp/htdocs/githup/my-app/data/";//real path of 'data' folder
 ```
 If you Move your data folders to outside DocumentRoot. You can map Alias directory at 'apacheFolder\conf\httpd.conf' Or /etc/apache2/apache2.conf from ubuntu.
