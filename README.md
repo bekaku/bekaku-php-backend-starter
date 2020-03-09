@@ -25,4 +25,8 @@ example on windows
 ```
 $ mysql -uroot -p bekaku_php < E:\bak\db\bekaku_php.sql
 ```
+example on Ubuntu
+```
+$ mysql -uroot -p bekaku_php < /var/tmp/bekaku_php.sql
+```
 
