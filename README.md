@@ -60,7 +60,9 @@ $GLOBALS_PROJECT_PATH = "/githup/$GLOBALS_PROJECT_NAME/";//path after your web s
 $GLOBALS_PROJECT_APP_DATA_DISPLAY = "/githup/my-app/data";//path for access from public
 $GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/xampp/htdocs/githup/my-app/data/";//real path of 'data' folder
 ```
-If you Move your data folders to outside DocumentRoot. You can map Alias directory at 'apacheFolder\conf\httpd.conf' Or /etc/apache2/apache2.conf from ubuntu
+If you Move your data folders to outside DocumentRoot. You can map Alias directory at 'apacheFolder\conf\httpd.conf' Or /etc/apache2/apache2.conf from ubuntu.
+
+Windows
 ```
 <IfModule mod_alias.c>
     Alias /myCdn/ "D:/myPath/data/"
@@ -72,3 +74,17 @@ If you Move your data folders to outside DocumentRoot. You can map Alias directo
     </Directory>	
 </IfModule>
 ```
+Ubuntu
+```
+<IfModule mod_alias.c>
+    Alias /myCdn/ "/var/myPath/data/"
+    <Directory "/var/myPath/data">
+        Options Indexes MultiViews
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+</IfModule>
+```
+
+
