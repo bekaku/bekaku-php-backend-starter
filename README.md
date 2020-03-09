@@ -39,14 +39,14 @@ Config your database connection at `my-app`/data/configuration/app.php
     'db_default_driver' => 'mysql',
     'mysql' => array(
         'driver'    => 'mysql',
-        'host'      => 'localhost',
+        'host'      => 'YOUR_MYSQL_SERVER_IP',//locahost
         'database'  => 'bekaku_php',
-        'username'  => 'root',
-        'password'  => '',
+        'username'  => 'YOUR_MYSQL_USERNAME',//root
+        'password'  => 'YOUR_MYSQL_PASSWORD',
         'charset'   => 'utf8',
         'collation' => 'utf8_general_ci',
         'prefix'    => '',
-		    'port'    => '3306',
+	'port'    => '3306',
         'strict'    => false,
     ),
 ```
