@@ -29,6 +29,12 @@ example on Ubuntu
 ```sql
 $ mysql -uroot -p bekaku_php < /var/tmp/bekaku_php.sql
 ```
+default admin username and password
+```
+Username : admin
+Password : P@ssw0rd
+```
+
 Config your database connection at `my-app`/data/configuration/app.php
 ```php
     /*
