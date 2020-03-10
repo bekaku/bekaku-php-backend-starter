@@ -55,13 +55,13 @@ Config your application path at `my-app`/.htaccess
  
  ```.htaccess
 #PROJECT_HOME is path after your web server DocumentRoot
-SetEnv PROJECT_HOME /github/my-app
+SetEnv PROJECT_HOME /my-app
 
 #PROJECT_DATA_HOME is real path of 'data' folder
-SetEnv PROJECT_DATA_HOME D:/xampp/htdocs/github/my-app/data
+SetEnv PROJECT_DATA_HOME D:/xampp/htdocs/my-app/data
 
 #PROJECT_DATA_DISPLAY is path for access from public
-SetEnv PROJECT_DATA_DISPLAY /github/my-app/data
+SetEnv PROJECT_DATA_DISPLAY /my-app/data
 ```
 If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` from ubuntu.
 
