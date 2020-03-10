@@ -18,86 +18,92 @@ class MessageUtils
     public static function getConfig($params = null)
     {
         $confString = null;
-        if($params){
-
+        if ($params) {
             // if(file_exists(__SITE_PATH.'/application/configuration/app.php')) {
             //     $configArray = require __SITE_PATH . "/application/configuration/app.php";
             //     $confString = self::getValueFromArray($configArray, $params);
             // }
-             $configPath=null;
-            if(AppUtil::getCurrentOS() == SystemConstant::OS_WIN){
-                $configPath = 'D:/php_htdocs/github/php/bekaku-php-backend-starter/data/configuration/app.php';
-            }else if(AppUtil::getCurrentOS() == SystemConstant::OS_LINUX){
-                $configPath = '/var/bekaku-php-backend-starter/data/configuration/app.php';
-            }else if(AppUtil::getCurrentOS() == SystemConstant::OS_OSX){
-                $configPath = '/Users/bekaku/bekaku-php-backend-starter/data/configuration/app.php';
-            }else{
-                ControllerUtil::displayError('Config file not found.');
-            }
-            
-             if(file_exists($configPath)) {
-                $configArray = require $configPath;
-                $confString = self::getValueFromArray($configArray, $params);
-            }
+//             $configPath=null;
+//            if(AppUtil::getCurrentOS() == SystemConstant::OS_WIN){
+//                $configPath = 'D:/php_htdocs/github/php/bekaku-php-backend-starter/data/configuration/app.php';
+//            }else if(AppUtil::getCurrentOS() == SystemConstant::OS_LINUX){
+//                $configPath = '/var/bekaku-php-backend-starter/data/configuration/app.php';
+//            }else if(AppUtil::getCurrentOS() == SystemConstant::OS_OSX){
+//                $configPath = '/Users/bekaku/bekaku-php-backend-starter/data/configuration/app.php';
+//            }else{
+//                ControllerUtil::displayError('Config file not found.');
+//            }
+//            $configPath = getenv('BEKAKU_DATA_HOME');
+//            if(empty($configPath)){
+//                ControllerUtil::displayError('Config file not found.');
+//            }
+//            $configPath .="configuration/app.php";
+//            if (file_exists($configPath)) {
+//                $configArray = require $configPath;
+//                $confString = self::getValueFromArray($configArray, $params);
+//            }
+            $applicaionConfigArray =__APP_CONFIG;
+            $confString = self::getValueFromArray($applicaionConfigArray, $params);
         }
         return $confString;
     }
-    public static function getVendorConfig($params = null, $isInternalFile=true)
+
+    public static function getVendorConfig($params = null, $isInternalFile = true)
     {
         $cdnOnline = self::getConfig('cdn_online');
 //        echoln('cdn-Mode====>'.$cdnOnline);
         $confString = null;
-        if($params){
+        if ($params) {
 
-            if(file_exists(__SITE_PATH.'/application/configuration/vendorConf.php')) {
+            if (file_exists(__SITE_PATH . '/application/configuration/vendorConf.php')) {
                 $configArray = require __SITE_PATH . "/application/configuration/vendorConf.php";
                 $confString = self::getValueFromArray($configArray, $params);
             }
         }
-        if($isInternalFile || !$cdnOnline){
-            return __RESOURCES.$confString;
-        }else{
+        if ($isInternalFile || !$cdnOnline) {
+            return __RESOURCES . $confString;
+        } else {
             return $confString;
         }
 
     }
-    public static function genScriptCustom($list=array())
+    public static function genScriptCustom($list = array())
     {
-        if(!AppUtil::isArrayEmpty($list)){
+        if (!AppUtil::isArrayEmpty($list)) {
 
-            foreach ($list AS $js){
-                echo "<script type=\"text/javascript\" src=\"".$js."\"></script>";
+            foreach ($list AS $js) {
+                echo "<script type=\"text/javascript\" src=\"" . $js . "\"></script>";
             }
         }
     }
-    public static function genStyleCustom($list=array())
+    public static function genStyleCustom($list = array())
     {
-        if(!AppUtil::isArrayEmpty($list)){
+        if (!AppUtil::isArrayEmpty($list)) {
 
-            foreach ($list AS $css){
+            foreach ($list AS $css) {
                 echo "    <link rel=\"stylesheet\" type=\"text/css\" href=\"" . $css . "\"> \r";
             }
         }
     }
-
-    public static function getMessage($params){
+    public static function getMessage($params)
+    {
         $locale = MessageUtils::getConfig('locale');
         $msgString = null;
-        if($params){
+        if ($params) {
             $messageList = array();
-            if(file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/app.php')) {
+            if (file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/app.php')) {
                 $msgAppArray = require __SITE_PATH . '/resources/lang/' . $locale . '/app.php';
                 array_push($messageList, $msgAppArray);
             }
-            if(file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/error.php')) {
+            if (file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/error.php')) {
                 $msgErrorArray = require __SITE_PATH . '/resources/lang/' . $locale . '/error.php';
                 array_push($messageList, $msgErrorArray);
             }
-            if(file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/model.php')) {
+            if (file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/model.php')) {
                 $msgModelArray = require __SITE_PATH . '/resources/lang/' . $locale . '/model.php';
                 array_push($messageList, $msgModelArray);
             }
-            if(file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/date.php')) {
+            if (file_exists(__SITE_PATH . '/resources/lang/' . $locale . '/date.php')) {
                 $msgDateArray = require __SITE_PATH . '/resources/lang/' . $locale . '/date.php';
                 array_push($messageList, $msgDateArray);
             }
@@ -105,32 +111,33 @@ class MessageUtils
         }
         return $msgString;
     }
-    private static function getValueFromMessageArray(&$msgArr, $param){
-        foreach($msgArr as $msg){
-            if(isset($msg[$param])){
+    private static function getValueFromMessageArray(&$msgArr, $param)
+    {
+        foreach ($msgArr as $msg) {
+            if (isset($msg[$param])) {
                 return $msg[$param];
                 break;
             }
         }
         return null;
     }
+
     private static function getValueFromArray(&$config, $params = null)
     {
         $confString = null;
-        if($params){
+        if ($params) {
 
-            $keys = explode(".",$params);
-            if(count($keys)>=2){
-                while (count($keys) > 1){
+            $keys = explode(".", $params);
+            if (count($keys) >= 2) {
+                while (count($keys) > 1) {
                     $key = array_shift($keys);
-                    if ( ! isset($config[$key]) or ! is_array($config[$key]))
-                    {
+                    if (!isset($config[$key]) or !is_array($config[$key])) {
                         $config[$key] = array();
                     }
                     $config =& $config[$key];
                 }
                 $confString = $config[array_shift($keys)];
-            }else{
+            } else {
                 $confString = $config[$keys[0]];
             }
         }

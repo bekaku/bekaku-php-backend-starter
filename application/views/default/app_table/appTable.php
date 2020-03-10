@@ -106,10 +106,10 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                             <input value="1"  checked type="checkbox" name="controller" id="controller">
                             Controller
                         </label>
-<!--                        <label class="checkbox">-->
-<!--                            <input value="1" type="checkbox" name="validator" id="validator">-->
-<!--                            Validator-->
-<!--                        </label>-->
+                        <label class="checkbox">
+                            <input value="1" checked type="checkbox" name="validator" id="validator">
+                            Validator
+                        </label>
 <!--                        <label class="checkbox">-->
 <!--                            <input value="1" type="checkbox" name="vlist" id="vlist">-->
 <!--                            List View-->

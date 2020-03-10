@@ -64,9 +64,7 @@ class AppUserController extends AppController
     {
 
         $perPage = FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) > 0 ? FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) : 0;
-        if ($perPage > 0) {
-            $this->setRowPerPage($perPage);
-        }
+        $this->setRowPerPage($perPage);
         $q_parameter = $this->initSearchParam(new AppUser());
 
         $this->pushDataToView = $this->getDefaultResponse();
@@ -78,10 +76,7 @@ class AppUserController extends AppController
     public function crudAdd()
     {
         $uid = SecurityUtil::getAppuserIdFromJwtPayload();
-
         $jsonData = $this->getJsonData(false);
-
-
         $this->pushDataToView = $this->getDefaultResponse();
         $appUser = new AppUser();
         $appUser->populatePostDataRestApi($jsonData);
@@ -110,13 +105,9 @@ class AppUserController extends AppController
             $appUser->setLoginPassword(ControllerUtil::genHashPassword($appUser->getLoginPassword(), $randomSalt));
             $appUser->setSalt($randomSalt);
 
-
             $lastInsertId = $this->appUserService->createByObject($appUser);
             if ($lastInsertId) {
-
                 $this->addAppUserRoleRoles($lastInsertId, $jsonData->roles);
-
-
                 $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));
             } else {
                 $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, false, i18next::getTranslation('error.error_something_wrong'));
@@ -281,7 +272,7 @@ class AppUserController extends AppController
             }
 
             //upload new img
-            $imagNameGenerate = $uid . '_' . DateUtils::getTimeNow() . '_' . AppUtil::generateRandID();
+            $imagNameGenerate = UploadUtil::getUploadFileName($uid);
             if (is_uploaded_file($_FILES[SystemConstant::APP_IMAGE_FILE_UPLOAD_ATT]['tmp_name'])) {
                 $imgName = UploadUtil::uploadImgFiles($_FILES[SystemConstant::APP_IMAGE_FILE_UPLOAD_ATT], $appUser->getCreatedDate(), 0, $imagNameGenerate);
                 if ($imgName) {

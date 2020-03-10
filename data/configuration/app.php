@@ -1,9 +1,10 @@
 <?php
-$GLOBALS_PROJECT_NAME = "bekaku-php-backend-starter";
-$GLOBALS_PROJECT_PATH = "/github/php/$GLOBALS_PROJECT_NAME/";
 
-$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/php/bekaku-php-backend-starter/data";
-$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/php_htdocs/github/php/bekaku-php-backend-starter/data/";
+//$GLOBALS_PROJECT_PATH = "/github/php/bekaku-php-backend-starter/";//path after your web server DocumentRoot
+
+//$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/php/bekaku-php-backend-starter/data";//path for access from public
+//$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/php_htdocs/github/php/bekaku-php-backend-starter/data/";//real path of 'data' folder
+
 // windows D:/php_htdocs/github/php/bekaku-php-backend-starter/data/, production linux /var/bekaku-php-backend-starter/data/, ,mac -> /Users/bekaku/bekaku-php-backend-starter/data/
 
 
@@ -30,7 +31,7 @@ return array(
     */
     'log' => array(
         'log_threshold' => 4,
-        'log_path' => $GLOBALS_PROJECT_APP_DATA_UPLOAD . '/logs/',
+        'log_path' => getenv('PROJECT_DATA_HOME') . '/logs/',
         'log_date_format' => 'Y-m-d H:i:s',
         'can_log' => true,
     ),
@@ -187,28 +188,27 @@ return array(
     */
     'can_register' => 'any',
     'default_role' => 'member',
+
+    'base_paging_param' => 'page',
+    'base_module_name' => 'module',
     /*
     | Is this a secure connection?  The default is FALSE, but the use of an
     | HTTPS connection for logging in is recommended.
     | If you are using an HTTPS connection, change this to TRUE
     */
     'secure' => false,
-    'cdn_online' => false,
-
-    'base_paging_param' => 'page',
-    'base_module_name' => 'module',
-    'url' => 'localhost',
-    'url_port' => '80',
-    'ssl_port' => '443',
-    'url_rewriting_project_path' => $GLOBALS_PROJECT_PATH,
-    'base_project_path' => $GLOBALS_PROJECT_PATH,
-    'base_project_resources_path' => $GLOBALS_PROJECT_PATH . 'resources',
+    'url' => 'localhost',//your server's domain or ip
+    'url_port' => '80',//your http port
+    'ssl_port' => '443',//your https port
+    'url_rewriting_project_path' => getenv('PROJECT_HOME')."/",
+    'base_project_path' => getenv('PROJECT_HOME')."/",
+    'base_project_resources_path' => getenv('PROJECT_HOME') . '/resources',
 
     /*
      | can use "index.php" will be like "index.php?module=login" or "" empty string will be like "?module=login"
      | config .htaccess for xample.com/login for hide 'index.php?module='
      */
     'base_index_name' => 'index.php',
-    'base_data_path' => $GLOBALS_PROJECT_APP_DATA_UPLOAD,
-    'base_data_display' => $GLOBALS_PROJECT_APP_DATA_DISPLAY,
+    'base_data_path' => getenv('PROJECT_DATA_HOME'),
+    'base_data_display' => getenv('PROJECT_DATA_DISPLAY'),
 );

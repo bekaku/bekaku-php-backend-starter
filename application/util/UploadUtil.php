@@ -553,4 +553,8 @@ class UploadUtil
         $getExtension = explode("/", $info);
         return count($getExtension) > 0 ? $getExtension[1] : null;
     }
+    public static function getUploadFileName($userId, $randomId = true)
+    {
+        return $userId . SystemConstant::UNDER_SCORE . DateUtils::getTimeNow() . ($randomId ? SystemConstant::UNDER_SCORE . AppUtil::generateRandStr(5) : '');
+    }
 }

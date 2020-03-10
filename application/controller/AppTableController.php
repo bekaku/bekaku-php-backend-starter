@@ -150,7 +150,7 @@ class AppTableController extends BaseController
             }
             if ($isValidator) {
                 $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
-//                $this->createValidatorFile();
+                $this->createValidatorFile();
             }
             if ($isCreateControler) {
                 $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
@@ -617,9 +617,9 @@ class AppTableController extends BaseController
             $strText .= $this->autoGenerateTextWarn . "\r\n";
             $strText .= "namespace application\\validator;" . "\r\n";
             $strText .= "" . "\r\n";
-            $strText .= "use application\\core\\AppBaseValidator as BaseValidate;" . "\r\n";
-            $strText .= "use application\\model\\" . $this->appTableModuleName . " as " . $this->appTableModuleName . ";" . "\r\n";
-            $strText .= "class " . $this->appTableModuleName . "Validator extends BaseValidate" . "\r\n";
+            $strText .= "use application\\core\\AppBaseValidator;" . "\r\n";
+            $strText .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
+            $strText .= "class " . $this->appTableModuleName . "Validator extends AppBaseValidator" . "\r\n";
             $strText .= "{" . "\r\n";
             $strText .= "    public function __construct($this->appTableModuleName $" . $this->appTableModuleSubName . ")" . "\r\n";
             $strText .= "    {" . "\r\n";

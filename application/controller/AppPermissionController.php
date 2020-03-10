@@ -1,4 +1,5 @@
 <?php
+
 namespace application\controller;
 
 use application\core\AppController as BaseController;
@@ -13,10 +14,11 @@ use application\util\SecurityUtil;
 use application\util\SystemConstant;
 use application\validator\AppPermissionValidator;
 
-class AppPermissionController extends  BaseController
+class AppPermissionController extends BaseController
 {
     private $appPermissionService;
     private $authenService;
+
     public function __construct($databaseConnection)
     {
         $this->setDbConn($databaseConnection);
@@ -24,18 +26,18 @@ class AppPermissionController extends  BaseController
         $this->authenService = new AuthenService($this->getDbConn());
 
     }
+
     public function __destruct()
     {
         unset($this->appPermissionService);
         unset($this->authenService);
     }
+
     public function crudList()
     {
 
-        $perPage = FilterUtil::filterGetInt(SystemConstant::PER_PAGE_ATT) >0 ? FilterUtil::filterGetInt(SystemConstant::PER_PAGE_ATT) : 0;
-        if($perPage>0){
-            $this->setRowPerPage($perPage);
-        }
+        $perPage = FilterUtil::filterGetInt(SystemConstant::PER_PAGE_ATT) > 0 ? FilterUtil::filterGetInt(SystemConstant::PER_PAGE_ATT) : 0;
+        $this->setRowPerPage($perPage);
         $q_parameter = $this->initSearchParam(new AppPermission());
 
         $this->pushDataToView = $this->getDefaultResponse();
@@ -43,6 +45,7 @@ class AppPermissionController extends  BaseController
         $this->pushDataToView[SystemConstant::APP_PAGINATION_ATT] = $this->appPermissionService->getTotalPaging();
         $this->jsonResponse($this->pushDataToView);
     }
+
     public function crudAdd()
     {
 
@@ -57,9 +60,9 @@ class AppPermissionController extends  BaseController
 
         $validator = new AppPermissionValidator($appPermission);
         $errors = $validator->getValidationErrors();
-        if($errors){
+        if ($errors) {
             $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, false, $errors);
-        }else{
+        } else {
 
             $appPermission->setCreatedUser($uid);
             $appPermission->setUpdatedUser($uid);
@@ -69,75 +72,75 @@ class AppPermissionController extends  BaseController
             $permissionDescription = $appPermission->getDescription();
             $isCrudPermission = false;
 
-            $cruds =$jsonData->cruds;
-            if($cruds){
-                foreach ($cruds AS $crud){
+            $cruds = $jsonData->cruds;
+            if ($cruds) {
+                foreach ($cruds AS $crud) {
 
-                    if($crud=='list'){
-                        $appPermission->setName($permissionName."_list");
-                        $appPermission->setDescription($permissionDescription.' ('.i18next::getTranslation('base.list').')');
+                    if ($crud == 'list') {
+                        $appPermission->setName($permissionName . "_list");
+                        $appPermission->setDescription($permissionDescription . ' (' . i18next::getTranslation('base.list') . ')');
                         $listPermissionInsertId = $this->appPermissionService->createByObject($appPermission);
 
                         //create all permission for dev
                         $dataCrudList['role'] = 1;
                         $dataCrudList['permission'] = $listPermissionInsertId;
-                        $dataCrudList = $this->initBaseCreateDataByUid($dataCrudList,$uid);
+                        $dataCrudList = $this->initBaseCreateDataByUid($dataCrudList, $uid);
                         $this->appPermissionService->createPermissionRole($dataCrudList);
                         $isCrudPermission = true;
                     }
-                    if($crud=='add'){
-                        $appPermission->setName($permissionName."_add");
-                        $appPermission->setDescription($permissionDescription.' ('.i18next::getTranslation('base.add_new').')');
-                        $addPermissionInsertId =$this->appPermissionService->createByObject($appPermission);
+                    if ($crud == 'add') {
+                        $appPermission->setName($permissionName . "_add");
+                        $appPermission->setDescription($permissionDescription . ' (' . i18next::getTranslation('base.add_new') . ')');
+                        $addPermissionInsertId = $this->appPermissionService->createByObject($appPermission);
                         //create all permission for dev
                         $dataCrudAdd['role'] = 1;
                         $dataCrudAdd['permission'] = $addPermissionInsertId;
-                        $dataCrudAdd = $this->initBaseCreateDataByUid($dataCrudAdd,$uid);
+                        $dataCrudAdd = $this->initBaseCreateDataByUid($dataCrudAdd, $uid);
                         $this->appPermissionService->createPermissionRole($dataCrudAdd);
                         $isCrudPermission = true;
                     }
-                    if($crud=='edit'){
-                        $appPermission->setName($permissionName."_edit");
-                        $appPermission->setDescription($permissionDescription.' ('.i18next::getTranslation('base.edit').')');
-                        $editPermissionInsertId =$this->appPermissionService->createByObject($appPermission);
+                    if ($crud == 'edit') {
+                        $appPermission->setName($permissionName . "_edit");
+                        $appPermission->setDescription($permissionDescription . ' (' . i18next::getTranslation('base.edit') . ')');
+                        $editPermissionInsertId = $this->appPermissionService->createByObject($appPermission);
                         //create all permission for dev
                         $dataCrudEdit['role'] = 1;
                         $dataCrudEdit['permission'] = $editPermissionInsertId;
-                        $dataCrudEdit = $this->initBaseCreateDataByUid($dataCrudEdit,$uid);
+                        $dataCrudEdit = $this->initBaseCreateDataByUid($dataCrudEdit, $uid);
                         $this->appPermissionService->createPermissionRole($dataCrudEdit);
                         $isCrudPermission = true;
                     }
-                    if($crud=='delete'){
-                        $appPermission->setName($permissionName."_delete");
-                        $appPermission->setDescription($permissionDescription.' ('.i18next::getTranslation('base.delete').')');
-                        $deletePermissionInsertId =$this->appPermissionService->createByObject($appPermission);
+                    if ($crud == 'delete') {
+                        $appPermission->setName($permissionName . "_delete");
+                        $appPermission->setDescription($permissionDescription . ' (' . i18next::getTranslation('base.delete') . ')');
+                        $deletePermissionInsertId = $this->appPermissionService->createByObject($appPermission);
                         //create all permission for dev
                         $dataCrudDelete['role'] = 1;
                         $dataCrudDelete['permission'] = $deletePermissionInsertId;
-                        $dataCrudDelete = $this->initBaseCreateDataByUid($dataCrudDelete,$uid);
+                        $dataCrudDelete = $this->initBaseCreateDataByUid($dataCrudDelete, $uid);
                         $this->appPermissionService->createPermissionRole($dataCrudDelete);
                         $isCrudPermission = true;
                     }
-                    if($crud=='view'){
-                        $appPermission->setName($permissionName."_view");
-                        $appPermission->setDescription($permissionDescription.' ('.i18next::getTranslation('base.view').')');
-                        $viewPermissionInsertId =$this->appPermissionService->createByObject($appPermission);
+                    if ($crud == 'view') {
+                        $appPermission->setName($permissionName . "_view");
+                        $appPermission->setDescription($permissionDescription . ' (' . i18next::getTranslation('base.view') . ')');
+                        $viewPermissionInsertId = $this->appPermissionService->createByObject($appPermission);
                         //create all permission for dev
                         $dataCrudView['role'] = 1;
                         $dataCrudView['permission'] = $viewPermissionInsertId;
-                        $dataCrudView = $this->initBaseCreateDataByUid($dataCrudView,$uid);
+                        $dataCrudView = $this->initBaseCreateDataByUid($dataCrudView, $uid);
                         $this->appPermissionService->createPermissionRole($dataCrudView);
                         $isCrudPermission = true;
                     }
                 }
             }
 
-            if(!$isCrudPermission){
+            if (!$isCrudPermission) {
                 $permissionInsertId = $this->appPermissionService->createByObject($appPermission);
                 //create all permission for dev
                 $dataPermission['role'] = 1;
                 $dataPermission['permission'] = $permissionInsertId;
-                $dataPermission = $this->initBaseCreateDataByUid($dataPermission,$uid);
+                $dataPermission = $this->initBaseCreateDataByUid($dataPermission, $uid);
                 $this->appPermissionService->createPermissionRole($dataPermission);
             }
 
@@ -145,12 +148,13 @@ class AppPermissionController extends  BaseController
         }
         $this->jsonResponse($this->pushDataToView);
     }
+
     public function crudEdit()
     {
         $uid = SecurityUtil::getAppuserIdFromJwtPayload();
         $id = FilterUtil::validateGetInt(ControllerUtil::encodeParamId(AppPermission::$tableName));
 
-        if(AppUtil::isEmpty($id)) {
+        if (AppUtil::isEmpty($id)) {
             ControllerUtil::f404Static();
         }
 
@@ -163,29 +167,30 @@ class AppPermissionController extends  BaseController
 
         $validator = new AppPermissionValidator($appPermission);
         $errors = $validator->getValidationErrors();
-        if($errors){
+        if ($errors) {
             $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, false, $errors);
-        }else{
-            $appPermission=$this->initBaseUpdateDataRestApi($appPermission, $uid);
+        } else {
+            $appPermission = $this->initBaseUpdateDataRestApi($appPermission, $uid);
 
-            $effectRow = $this->appPermissionService->updateByObject($appPermission, array('id'=>$appPermission->getId()));
-            if($effectRow){
+            $effectRow = $this->appPermissionService->updateByObject($appPermission, array('id' => $appPermission->getId()));
+            if ($effectRow) {
                 $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, true, i18next::getTranslation(('success.update_succesfull')));
-            }else{
+            } else {
                 $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, false, i18next::getTranslation('error.error_something_wrong'));
             }
         }
         $this->jsonResponse($this->pushDataToView);
     }
+
     public function crudDelete()
     {
         $this->pushDataToView = $this->getDefaultResponse();
         $id = FilterUtil::validateGetInt(ControllerUtil::encodeParamId(AppPermission::$tableName));
-        if(AppUtil::isEmpty($id)) {
+        if (AppUtil::isEmpty($id)) {
             ControllerUtil::f404Static();
         }
         $appPermission = $this->appPermissionService->findById($id);
-        if(!$appPermission){
+        if (!$appPermission) {
             ControllerUtil::f404Static();
         }
 
@@ -193,9 +198,9 @@ class AppPermissionController extends  BaseController
         $this->appPermissionService->deletePermissionRoleByPermission($id);
         //then delete permission
         $effectRow = $this->appPermissionService->deleteById($id);
-        if(!$effectRow){
+        if (!$effectRow) {
             $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, false, i18next::getTranslation('error.error_something_wrong'));
-        }else{
+        } else {
             $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, true, i18next::getTranslation(('success.delete_succesfull')));
         }
 

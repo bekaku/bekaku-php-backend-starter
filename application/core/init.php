@@ -16,15 +16,28 @@ spl_autoload_register(function($class) {
         require_once  $path;
     }
 });
-
 require __SITE_PATH .'/application/util/common.php';
 require __SITE_PATH.'/application/core/initRoutes.php';
 
 use application\util\AppUtil;
 use application\util\ControllerUtil;
-use application\util\i18next;
 use application\util\MessageUtils;
-use application\util\SystemConstant;
+
+/*
+|--------------------------------------------------------------------------
+| Reuire Application Configuration
+|--------------------------------------------------------------------------
+*/
+$configPath = getenv('PROJECT_DATA_HOME');
+if (empty($configPath)) {
+    ControllerUtil::displayError('Config file not found.');
+}
+$configPath .= "/configuration/app.php";
+$configArray=null;
+if (file_exists($configPath)) {
+    $configArray = require $configPath;
+}
+define('__APP_CONFIG', $configArray);
 /*
 |--------------------------------------------------------------------------
 | define useful variable for whole project
@@ -50,8 +63,6 @@ define('__UPLOAD_PATH', MessageUtils::getConfig('base_data_path'));
 define('__UPLOAD_PATH_IMG', MessageUtils::getConfig('base_data_path').'/img');
 define('__UPLOAD_PATH_LOGS', MessageUtils::getConfig('base_data_path').'/logs');
 define('__UPLOAD_PATH_FILES', MessageUtils::getConfig('base_data_path').'/files');
-
-
 
 define('__DISPLAY_PATH', $url.MessageUtils::getConfig('base_data_display'));
 define('__DISPLAY_PATH_IMG', $url.MessageUtils::getConfig('base_data_display').'/img');
