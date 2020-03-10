@@ -16,7 +16,7 @@ Repository will be downloaded into `my-app/` folder
 
 ## Database
 
-Database file located at `my-app`/data/files/bekaku_php.sql and you can use below command for restore to your db.
+Database file located at `my-app`/data/files/bekaku_php.sql and you can use following command for restore to your db.
 
 ```sql
 $ mysql -uroot -p your_db_name < your_backup_file_path
@@ -65,7 +65,7 @@ Config your application path at `my-app`/.htaccess
  
 SET ENVIRONMENT VARIABLE IN HTACCESS
 
-An environment variable can also be set with the htaccess file. This method of setting an environment variables requires allowOveride set and the env module enabled. To enable mod_env in ubuntu use the following commands.
+To enable mod_env in ubuntu use the following commands.
 
  ```
 sudo a2enmod env
@@ -87,7 +87,7 @@ SetEnv PROJECT_DATA_HOME D:/xampp/htdocs/my-app/data
 #PROJECT_DATA_DISPLAY is path for access from public
 SetEnv PROJECT_DATA_DISPLAY /my-app/data
 ```
-If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` from ubuntu.
+If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` in ubuntu.
 
 Windows
 ```
