@@ -79,4 +79,5 @@ Route::get("jsongetuniqetoken","Util","jsonGetUniqeToken");
 
 /* TestContronller*/
 Route::get("test","Test","index");
+Route::get("test-uri","Test","index");
 Route::post("test","Test","index");
