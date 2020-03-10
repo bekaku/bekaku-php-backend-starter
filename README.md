@@ -18,15 +18,15 @@ Repository will be downloaded into `my-app/` folder
 
 Database file located at `my-app`/data/files/bekaku_php.sql and you can use below command for restore to your db.
 
-```
+```sql
 $ mysql -uroot -p your_db_name < your_backup_file_path
 ```
 example on windows
-```
+```sql
 $ mysql -uroot -p bekaku_php < E:\bak\db\bekaku_php.sql
 ```
 example on Ubuntu
-```
+```sql
 $ mysql -uroot -p bekaku_php < /var/tmp/bekaku_php.sql
 ```
 Config your database connection at `my-app`/data/configuration/app.php
