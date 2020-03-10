@@ -54,7 +54,7 @@ Config your database connection at `my-app`/data/configuration/app.php
  Config your application path at `my-app`/data/configuration/app.php 
  
  ```php
-$GLOBALS_PROJECT_NAME = "my-app";/your application path name
+$GLOBALS_PROJECT_NAME = "my-app";//your application path name
 $GLOBALS_PROJECT_PATH = "/github/$GLOBALS_PROJECT_NAME/";//path after your web server DocumentRoot 
 
 $GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/my-app/data";//path for access from public
