@@ -51,14 +51,15 @@ Config your database connection at `my-app`/data/configuration/app.php
     ),
 ```
 ## Configuration
- Config your application path at `my-app`/data/configuration/app.php 
+Config your application path at `my-app`/.htaccess
  
- ```php
-$GLOBALS_PROJECT_NAME = "my-app";//your application path name
-$GLOBALS_PROJECT_PATH = "/github/$GLOBALS_PROJECT_NAME/";//path after your web server DocumentRoot 
-
-$GLOBALS_PROJECT_APP_DATA_DISPLAY = "/github/my-app/data";//path for access from public
-$GLOBALS_PROJECT_APP_DATA_UPLOAD = "D:/xampp/htdocs/github/my-app/data/";//real path of 'data' folder
+ ```htaccess
+#PROJECT_HOME is path after your web server DocumentRoot
+SetEnv PROJECT_HOME /github/my-app
+#PROJECT_DATA_HOME is real path of 'data' folder
+SetEnv PROJECT_DATA_HOME D:/xampp/htdocs/github/my-app/data
+#PROJECT_DATA_DISPLAY is path for access from public
+SetEnv PROJECT_DATA_DISPLAY /github/my-app/data
 ```
 If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` from ubuntu.
 
