@@ -50,7 +50,17 @@ Config your database connection at `my-app`/data/configuration/app.php
         'strict'    => false,
     ),
 ```
-## Configuration
+
+## Site Connection
+Config your site connection at `my-app`/data/configuration/app.php
+```php
+    'secure' => false,
+    'url' => 'localhost',//your server's domain or ip
+    'url_port' => '80',//your http port
+    'ssl_port' => '443',//your https port
+```
+
+## Configuration Path
 Config your application path at `my-app`/.htaccess
  
  ```.htaccess
@@ -68,7 +78,7 @@ If you Move your data folders to outside DocumentRoot. You can map Alias directo
 Windows
 ```
 <IfModule mod_alias.c>
-    Alias /myCdn/ "D:/myPath/data/"
+    Alias /myCustomPublicPath/ "D:/myPath/data/"
     <Directory "D:/myPath/data">
         Options Indexes MultiViews
         AllowOverride None
@@ -80,7 +90,7 @@ Windows
 Ubuntu
 ```
 <IfModule mod_alias.c>
-    Alias /myCdn/ "/var/myPath/data/"
+    Alias /myCustomPublicPath/ "/var/myPath/data/"
     <Directory "/var/myPath/data">
         Options Indexes MultiViews
         AllowOverride None
@@ -89,24 +99,3 @@ Ubuntu
     </Directory>
 </IfModule>
 ```
-Connection
-```php
-    'secure' => false,
-    'url' => 'localhost',//your server's domain or ip
-    'url_port' => '80',//your http port
-    'ssl_port' => '443',//your https port
-```
-
- Config your MessageUtils path at `my-app`/application/util/MessageUtils.php 
- ```php
-    $configPath=null;
-    if(AppUtil::getCurrentOS() == SystemConstant::OS_WIN){
-       $configPath = 'D:/xampp/htdocs/github/my-app/data/configuration/app.php';
-     }else if(AppUtil::getCurrentOS() == SystemConstant::OS_LINUX){
-       $configPath = '/var/github/my-app/data/configuration/app.php';
-     }else if(AppUtil::getCurrentOS() == SystemConstant::OS_OSX){
-        $configPath = '/Users/bekaku/github/my-app/data/configuration/app.php';
-      }else{
-        ControllerUtil::displayError('Config file not found.');
-    }
- ```
