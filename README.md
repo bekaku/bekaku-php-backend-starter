@@ -64,6 +64,7 @@ Config your site connection at `my-app`/data/configuration/app.php
 Config your application path at `my-app`/.htaccess
  
 SET ENVIRONMENT VARIABLE IN HTACCESS
+
 An environment variable can also be set with the htaccess file. This method of setting an environment variables requires allowOveride set and the env module enabled. To enable mod_env in ubuntu use the following commands.
 
  ```
