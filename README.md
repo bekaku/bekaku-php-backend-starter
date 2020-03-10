@@ -53,11 +53,13 @@ Config your database connection at `my-app`/data/configuration/app.php
 ## Configuration
 Config your application path at `my-app`/.htaccess
  
- ```htaccess
+ ```.htaccess
 #PROJECT_HOME is path after your web server DocumentRoot
 SetEnv PROJECT_HOME /github/my-app
+
 #PROJECT_DATA_HOME is real path of 'data' folder
 SetEnv PROJECT_DATA_HOME D:/xampp/htdocs/github/my-app/data
+
 #PROJECT_DATA_DISPLAY is path for access from public
 SetEnv PROJECT_DATA_DISPLAY /github/my-app/data
 ```
