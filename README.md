@@ -9,14 +9,14 @@ Only supported on PHP 5.6 and up.
 
 ### 1. Download this repository
 ```
-git clone https://github.com/bekaku/bekaku-php-backend-starter my-app
+git clone https://github.com/bekaku/bekaku-php-rest-api-starter my-app
 ```
 
 Repository will be downloaded into `my-app/` folder
 
 ## Database
 
-Database file located at `my-app`/data/files/bekaku_php.sql and you can use below command for restore to your db.
+Database file located at `my-app`/data/files/bekaku_php.sql and you can use following command for restore to your db.
 
 ```sql
 $ mysql -uroot -p your_db_name < your_backup_file_path
@@ -29,6 +29,12 @@ example on Ubuntu
 ```sql
 $ mysql -uroot -p bekaku_php < /var/tmp/bekaku_php.sql
 ```
+default admin username and password
+```
+Username : admin
+Password : P@ssw0rd
+```
+
 Config your database connection at `my-app`/data/configuration/app.php
 ```php
     /*
@@ -63,6 +69,20 @@ Config your site connection at `my-app`/data/configuration/app.php
 ## Configuration Path
 Config your application path at `my-app`/.htaccess
  
+SET ENVIRONMENT VARIABLE IN HTACCESS
+
+To enable mod_env in ubuntu use the following commands.
+
+ ```
+sudo a2enmod env
+sudo service apache2 restart
+ ```
+ 
+ ```
+SetEnv MYAPP_ENV envValue
+ ```
+
+
  ```.htaccess
 #PROJECT_HOME is path after your web server DocumentRoot
 SetEnv PROJECT_HOME /my-app
@@ -73,7 +93,7 @@ SetEnv PROJECT_DATA_HOME D:/xampp/htdocs/my-app/data
 #PROJECT_DATA_DISPLAY is path for access from public
 SetEnv PROJECT_DATA_DISPLAY /my-app/data
 ```
-If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` from ubuntu.
+If you Move your data folders to outside DocumentRoot. You can map Alias directory at `apacheFolder\conf\httpd.conf` Or `/etc/apache2/apache2.conf` in ubuntu.
 
 Windows
 ```
