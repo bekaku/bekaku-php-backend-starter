@@ -13,15 +13,16 @@ use application\util\i18next;
 
 class IndexController extends AppController
 {
-    public function __construct($databaseConnection){
+    public function __construct($databaseConnection)
+    {
         $this->setDbConn($databaseConnection);
         $this->isAuthRequired = false;
     }
-    public function index(){
-        $this->jsonResponse(
-            $this->setResponseStatus(
-                $this->getDefaultResponse(), true,i18next::getTranslation('app.system_name'))
-        );
+
+    public function index()
+    {
+        $this->pushDataToView = $this->setResponseStatus(array(), true, i18next::getTranslation('app.system_name'));
+        $this->jsonResponse($this->pushDataToView);
 
     }
 }
