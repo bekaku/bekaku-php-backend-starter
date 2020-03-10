@@ -788,7 +788,7 @@ class AppTableController extends BaseController
             $strText .= "    public function crudDelete()" . "\r\n";
             $strText .= "    {" . "\r\n";
             $strText .= "        $" . "this->pushDataToView = $" . "this->getDefaultResponse(true);" . "\r\n";
-            $strText .= "        $" . "idParams = FilterUtils::filterGetInt(SystemConstant::ID_PARAMS);//paramiter format : idOfNo1_idOfNo2_idOfNo3_idOfNo4 ..." . "\r\n";
+            $strText .= "        $" . "idParams = FilterUtils::filterGetString(SystemConstant::ID_PARAMS);//paramiter format : idOfNo1_idOfNo2_idOfNo3_idOfNo4 ..." . "\r\n";
             $strText .= "        $" . "idArray = explode(SystemConstant::UNDER_SCORE, $" . "idParams);" . "\r\n";
             $strText .= "        if (count($" . "idArray) > 0) {" . "\r\n";
             $strText .= "            foreach ($" . "idArray AS $" . "id) {" . "\r\n";
@@ -1553,10 +1553,10 @@ class AppTableController extends BaseController
         $strText .= "|--------------------------------------------------------------------------" . " <br>";
         $strText .= "*/" . " <br>";
         $strText .= "Route::get(\"" . $this->appTableModuleSubName . "List\",\"" . $this->appTableModuleName . "\",\"crudList\",\"" . $appTable->getAppTableName() . "_list\");" . "<br>";
-        $strText .= "Route::get(\"" . $this->appTableModuleSubName . "Add\",\"" . $this->appTableModuleName . "\",\"crudAdd\",\"" . $appTable->getAppTableName() . "_add\");" . "<br>";
+        $strText .= "Route::post(\"" . $this->appTableModuleSubName . "Add\",\"" . $this->appTableModuleName . "\",\"crudAdd\",\"" . $appTable->getAppTableName() . "_add\");" . "<br>";
         $strText .= "Route::get(\"" . $this->appTableModuleSubName . "ReadSingle\",\"" . $this->appTableModuleName . "\",\"crudReadSingle\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
         $strText .= "Route::post(\"" . $this->appTableModuleSubName . "Edit\",\"" . $this->appTableModuleName . "\",\"crudEdit\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
-        $strText .= "Route::post(\"" . $this->appTableModuleSubName . "Delete\",\"" . $this->appTableModuleName . "\",\"crudDelete\",\"" . $appTable->getAppTableName() . "_delete\");";
+        $strText .= "Route::get(\"" . $this->appTableModuleSubName . "Delete\",\"" . $this->appTableModuleName . "\",\"crudDelete\",\"" . $appTable->getAppTableName() . "_delete\");";
         return $strText;
     }
 
