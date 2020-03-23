@@ -83,6 +83,7 @@
 			"error":"Error",
 			"oops":"Oops!!",
 			"login_wrong":"Login failed, please verify that your username and password are correct.",
+			"loginSessionExpired": "Expired session Please login again.",
 			"seleted_data_del_frist":"Please select at least 1 information.",
 			"validate_require":"This field must be filled in",
 			"validate_unique":"This value is already in use",
@@ -94,7 +95,8 @@
 			"validate_date":"Wrong format date 'yyy-MM-dd'",
 			"contact_admin":"There was an error, please contact the administrator.",
 			"error_something_wrong":"Something went wrong!!",
-			"permissionDeny":"Users do not have permission to access this information."
+			"permissionDeny":"Users do not have permission to access this information.",
+			"err_404": "Page not found."
 		},
 		"success": {
 			"success": "Success",

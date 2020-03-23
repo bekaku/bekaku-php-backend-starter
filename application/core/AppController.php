@@ -227,7 +227,7 @@ class AppController
         return apache_request_headers();
     }
 
-    public function getDefaultResponse($isOk=true)
+    public function getDefaultResponse($isOk = true)
     {
         if ($isOk) {
             return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_STATUS_CODE_ATT => 200, SystemConstant::SERVER_MSG_ATT => "");
@@ -244,18 +244,8 @@ class AppController
         return $data;
     }
 
-    public function jsonResponse($data = array())
+    public function jsonResponse($data = [], $status = 200)
     {
-        echo json_encode($data);
+        jsonResponse($data, $status);
     }
-
-    public function jsonResponseApi($data = array())
-    {
-        if ($data[SystemConstant::SERVER_STATUS_CODE_ATT] == SystemConstant::HTTP_OK) {
-            echo json_encode($data[SystemConstant::SERVER_RESPONSE_DATA]);
-        } else {
-            echo json_encode($data);
-        }
-    }
-
 }

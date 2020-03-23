@@ -54,8 +54,10 @@ class AuthenService extends DatabaseSupport
                         $hashPasswordInDb = $this->userUpdateSalt($password, $userIdInDb);
                     }
                     // Get the user-agent string of the user. for apiKey
-                    $userAgent = FilterUtils::filterServer('HTTP_USER_AGENT');
-                    $dataReturn[SystemConstant::USER_API_KEY_ATT] = ControllerUtil::genHashPassword($hashPasswordInDb, $userAgent);
+//                    $userAgent = FilterUtils::filterServer('HTTP_USER_AGENT');
+//                    $dataReturn[SystemConstant::USER_API_KEY_ATT] = ControllerUtil::genHashPassword($hashPasswordInDb, $userAgent);
+                    $hashUserDescription = ControllerUtil::genHashPassword(FilterUtils::filterServer('HTTP_USER_AGENT'), $userIdInDb.DateUtils::getTimeNow());
+                    $dataReturn[SystemConstant::USER_API_KEY_ATT] = ControllerUtil::genHashPassword(ControllerUtil::getRadomSault(), $hashUserDescription);
                     $dataReturn[SystemConstant::SERVER_MSG_ATT] = null;
                     $dataReturn[SystemConstant::SERVER_STATUS_ATT] = true;
                 } else {

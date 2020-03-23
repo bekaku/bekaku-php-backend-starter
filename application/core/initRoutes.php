@@ -15,7 +15,7 @@ use application\core\Route as Route;
 | IndexController
 |--------------------------------------------------------------------------
 */
-Route::get("index","Index","index");
+Route::get([],"index","Index","index");
 /*
 |--------------------------------------------------------------------------
 | AppTableController
@@ -27,57 +27,58 @@ Route::get("index","Index","index");
 //Route::post("apptabledelete","AppTable","crudDelete","app_table_delete");
 //Route::get("apptableedit","AppTable","crudEdit","app_table_edit");
 //Route::post("apptableedit","AppTable","crudEditProcess","app_table_edit");
-Route::get("generateStarter","AppTable","crudAdd");
-Route::post("generateStarter","AppTable","crudAddProcess");
+Route::get([],"generateStarter","AppTable","crudAdd");
+Route::post([],"generateStarter","AppTable","crudAddProcess");
 /*
 |--------------------------------------------------------------------------
 | AppPermissionController
 |--------------------------------------------------------------------------
 */
-Route::get("apppermissionlist","AppPermission","crudList","app_permission_list");
-Route::post("apppermissionadd","AppPermission","crudAdd","app_permission_add");
-Route::get("apppermissiondelete","AppPermission","crudDelete","app_permission_delete");
-Route::post("apppermissionedit","AppPermission","crudEdit","app_permission_edit");
+Route::get(['AuthApi'],"apppermissionlist","AppPermission","crudList","app_permission_list");
+Route::post(['AuthApi'],"apppermissionadd","AppPermission","crudAdd","app_permission_add");
+Route::get(['AuthApi'],"apppermissiondelete","AppPermission","crudDelete","app_permission_delete");
+Route::post(['AuthApi'],"apppermissionedit","AppPermission","crudEdit","app_permission_edit");
 
 /*
 |--------------------------------------------------------------------------
 | AppUserRoleController
 |--------------------------------------------------------------------------
 */
-Route::get("appuserrolelist","AppUserRole","crudList","app_user_role_list");
-Route::post("appuserroleadd","AppUserRole","crudAdd","app_user_role_add");
-Route::get("appuserroledelete","AppUserRole","crudDelete","app_user_role_delete");
-Route::post("appuserroleedit","AppUserRole","crudEdit","app_user_role_edit");
+Route::get(['AuthApi'],"appuserrolelist","AppUserRole","crudList","app_user_role_list");
+Route::post(['AuthApi'],"appuserroleadd","AppUserRole","crudAdd","app_user_role_add");
+Route::get(['AuthApi'],"appuserroledelete","AppUserRole","crudDelete","app_user_role_delete");
+Route::post(['AuthApi'],"appuserroleedit","AppUserRole","crudEdit","app_user_role_edit");
 
-Route::post("appuserrolepermission","AppUserRole","rolePermission","app_user_role_add");
+Route::post(['AuthApi'],"appuserrolepermission","AppUserRole","rolePermission","app_user_role_add");
 /*
 |--------------------------------------------------------------------------
 | AppUserController
 |--------------------------------------------------------------------------
 */
-Route::get("appuserlist","AppUser","crudList","app_user_list");
-Route::post("appuseradd","AppUser","crudAdd","app_user_add");
-Route::post("appuseredit","AppUser","crudEdit","app_user_edit");
-Route::get("appuserdelete","AppUser","crudDelete","app_user_delete");
-Route::post("appuseruploadimage","AppUser","uploadImage","app_user_add");
-Route::post("appUserChangePwd","AppUser","changePwd","app_user_add");
+Route::get(['AuthApi'],"appuserlist","AppUser","crudList","app_user_list");
+Route::post(['AuthApi'],"appuseradd","AppUser","crudAdd","app_user_add");
+Route::post(['AuthApi'],"appuseredit","AppUser","crudEdit","app_user_edit");
+Route::get(['AuthApi'],"appuserdelete","AppUser","crudDelete","app_user_delete");
+Route::post(['AuthApi'],"appuseruploadimage","AppUser","uploadImage","app_user_add");
+Route::post(['AuthApi'],"appUserChangePwd","AppUser","changePwd","app_user_add");
 /*
 |--------------------------------------------------------------------------
 | AuthenApiController
 |--------------------------------------------------------------------------
 */
-Route::post("appUserAuthen","AuthenApi","appUserAuthen");
-Route::get("checkUserAuthenApi","AuthenApi","checkUserAuthenApi");
+Route::post([],"appUserAuthen","AuthenApi","appUserAuthen");
+Route::get(['AuthApi'],"appUserLogout","AuthenApi","appUserLogout");
+Route::get(['AuthApi'],"checkUserAuthenApi","AuthenApi","checkUserAuthenApi");
 /*
 |--------------------------------------------------------------------------
 | UtilController
 |--------------------------------------------------------------------------
 */
-Route::post("changeSystemLocale","Util","changeSystemLocale");
-Route::get("changeSystemLocale","Util","changeSystemLocale");
-Route::get("jsongetuniqetoken","Util","jsonGetUniqeToken");
+Route::post([],"changeSystemLocale","Util","changeSystemLocale");
+Route::get([],"changeSystemLocale","Util","changeSystemLocale");
+Route::get([],"jsongetuniqetoken","Util","jsonGetUniqeToken");
 
 /* TestContronller*/
-Route::get("test","Test","index");
-Route::get("test-uri","Test","index");
-Route::post("test","Test","index");
+Route::get([],"test","Test","index");
+Route::get(['AuthApi'],"test-uri","Test","index");
+Route::post(['AuthApi'],"test","Test","index");

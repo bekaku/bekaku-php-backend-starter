@@ -9,22 +9,20 @@
 namespace application\controller;
 
 use application\core\AppController;
-use application\util\AppUtil;
+use application\util\ControllerUtil;
 use application\util\FilterUtils;
 use application\util\JWT;
-use application\util\MessageUtils;
 use application\util\SystemConstant;
 
 class TestController extends AppController
 {
     public function __construct($databaseConnection){
-
-        $this->headerContentType = SystemConstant::CONTENT_TYPE_TEXT_HTML;
         $this->setDbConn($databaseConnection);
         $this->isAuthRequired = false;
     }
     public function index(){
         echoln("TestController");
+        echoln('pwd : '.ControllerUtil::hashSha512('P@ssw0rd'));
     }
     private function testEncodeJWT($secretServerkey)
     {

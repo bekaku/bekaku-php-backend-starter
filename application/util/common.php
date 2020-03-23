@@ -201,3 +201,11 @@ function curPageNameParam() {
 	$pageURL = substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1).$uri;
 	return $pageURL;
 }
+function jsonResponse($res = array(), $status = 200) {
+    if(!headers_sent()){
+        header(SystemConstant::CONTENT_TYPE_APPLICATION_JSON);
+        header("HTTP/1.0 $status ");
+    }
+    echo json_encode($res);
+    exit();
+}

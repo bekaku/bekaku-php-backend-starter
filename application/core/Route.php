@@ -1,5 +1,6 @@
 <?php namespace application\core;
 
+use application\middleware\SetLocale;
 use application\service\ApiClientService;
 use application\service\AppUserService as AppUserService;
 use application\service\AuthenService;
@@ -27,6 +28,7 @@ class Route
 {
     //static value
     public static $METHOD_TYPE_ATT = "methodType";
+    public static $MIDDLEWARE_ATT = "middleWare";
     public static $URL_ATT = "url";
     public static $CONTROLLER_ATT = "controller";
     public static $ACTION_ATT = "action";
@@ -44,7 +46,7 @@ class Route
     public static $CONTROLLER_POST_FIX = 'Controller';
 
     public static $routeList = array();
-
+    public static $middleware = [];
     public static $methodType;
     public static $url;
     public static $controllerName;
@@ -53,7 +55,7 @@ class Route
     public static $permissionName;
     public static $paramToActionController = array();
 
-    public static function get($url, $controller, $method, $permission = null)
+    public static function get($middleWare = [], $url = null, $controller = null, $method = null, $permission = null)
     {
 
         $data[] = "";
@@ -65,46 +67,75 @@ class Route
                 $data[Route::$PERMISSION_ATT] = $permission;
                 array_push(Route::$routeList, $data);
         */
-        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_GET_VAL;
-        $data[self::$URL_ATT] = $url;
-        $data[self::$CONTROLLER_ATT] = $controller;
-        $data[self::$ACTION_ATT] = $method;
-        $data[self::$PERMISSION_ATT] = $permission;
-        array_push(self::$routeList, $data);
+//        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_GET_VAL;
+//        $data[self::$MIDDLEWARE_ATT] = $middleWare;
+//        $data[self::$URL_ATT] = $url;
+//        $data[self::$CONTROLLER_ATT] = $controller;
+//        $data[self::$ACTION_ATT] = $method;
+//        $data[self::$PERMISSION_ATT] = $permission;
+
+        array_push(self::$routeList, [
+            self::$METHOD_TYPE_ATT=> self::$METHOD_TYPE_GET_VAL,
+            self::$MIDDLEWARE_ATT=> $middleWare,
+            self::$URL_ATT=> $url,
+            self::$CONTROLLER_ATT=> $controller,
+            self::$ACTION_ATT=> $method,
+            self::$PERMISSION_ATT=> $permission,
+        ]);
 
     }
 
-    public static function post($url, $controller, $method, $permission = null)
+    public static function post($middleWare = [], $url = null, $controller = null, $method = null, $permission = null)
     {
+//        $data[] = "";
+//        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_POST_VAL;
+//        $data[self::$MIDDLEWARE_ATT] = $middleWare;
+//        $data[self::$URL_ATT] = $url;
+//        $data[self::$CONTROLLER_ATT] = $controller;
+//        $data[self::$ACTION_ATT] = $method;
+//        $data[self::$PERMISSION_ATT] = $permission;
+//        array_push(self::$routeList, $data);
 
-        $data[] = "";
-
-        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_POST_VAL;
-        $data[self::$URL_ATT] = $url;
-        $data[self::$CONTROLLER_ATT] = $controller;
-        $data[self::$ACTION_ATT] = $method;
-        $data[self::$PERMISSION_ATT] = $permission;
-        array_push(self::$routeList, $data);
+        array_push(self::$routeList, [
+            self::$METHOD_TYPE_ATT=> self::$METHOD_TYPE_POST_VAL,
+            self::$MIDDLEWARE_ATT=> $middleWare,
+            self::$URL_ATT=> $url,
+            self::$CONTROLLER_ATT=> $controller,
+            self::$ACTION_ATT=> $method,
+            self::$PERMISSION_ATT=> $permission,
+        ]);
 
     }
 
-    public static function put($url, $controller, $method, $permission = null)
+    public static function put($middleWare = [], $url = null, $controller = null, $method = null, $permission = null)
     {
+//        $data[] = "";
+//        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_PUT_VAL;
+//        $data[self::$MIDDLEWARE_ATT] = $middleWare;
+//        $data[self::$URL_ATT] = $url;
+//        $data[self::$CONTROLLER_ATT] = $controller;
+//        $data[self::$ACTION_ATT] = $method;
+//        $data[self::$PERMISSION_ATT] = $permission;
+//        array_push(self::$routeList, $data);
 
-        $data[] = "";
-
-        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_PUT_VAL;
-        $data[self::$URL_ATT] = $url;
-        $data[self::$CONTROLLER_ATT] = $controller;
-        $data[self::$ACTION_ATT] = $method;
-        $data[self::$PERMISSION_ATT] = $permission;
-        array_push(self::$routeList, $data);
+        array_push(self::$routeList, [
+            self::$METHOD_TYPE_ATT=> self::$METHOD_TYPE_PUT_VAL,
+            self::$MIDDLEWARE_ATT=> $middleWare,
+            self::$URL_ATT=> $url,
+            self::$CONTROLLER_ATT=> $controller,
+            self::$ACTION_ATT=> $method,
+            self::$PERMISSION_ATT=> $permission,
+        ]);
 
     }
 
     public static function route($url)
     {
         self::initProductionMode();
+        //set middleware locale
+        new SetLocale();
+        //End set locale
+
         //open database connection
         $databaseBase = new DatabaseBase();
         if ($databaseBase->getSystemConnection()) {
@@ -113,6 +144,7 @@ class Route
             /* check in normal url mode */
             $isUrlExit = self::isUrlExit($url);
             if ($isUrlExit) {
+                self::middleware($databaseBase->getSystemConnection());
                 self::controller($databaseBase->getSystemConnection());
             } else {
                 ControllerUtils::f404Static('Error 404');
@@ -123,34 +155,36 @@ class Route
             $databaseBase->closeConnection();
             unset($databaseBase);
         }
+    }
 
+    public static function middleware($connection)
+    {
+        $middlewares = self::$middleware;
+        foreach ($middlewares AS $mid) {
+            if (file_exists(__SITE_PATH . '/application/middleware/' . $mid . '.php')) {
+                $middlewareName = '\\application\\middleware\\' . $mid;
+                require_once(__SITE_PATH . '/application/middleware/' . $mid . '.php');
+                if ($mid == SecurityUtil::PERMISSION_GRANT_MIDDLEWARE) {
+                    new $middlewareName($connection, self::$permissionName);
+                } else {
+                    new $middlewareName($connection);
+                }
+            }
+        }
     }
 
     public static function controller($connection)
     {
-
         if (file_exists(__SITE_PATH . '/application/controller/' . self::$controllerName . self::$CONTROLLER_POST_FIX . '.php')) {
-
             try {
                 $controllerName = '\\application\\controller\\' . self::$controllerName . self::$CONTROLLER_POST_FIX;
                 require_once(__SITE_PATH . '/application/controller/' . self::$controllerName . self::$CONTROLLER_POST_FIX . '.php');
                 $controllerClass = new $controllerName($connection);
-
-//                if ($controllerClass->headerContentType!=SystemConstant::$CONTENT_TYPE_APPLICATION_JSON){
-                header($controllerClass->headerContentType);
-//                }
-
-
-                //check if login require
-                self::authorizationManage($controllerClass->isAuthRequired, $connection);
-
-
                 if (!AppUtils::isArrayEmpty(self::$paramToActionController)) {
                     $controllerClass->{self::$actionName}(self::$paramToActionController);
                 } else {
                     $controllerClass->{self::$actionName}();
                 }
-
                 unset($controllerClass);
             } catch (Exception $e) {
                 ControllerUtils::f404Static();
@@ -159,44 +193,6 @@ class Route
             ControllerUtils::f404Static();
         }
     }
-
-    private static function authorizationManage($isAuthRequired, $connection)
-    {
-
-        //check if login require
-        if ($isAuthRequired) {
-
-            $authorizationData = SecurityUtil::requiredTokenAuthorization(new AuthenService($connection), new ApiClientService($connection));
-            $payLoad = $authorizationData['payload'];
-            $locale = $payLoad['locale'] ? $payLoad['locale'] : ControllerUtil::getCurrentLocale();
-            //set locale
-            ControllerUtil::i18nextInit($locale);
-            if (!AppUtils::isEmpty(self::$permissionName)) {
-                if (!ControllerUtils::isPermissionByUserId($connection, $payLoad[SystemConstant::JWT_USER_ID_ATT], self::$permissionName)) {
-                    ControllerUtils::displayError(i18next::getTranslation('error.permissionDeny'));
-                }
-            }
-        } else {
-            //get normal authorization
-            //verify authoriztion by pass on developer mode test
-            $isProductionMode = MessageUtils::getConfig('production_mode');
-            if ($isProductionMode) {
-                $jwt = SecurityUtil::decodeJWTAuthorizationData(SecurityUtil::getRequestHeaders(), new ApiClientService($connection));
-                if (!$jwt[SystemConstant::SERVER_STATUS_ATT]) {
-                    ControllerUtil::f401Static(null, $jwt);
-                } else {
-                    $payLoad = $jwt['payload'];
-                    $locale = $payLoad['locale'] ? $payLoad['locale'] : ControllerUtil::getCurrentLocale();
-                    //set locale
-                    ControllerUtil::i18nextInit($locale);
-                }
-            } else {
-                //set locale
-                ControllerUtil::i18nextInit(ControllerUtil::getCurrentLocale());
-            }
-        }
-    }
-
     /**
      * @param $url
      * @return bool
@@ -217,6 +213,7 @@ class Route
             if ($route[self::$URL_ATT] == $url && $route[self::$METHOD_TYPE_ATT] == self::$requestMethod) {
 
                 self::$methodType = $route[self::$METHOD_TYPE_ATT];
+                self::$middleware = $route[self::$MIDDLEWARE_ATT];
                 self::$url = $route[self::$URL_ATT];
                 self::$controllerName = $route[self::$CONTROLLER_ATT];
                 self::$actionName = $route[self::$ACTION_ATT];

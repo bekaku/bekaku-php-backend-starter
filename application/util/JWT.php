@@ -7,6 +7,7 @@
  */
 
 namespace application\util;
+
 use DomainException;
 use UnexpectedValueException;
 
@@ -22,9 +23,9 @@ use UnexpectedValueException;
 class JWT
 {
     /**
-     * @param string      $jwt    The JWT
-     * @param string|null $key    The secret key
-     * @param bool        $verify Don't skip verification process
+     * @param string $jwt The JWT
+     * @param string|null $key The secret key
+     * @param bool $verify Don't skip verification process
      *
      * @return object The JWT's payload as a PHP object
      */
@@ -37,30 +38,30 @@ class JWT
         if (count($tks) != 3) {
 //            throw new UnexpectedValueException('Wrong number of segments');
 
-            $msg .='Wrong number of segments <br>';
+            $msg .= 'Wrong number of segments <br>';
             $isSign = false;
-        }else{
+        } else {
             list($headb64, $payloadb64, $cryptob64) = $tks;
             if (null === ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))
             ) {
 //            throw new UnexpectedValueException('Invalid segment encoding');
-                $msg .='Invalid segment encoding <br>';
+                $msg .= 'Invalid segment encoding <br>';
                 $isSign = false;
             }
 
-            if($isSign){
+            if ($isSign) {
 
                 if (null === $payload = JWT::jsonDecode(JWT::urlsafeB64Decode($payloadb64))
                 ) {
 //            throw new UnexpectedValueException('Invalid segment encoding');
-                    $msg .='Invalid segment encoding <br>';
-                    $isSign= false;
-                }else{
+                    $msg .= 'Invalid segment encoding <br>';
+                    $isSign = false;
+                } else {
                     $isSign = true;
                 }
             }
 
-            if($isSign) {
+            if ($isSign) {
                 $sig = JWT::urlsafeB64Decode($cryptob64);
                 if ($verify) {
                     if (empty($header->alg)) {
@@ -77,24 +78,25 @@ class JWT
             }
         }
 
-        if(!$isSign){
-            $data[SystemConstant::SERVER_STATUS_ATT] = $isSign;
-            $data[SystemConstant::SERVER_MSG_ATT] = $msg;
-        }else{
+        if (!$isSign) {
+            $data["status"] = $isSign;
+            $data["msg"] = $msg;
+            $data["payload"] = null;
+        } else {
 
-            $data[SystemConstant::SERVER_STATUS_ATT] = $isSign;
-            $data[SystemConstant::SERVER_MSG_ATT] = $msg;
-            $dataPayLoad = null;
-//            $array = json_decode(json_encode($payload), true);
-//            print_r($array);
-            foreach($payload as $key => $value){
-                $dataPayLoad[$key] = $value;
-            }
-//            $data["payload"] = $payload ? json_decode(json_encode($payload[0]), true) : null;
-            $data["payload"] = $dataPayLoad;
+            $data["status"] = $isSign;
+            $data["msg"] = $msg;
+//            $dataPayLoad = [];
+//            foreach ($payload as $key => $value) {
+//                $dataPayLoad[$key] = $value;
+//            }
+//            print_r($dataPayLoad);
+//            $data["payload"] = count($dataPayLoad) > 0 ? $dataPayLoad[0] : $dataPayLoad;
+            $data["payload"] = is_array($payload) && count($payload) > 0 ? $payload[0] : $payload;
         }
         return $data;
     }
+
     private static function objectToArray($d)
     {
         if (is_object($d)) {
@@ -115,10 +117,11 @@ class JWT
             return $d;
         }
     }
+
     /**
      * @param object|array $payload PHP object or array
-     * @param string       $key     The secret key
-     * @param string       $algo    The signing algorithm
+     * @param string $key The secret key
+     * @param string $algo The signing algorithm
      *
      * @return string A JWT
      */
@@ -133,9 +136,10 @@ class JWT
         $segments[] = JWT::urlsafeB64Encode($signature);
         return implode('.', $segments);
     }
+
     /**
-     * @param string $msg    The message to sign
-     * @param string $key    The secret key
+     * @param string $msg The message to sign
+     * @param string $key The secret key
      * @param string $method The signing algorithm
      *
      * @return string An encrypted message
@@ -152,6 +156,7 @@ class JWT
         }
         return hash_hmac($methods[$method], $msg, $key, true);
     }
+
     /**
      * @param string $input JSON string
      *
@@ -162,12 +167,12 @@ class JWT
         $obj = json_decode($input);
         if (function_exists('json_last_error') && $errno = json_last_error()) {
             JWT::handleJsonError($errno);
-        }
-        else if ($obj === null && $input !== 'null') {
+        } else if ($obj === null && $input !== 'null') {
             throw new DomainException('Null result with non-null input');
         }
         return $obj;
     }
+
     /**
      * @param object|array $input A PHP object or array
      *
@@ -178,12 +183,12 @@ class JWT
         $json = json_encode($input);
         if (function_exists('json_last_error') && $errno = json_last_error()) {
             JWT::handleJsonError($errno);
-        }
-        else if ($json === 'null' && $input !== null) {
+        } else if ($json === 'null' && $input !== null) {
             throw new DomainException('Null result with non-null input');
         }
         return $json;
     }
+
     /**
      * @param string $input A base64 encoded string
      *
@@ -198,6 +203,7 @@ class JWT
         }
         return base64_decode(strtr($input, '-_', '+/'));
     }
+
     /**
      * @param string $input Anything really
      *
@@ -207,6 +213,7 @@ class JWT
     {
         return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
     }
+
     /**
      * @param int $errno An error number from json_last_error()
      *
@@ -219,17 +226,15 @@ class JWT
             JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
             JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON'
         );
-//        throw new DomainException(isset($messages[$errno])
-//            ? $messages[$errno]
-//            : 'Unknown JSON error: ' . $errno
-//        );
-        ControllerUtil::displayError(isset($messages[$errno])
+        throw new DomainException(isset($messages[$errno])
             ? $messages[$errno]
-            : 'Unknown JSON error: ' . $errno);
+            : 'Unknown JSON error: ' . $errno
+        );
     }
 
 
-    public static function defaultJWTHeaderHS256(){
+    public static function defaultJWTHeaderHS256()
+    {
 
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));

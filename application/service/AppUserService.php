@@ -103,6 +103,20 @@ class AppUserService extends DatabaseSupport implements AppUserServiceInterface
         }
         return false;
     }
+    public function findByIdArr($id)
+    {
+        $query = "SELECT ";
+        $query .="app_user.`username` AS `username` ";
+        $query .=",app_user.`email` AS `email` ";
+        $query .=",app_user.`status` AS `status` ";
+        $query .=",app_user.`img_name` AS `img_name` ";
+        $query .="FROM app_user AS app_user ";
+        $query .="WHERE app_user.`id`=:id ";
+
+        $this->query($query);
+        $this->bind(":id", (int)$id);
+        return $this->single();
+    }
     public function findUserRoleById($id)
     {
         $query = "SELECT app_user_role from app_user_role_roles ";

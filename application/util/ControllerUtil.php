@@ -312,48 +312,34 @@ class ControllerUtil
 
     public static function f404Static($theme = "default")
     {
-//		if(!headers_sent()){
-//			header("HTTP/1.0 404 Not Found");
-//		}
-
-        echo json_encode(array(
+	 jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
-            SystemConstant::SERVER_STATUS_CODE_ATT => 404,
-            SystemConstant::SERVER_MSG_ATT => "HTTP/1.0 404 Not Found"
-        ));
-        exit;
+            SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.err_404')
+        ],404);
     }
 
     public static function f401Static($msg, $responseArray = null)
     {
-//		if(!headers_sent()){
-//			header("HTTP/1.0 401 Unauthorized");
-//		}
-        $defaultResponse = array(
+        jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
-            SystemConstant::SERVER_STATUS_CODE_ATT => 401,
-            SystemConstant::SERVER_MSG_ATT => $msg);
-        $response = $responseArray ? $responseArray : $defaultResponse;
-        echo json_encode($response);
-        exit;
+            SystemConstant::SERVER_MSG_ATT => $msg
+        ],401);
     }
 
     public static function displaySqlError($err_msg_str, $theme = "default")
     {
-        echo json_encode(array(
+        jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
             SystemConstant::SERVER_MSG_ATT => $err_msg_str
-        ));
-        exit;
+        ],200);
     }
 
     public static function displayError($err_msg_str, $theme = "default")
     {
-        echo json_encode(array(
+        jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
             SystemConstant::SERVER_MSG_ATT => $err_msg_str
-        ));
-        exit;
+        ],200);
     }
 
     public static function setErrorMessage($err_msg_str)

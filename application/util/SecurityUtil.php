@@ -17,53 +17,54 @@ use application\service\AuthenService;
 
 class SecurityUtil
 {
+    const PERMISSION_GRANT_MIDDLEWARE = 'PermissionGrant';
     public static function getRequestHeaders()
     {
         return apache_request_headers();
     }
-
-    public static function decodeJWTAuthorizationData($header, ApiClientService $apiClientService = null, $isChekApi = true)
+    public static function getReqHeaderByAtt($attName = null)
     {
-        $authKey = isset($header['Authorization']) ? $header['Authorization'] : "";
-//        $authKey ="key=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.W3siYXBpQ2xpZW50IjoiY3R0X2xvZ2lzdGljIn1d._RMZcdLabS2AiXBoB6PHt3fEmKD7jh_i_bdt3ldQVHs";
-        $authorization = FilterUtils::filterVarString($authKey);
-
-        $jwtToken = null;
+        $headers = self::getRequestHeaders();
+        return $attName != null && !empty($headers) && isset($headers[$attName]) ? FilterUtils::filterVarString($headers[$attName]) : null;
+    }
+    public static function decodeJWT($verify = false, $secretServerkey=null)
+    {
+        $authorization = self::getReqHeaderByAtt('Authorization');
+        if (!$authorization) {
+            $authorization = (isset($_GET['key']) ? "key=" . FilterUtils::filterVarString($_GET['key']) : null);
+        }
+        $jwt = null;
         if ($authorization) {
-
             $jwtKeyArr = explode("key=", $authorization);
+            $jwtToken = null;
             if (count($jwtKeyArr) > 0) {
                 $jwtToken = $jwtKeyArr[1];
             }
-            //step 1
-            $jwt = JWT::decode($jwtToken, null, false);
-
-            if (!$jwt) {
-                return self::defaultDenyResponse();
+            $jwt = JWT::decode($jwtToken, $secretServerkey, $verify);
+            if ($verify) {
+                $payLoad = $jwt['payload'];
+                if (!empty($payLoad)) {
+                    if ($payLoad->exp <= DateUtils::getTimeNow()) {
+                        jsonResponse([
+                            SystemConstant::SERVER_STATUS_ATT => false,
+                            SystemConstant::SERVER_MSG_ATT => 'JWT Request timeout',
+                        ], 401);
+                    }
+                } else {
+                    jsonResponse([
+                        SystemConstant::SERVER_STATUS_ATT => false,
+                        SystemConstant::SERVER_MSG_ATT => 'JWT Signature verification failed',
+                    ], 401);
+                }
             }
 
-            //if not required api client verify return payload
-            if (!$isChekApi) {
-                return $jwt;
-            }
-
-            $payLoad = isset($jwt['payload']) ? $jwt['payload'] : null;
-            if (!$payLoad) {
-                return self::defaultDenyResponse();
-            }
-
-            //if jwt req timeout
-            if (isset($payLoad['exp']) && $payLoad['exp'] <= DateUtils::getTimeNow()) {
-                $response = self::defaultDenyResponse();
-                $response[SystemConstant::SERVER_MSG_ATT] = 'JWT Request timeout';
-                return $response;
-            }
-            $verify = self::verifyApiClient($jwtToken, $apiClientService, $payLoad);
-
-            return $verify ? $jwt : self::defaultDenyResponse();
         } else {
-            return self::defaultDenyResponse();
+            jsonResponse([
+                SystemConstant::SERVER_STATUS_ATT => false,
+                SystemConstant::SERVER_MSG_ATT => 'JWT Signature verification failed',
+            ], 401);
         }
+        return $jwt;
     }
 
     private static function verifyApiClient($jwtToken, ApiClientService $apiClientService, $payLoad)
@@ -122,38 +123,6 @@ class SecurityUtil
 
     }
 
-    public static function requiredTokenAuthorization(AuthenService $authenService, ApiClientService $apiClientService)
-    {
-        $authorizationData = self::decodeJWTAuthorizationData(self::getRequestHeaders(), $apiClientService);
-
-        if (!$authorizationData[SystemConstant::SERVER_STATUS_ATT]) {
-            $data[SystemConstant::SERVER_STATUS_ATT] = $authorizationData[SystemConstant::SERVER_STATUS_ATT];
-            $data[SystemConstant::SERVER_MSG_ATT] = $authorizationData[SystemConstant::SERVER_MSG_ATT];
-            $data[SystemConstant::SERVER_STATUS_CODE_ATT] = 401;
-            $data[SystemConstant::LOGIN_SESSION_EXPIRE] = true;
-            ControllerUtil::f401Static(null, $data);
-        } else {
-            $payload = $authorizationData['payload'];
-            if (isset($payload[SystemConstant::JWT_USER_ID_ATT]) && isset($payload['key'])) {
-                $isTokenAuthenCheck = $authenService->checkUserAuthenApi($payload[SystemConstant::JWT_USER_ID_ATT], $payload['key']);
-                if (!$isTokenAuthenCheck) {
-                    $data[SystemConstant::LOGIN_SESSION_EXPIRE] = true;
-                    $data[SystemConstant::SERVER_STATUS_ATT] = false;
-                    $data[SystemConstant::SERVER_MSG_ATT] = "Session Expired Login again";
-                    $data[SystemConstant::SERVER_STATUS_CODE_ATT] = 401;
-                    ControllerUtil::f401Static(null, $data);
-                }
-            } else {
-                $data[SystemConstant::LOGIN_SESSION_EXPIRE] = true;
-                $data[SystemConstant::SERVER_STATUS_ATT] = false;
-                $data[SystemConstant::SERVER_MSG_ATT] = "Session Expired Login again";
-                $data[SystemConstant::SERVER_STATUS_CODE_ATT] = 401;
-                ControllerUtil::f401Static(null, $data);
-            }
-        }
-
-        return $authorizationData;
-    }
 
     public static function isPermission($connection, $permission)
     {
@@ -175,23 +144,6 @@ class SecurityUtil
         }
         return true;
     }
-
-    public static function isPermissionByUserId($connection, $userId, $permission)
-    {
-        $permissionService = new AppPermissionService($connection);
-        $isPermised = $permissionService->checkPermissionByUserId($userId, $permission);
-        unset($permissionService);
-        return $isPermised;
-    }
-
-    public static function getAppUserLoged($connection)
-    {
-        $appUserServices = new AppUserService($connection);
-        $appUser = $appUserServices->findById(ControllerUtil::getUserIdSession());
-        unset($appUserServices);
-        return $appUser;
-    }
-
     private static function defaultDenyResponse()
     {
         return array(
@@ -205,13 +157,13 @@ class SecurityUtil
 
     public static function getJwtPayload()
     {
-        $jwt = self::decodeJWTAuthorizationData(self::getRequestHeaders(), null, false);
+        $jwt = self::decodeJWT(false);
         return isset($jwt['payload']) ? $jwt['payload'] : null;
     }
 
     public static function getAppuserIdFromJwtPayload()
     {
         $jwtPaylaod = self::getJwtPayload();
-        return isset($jwtPaylaod[SystemConstant::JWT_USER_ID_ATT]) ? $jwtPaylaod[SystemConstant::JWT_USER_ID_ATT] : null;
+        return $jwtPaylaod && isset($jwtPaylaod->uid) ? $jwtPaylaod->uid : null;
     }
 }

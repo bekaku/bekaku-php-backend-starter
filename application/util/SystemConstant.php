@@ -13,6 +13,7 @@ class SystemConstant
 {
     const CODE_VERSION = 1;
     const LOCALE_ATT = "appLocale";
+    const HEADER_LOCALE_ATT = "X-Locale";
     const LOCALE_TH = "th";
     const LOCALE_EN = "en";
     const PRODUCTION_MODE_DEVELOP = "development";
