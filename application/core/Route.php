@@ -35,10 +35,9 @@ class Route
     public static $PERMISSION_ATT = "permission";
 
     public static $METHOD_TYPE_GET_VAL = "GET";//select
-    public static $METHOD_TYPE_POST_VAL = "POST";//update
-    public static $METHOD_TYPE_PUT_VAL = "PUT";//create
-    public static $METHOD_TYPE_PATCH_VAL = "PATCH";//update
-    public static $METHOD_TYPE_DELETE_VAL = "DELETE";//update
+    public static $METHOD_TYPE_POST_VAL = "POST";//create
+    public static $METHOD_TYPE_PUT_VAL = "PUT";//update
+    public static $METHOD_TYPE_DELETE_VAL = "DELETE";//delete
 
     public static $DEFAULT_URL_HOME = "public";//home dashboard
     public static $CONTROLLER_METHOD_INDEX = "index";
@@ -109,23 +108,30 @@ class Route
 
     public static function put($middleWare = [], $url = null, $controller = null, $method = null, $permission = null)
     {
-//        $data[] = "";
-//        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_PUT_VAL;
-//        $data[self::$MIDDLEWARE_ATT] = $middleWare;
-//        $data[self::$URL_ATT] = $url;
-//        $data[self::$CONTROLLER_ATT] = $controller;
-//        $data[self::$ACTION_ATT] = $method;
-//        $data[self::$PERMISSION_ATT] = $permission;
-//        array_push(self::$routeList, $data);
 
-        array_push(self::$routeList, [
-            self::$METHOD_TYPE_ATT=> self::$METHOD_TYPE_PUT_VAL,
-            self::$MIDDLEWARE_ATT=> $middleWare,
-            self::$URL_ATT=> $url,
-            self::$CONTROLLER_ATT=> $controller,
-            self::$ACTION_ATT=> $method,
-            self::$PERMISSION_ATT=> $permission,
-        ]);
+        $data[] = "";
+
+        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_PUT_VAL;
+        $data[self::$MIDDLEWARE_ATT] = $middleWare;
+        $data[self::$URL_ATT] = $url;
+        $data[self::$CONTROLLER_ATT] = $controller;
+        $data[self::$ACTION_ATT] = $method;
+        $data[self::$PERMISSION_ATT] = $permission;
+        array_push(self::$routeList, $data);
+
+    }
+    public static function delete($middleWare = [], $url = null, $controller = null, $method = null, $permission = null)
+    {
+
+        $data[] = "";
+
+        $data[self::$METHOD_TYPE_ATT] = self::$METHOD_TYPE_DELETE_VAL;
+        $data[self::$MIDDLEWARE_ATT] = $middleWare;
+        $data[self::$URL_ATT] = $url;
+        $data[self::$CONTROLLER_ATT] = $controller;
+        $data[self::$ACTION_ATT] = $method;
+        $data[self::$PERMISSION_ATT] = $permission;
+        array_push(self::$routeList, $data);
 
     }
 
@@ -175,10 +181,10 @@ class Route
 
     public static function controller($connection)
     {
-        if (file_exists(__SITE_PATH . '/application/controller/' . self::$controllerName . self::$CONTROLLER_POST_FIX . '.php')) {
+        if (file_exists(__SITE_PATH . '/application/controller/' . self::$controllerName  . '.php')) {
             try {
-                $controllerName = '\\application\\controller\\' . self::$controllerName . self::$CONTROLLER_POST_FIX;
-                require_once(__SITE_PATH . '/application/controller/' . self::$controllerName . self::$CONTROLLER_POST_FIX . '.php');
+                $controllerName = '\\application\\controller\\' . self::$controllerName;
+                require_once(__SITE_PATH . '/application/controller/' . self::$controllerName . '.php');
                 $controllerClass = new $controllerName($connection);
                 if (!AppUtils::isArrayEmpty(self::$paramToActionController)) {
                     $controllerClass->{self::$actionName}(self::$paramToActionController);

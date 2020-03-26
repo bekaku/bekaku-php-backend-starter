@@ -1552,11 +1552,11 @@ class AppTableController extends BaseController
         $strText .= "| " . $this->appTableModuleName . "Controller <br>";
         $strText .= "|--------------------------------------------------------------------------" . " <br>";
         $strText .= "*/" . " <br>";
-        $strText .= "Route::get(\"" . $this->appTableModuleSubName . "List\",\"" . $this->appTableModuleName . "\",\"crudList\",\"" . $appTable->getAppTableName() . "_list\");" . "<br>";
-        $strText .= "Route::post(\"" . $this->appTableModuleSubName . "Add\",\"" . $this->appTableModuleName . "\",\"crudAdd\",\"" . $appTable->getAppTableName() . "_add\");" . "<br>";
-        $strText .= "Route::get(\"" . $this->appTableModuleSubName . "ReadSingle\",\"" . $this->appTableModuleName . "\",\"crudReadSingle\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
-        $strText .= "Route::post(\"" . $this->appTableModuleSubName . "Edit\",\"" . $this->appTableModuleName . "\",\"crudEdit\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
-        $strText .= "Route::get(\"" . $this->appTableModuleSubName . "Delete\",\"" . $this->appTableModuleName . "\",\"crudDelete\",\"" . $appTable->getAppTableName() . "_delete\");";
+        $strText .= "Route::get(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudList\",\"" . $appTable->getAppTableName() . "_list\");" . "<br>";
+        $strText .= "Route::post(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudAdd\",\"" . $appTable->getAppTableName() . "_add\");" . "<br>";
+        $strText .= "Route::get(['AuthApi'],\"" . $this->appTableModuleSubName . "ReadSingle\",\"" . $this->appTableModuleName . "Controller\",\"crudReadSingle\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
+        $strText .= "Route::put(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudEdit\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
+        $strText .= "Route::delete(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudDelete\",\"" . $appTable->getAppTableName() . "_delete\");";
         return $strText;
     }
 

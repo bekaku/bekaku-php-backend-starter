@@ -11,7 +11,7 @@
  Target Server Version : 50539
  File Encoding         : 65001
 
- Date: 09/03/2020 17:09:01
+ Date: 23/03/2020 17:40:08
 */
 
 SET NAMES utf8mb4;
@@ -290,12 +290,36 @@ CREATE TABLE `app_user`  (
   INDEX `k_created_user`(`created_user`) USING BTREE,
   INDEX `k_updated_user`(`updated_user`) USING BTREE,
   INDEX `k_login_password`(`login_password`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of app_user
 -- ----------------------------
 INSERT INTO `app_user` VALUES (1, 'admin', 'admin@yourmail.com', '55be81a4f0b53f445d515474e85bdaf2ae186332ff7424964e73a842caa69db757df3d0a16ca9cc523fb7c1fd6b848b4647cd00302c31bef7105f7675f82600c', 'd54f6c95d3f21288dfc5be75033b6d6bc98cb1fb1f82db6b19f5dacf8c44807509e3d2017cd0b228289b1afb4f3c7f376a1b2c8de8f72f4b2ce1c7065a7310bf', 1, NULL, 1, '2020-03-09 11:06:01', 1, '2020-03-09 09:46:36');
+
+-- ----------------------------
+-- Table structure for app_user_access_tokens
+-- ----------------------------
+DROP TABLE IF EXISTS `app_user_access_tokens`;
+CREATE TABLE `app_user_access_tokens`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `token` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `app_user` int(11) UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `api_client` int(11) NULL DEFAULT NULL,
+  `revoked` tinyint(1) NOT NULL DEFAULT 0,
+  `expires_at` datetime NULL DEFAULT NULL,
+  `created_date` datetime NULL DEFAULT NULL,
+  `updated_date` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`, `token`) USING BTREE,
+  INDEX `app_user_access_tokens_user_id_index`(`app_user`) USING BTREE,
+  INDEX `app_user_access_tokens_api_client`(`api_client`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Records of app_user_access_tokens
+-- ----------------------------
+INSERT INTO `app_user_access_tokens` VALUES (1, 'fa31442d915fbbf195e93eaee9d362a13a9e132228b5374386a6b9f950e9ef55e09285dfd83a7c865f49b3a6a2bd08185a367eb5d3e5e2e03ce912e655a5a406', 1, 'PostmanRuntime/7.23.0', 1, 0, '2021-03-23 07:03:33', '2020-03-23 07:59:33', '2020-03-23 08:13:22');
 
 -- ----------------------------
 -- Table structure for app_user_login
@@ -309,7 +333,14 @@ CREATE TABLE `app_user_login`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   INDEX `k_app_user`(`app_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Records of app_user_login
+-- ----------------------------
+INSERT INTO `app_user_login` VALUES (1, '2020-03-23 07:59:33', '::1', 1);
+INSERT INTO `app_user_login` VALUES (2, '2020-03-23 08:14:18', '::1', 1);
+INSERT INTO `app_user_login` VALUES (3, '2020-03-23 08:14:38', '::1', 1);
 
 -- ----------------------------
 -- Table structure for app_user_login_attempts
@@ -455,6 +486,27 @@ CREATE TABLE `user_log`  (
   INDEX `FK_USER_LOG_UPDATEDUSER`(`updated_user`) USING BTREE,
   CONSTRAINT `FK_USER_LOG_CREATEDUSER` FOREIGN KEY (`created_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_USER_LOG_UPDATEDUSER` FOREIGN KEY (`updated_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Table structure for user_log_copy1
+-- ----------------------------
+DROP TABLE IF EXISTS `user_log_copy1`;
+CREATE TABLE `user_log_copy1`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activity` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `act_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `img_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `created_user` int(11) NULL DEFAULT NULL,
+  `created_date` datetime NULL DEFAULT NULL,
+  `updated_user` int(11) NULL DEFAULT NULL,
+  `updated_date` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_USER_LOG_CREATEDUSER`(`created_user`) USING BTREE,
+  INDEX `FK_USER_LOG_UPDATEDUSER`(`updated_user`) USING BTREE,
+  CONSTRAINT `user_log_copy1_ibfk_1` FOREIGN KEY (`created_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `user_log_copy1_ibfk_2` FOREIGN KEY (`updated_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 SET FOREIGN_KEY_CHECKS = 1;
