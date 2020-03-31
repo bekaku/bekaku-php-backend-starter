@@ -469,8 +469,10 @@ class AppTableController extends BaseController
             $strText .= "        $" . "query .=\"FROM " . $appTable->getAppTableName() . " AS " . $appTable->getAppTableName() . " \";" . "\r\n";
             $strText .= "" . "\r\n";
 
-            $strText .= "		//where query" . "\r\n";
+            $strText .= "		//default where query" . "\r\n";
             $strText .= "        $" . "query .=\" WHERE " . $appTable->getAppTableName() . ".`id` IS NOT NULL \";" . "\r\n";
+            $strText .= "		//custom where query" . "\r\n";
+            $strText .= "       //$"."query .= \"WHERE ".$appTable->getAppTableName().".custom_field =:customParam \";" . "\r\n";
             $strText .= "" . "\r\n";
             $strText .= "        //gen additional query and sort order" . "\r\n";
             $strText .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPage($" . "q_parameter, $" . "this->tableName);" . "\r\n";
@@ -483,6 +485,10 @@ class AppTableController extends BaseController
             $strText .= "           }" . "\r\n";
             $strText .= "       }" . "\r\n";
             $strText .= "" . "\r\n";
+            
+            $strText .= "        //custom where paramier" . "\r\n";
+            $strText .= "       // $"."data_bind_where['custom_field']=$"."paramValue;" . "\r\n";
+            $strText .= "       //end" . "\r\n";
 
             $strText .= "        //paging buider" . "\r\n";
             $strText .= "        if($" . "perpage>0){" . "\r\n";
