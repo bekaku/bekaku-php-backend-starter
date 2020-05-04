@@ -1,14 +1,14 @@
 <?php
-/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
 
 namespace application\service;
 
 use application\core\BaseDatabaseSupport;
-use application\serviceInterface\ApiClientServiceInterface;
+use application\serviceInterface\UserServiceInterface;
+use application\util\UploadUtil;
 
-class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceInterface
+class UserService extends BaseDatabaseSupport implements UserServiceInterface
 {
-    protected $tableName = 'api_client';
+    protected $tableName = 'user';
 
     public function __construct($dbConn)
     {
@@ -20,14 +20,14 @@ class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceIn
         //if have param
         $data_bind_where = null;
 
-        $query = "SELECT *  ";
+        $query = "SELECT id, username, email, image, created_at ";
 
-        $query .= "FROM api_client AS api_client ";
+        $query .= "FROM user AS user ";
 
         //default where query
-        $query .= " WHERE api_client.`id` IS NOT NULL ";
+        $query .= " WHERE user.`id` IS NOT NULL ";
         //custom where query
-        //$query .= "WHERE api_client.custom_field =:customParam ";
+        //$query .= "WHERE user.custom_field =:customParam ";
 
         //gen additional query and sort order
         $additionalParam = $this->genAdditionalParamAndWhereForListPage($q_parameter, $this->tableName);
@@ -54,32 +54,75 @@ class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceIn
         //$this->bind(":q_name", "%".$q_parameter['q_name']."%");//bind param for 'LIKE'
         //$this->bind(":q_name", $q_parameter['q_name']);//bind param for '='
         //END BIND VALUE FOR REGULAR QUERY
-
         //bind param for search param
         $this->genBindParamAndWhereForListPage($data_bind_where);
-
-        return $this->list();
+        $listTmp = $this->list();
+        $list = [];
+        if ($listTmp) {
+            foreach ($listTmp AS $item) {
+                $item->id = (int)$item->id;
+                $item->picture = UploadUtil::getUserAvatarApi($item->image, $item->created_at);
+                array_push($list, $item);
+            }
+        }
+        return $list;
     }
 
     public function findById($id)
     {
         $query = "SELECT *  ";
 
-        $query .= "FROM api_client AS api_client ";
-        $query .= "WHERE api_client.`id`=:id ";
+        $query .= "FROM user AS user ";
+        $query .= "WHERE user.`id`=:id ";
 
         $this->query($query);
         $this->bind(":id", (int)$id);
         return $this->single();
     }
 
-    public function findByApiName($name)
+    public function findUserDataById($id)
+    {
+        $query = "SELECT id, username, email, image, created_at, status  FROM `user` WHERE `id`=:id ";
+        $this->query($query);
+        $this->bind(":id", (int)$id);
+        $data = $this->single();
+        if ($data) {
+            $data->picture = UploadUtil::getUserAvatarApi($data->image, $data->created_at);
+            $data->status = (bool)$data->status;
+            $data->userRoles = $this->findUserRolesId($data->id);
+            unset($data->image);
+            return $data;
+        }
+        return null;
+    }
+
+    public function findByUsername($username)
     {
         $query = "SELECT *  ";
-        $query .= "FROM api_client AS api_client ";
-        $query .= "WHERE api_client.`api_name`=:api_name ";
+        $query .= "FROM user AS user ";
+        $query .= "WHERE user.`username`=:username ";
         $this->query($query);
-        $this->bind(":api_name", (string)$name);
+        $this->bind(":username", (string)$username);
+        return $this->single();
+    }
+
+    public function findByEmail($email)
+    {
+        $query = "SELECT *  ";
+        $query .= "FROM user AS user ";
+        $query .= "WHERE user.`email`=:email ";
+        $this->query($query);
+        $this->bind(":email", (string)$email);
+        return $this->single();
+    }
+
+    public function findForAuthenByEmail($email)
+    {
+        $query = "SELECT *  ";
+        $query .= "FROM user AS user ";
+        $query .= "WHERE user.`email`=:email AND user.status IS TRUE";
+        $this->query($query);
+        $this->bind(":email", (string)$email);
         return $this->single();
     }
 
@@ -111,13 +154,18 @@ class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceIn
         return $this->updateObjectHelper($object, $where_array, $whereType);
     }
 
-//api_client_ip
-    public function findIpByClientIdAndIp($apiId, $ip)
+    public function findUserRolesId($userId)
     {
-        $query = "SELECT * FROM api_client_ip AS api_client_ip  WHERE api_client_ip.api_client=:api_client AND api_client_ip.api_address=:api_address";
+        $query = "SELECT role FROM user_role WHERE user=:user";
         $this->query($query);
-        $this->bind(":api_client", (int)$apiId);
-        $this->bind(":api_address", (string)$ip);
-        return $this->single();
+        $this->bind(":user", $userId);
+        $listTmp = $this->list();
+        $list = [];
+        if ($listTmp) {
+            foreach ($listTmp AS $item) {
+                array_push($list, $item->role);
+            }
+        }
+        return $list;
     }
 }

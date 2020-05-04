@@ -3,10 +3,10 @@
 namespace application\service;
 
 use application\core\BaseDatabaseSupport;
-use application\serviceInterface\ApiClientIpServiceInterface;
-class ApiClientIpService extends BaseDatabaseSupport implements ApiClientIpServiceInterface
+use application\serviceInterface\RoleServiceInterface;
+class RoleService extends BaseDatabaseSupport implements RoleServiceInterface
 {
-    protected $tableName = 'api_client_ip';
+    protected $tableName = 'role';
 
     public function __construct($dbConn){
         $this->setDbh($dbConn);
@@ -18,12 +18,12 @@ class ApiClientIpService extends BaseDatabaseSupport implements ApiClientIpServi
 
         $query = "SELECT *  ";
 
-        $query .="FROM api_client_ip AS api_client_ip ";
+        $query .="FROM role AS role ";
 
 		//default where query
-        $query .=" WHERE api_client_ip.`id` IS NOT NULL ";
+        $query .=" WHERE role.`id` IS NOT NULL ";
 		//custom where query
-       //$query .= "WHERE api_client_ip.custom_field =:customParam ";
+       //$query .= "WHERE role.custom_field =:customParam ";
 
         //gen additional query and sort order
        $additionalParam = $this->genAdditionalParamAndWhereForListPage($q_parameter, $this->tableName);
@@ -61,8 +61,8 @@ class ApiClientIpService extends BaseDatabaseSupport implements ApiClientIpServi
     {
         $query = "SELECT *  ";
 
-        $query .="FROM api_client_ip AS api_client_ip ";
-        $query .="WHERE api_client_ip.`id`=:id ";
+        $query .="FROM role AS role ";
+        $query .="WHERE role.`id`=:id ";
 
         $this->query($query);
         $this->bind(":id", (int)$id);
@@ -75,9 +75,20 @@ class ApiClientIpService extends BaseDatabaseSupport implements ApiClientIpServi
         $this->bind(":id", (int)$id);
         return $this->execute();
     }
+    public function deleteUserRoleByUserId($uid)
+    {
+        $query = "DELETE FROM user_role WHERE user=:uid";
+        $this->query($query);
+        $this->bind(":uid", (int)$uid);
+        return $this->execute();
+    }
     public function createByArray($data_array)
     {
         return $this->insertHelper($this->tableName, $data_array);
+    }
+    public function createUserRoleByArray($data_array)
+    {
+        return $this->insertHelper('user_role', $data_array);
     }
     public function createByObject($oject)
     {

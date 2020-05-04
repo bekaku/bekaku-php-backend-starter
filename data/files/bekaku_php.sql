@@ -11,7 +11,7 @@
  Target Server Version : 50539
  File Encoding         : 65001
 
- Date: 23/03/2020 17:40:08
+ Date: 04/05/2020 10:17:57
 */
 
 SET NAMES utf8mb4;
@@ -220,34 +220,6 @@ INSERT INTO `app_permission_role` VALUES (654, 3, 22, 1, '2018-08-13 09:49:59', 
 INSERT INTO `app_permission_role` VALUES (655, 3, 23, 1, '2018-08-13 09:49:59', 1, '2018-08-13 09:49:59');
 
 -- ----------------------------
--- Table structure for app_statistic_day
--- ----------------------------
-DROP TABLE IF EXISTS `app_statistic_day`;
-CREATE TABLE `app_statistic_day`  (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `ip_add` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `ss_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `count_date` date NULL DEFAULT NULL,
-  `user_angine` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `isBot` varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `PK_ID`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
-
--- ----------------------------
--- Table structure for app_statistic_month
--- ----------------------------
-DROP TABLE IF EXISTS `app_statistic_month`;
-CREATE TABLE `app_statistic_month`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `month_view` int(11) NULL DEFAULT NULL,
-  `month_no` int(2) NULL DEFAULT NULL,
-  `year_no` int(7) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `PK_ID`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
-
--- ----------------------------
 -- Table structure for app_table
 -- ----------------------------
 DROP TABLE IF EXISTS `app_table`;
@@ -314,12 +286,12 @@ CREATE TABLE `app_user_access_tokens`  (
   PRIMARY KEY (`id`, `token`) USING BTREE,
   INDEX `app_user_access_tokens_user_id_index`(`app_user`) USING BTREE,
   INDEX `app_user_access_tokens_api_client`(`api_client`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of app_user_access_tokens
 -- ----------------------------
-INSERT INTO `app_user_access_tokens` VALUES (1, 'fa31442d915fbbf195e93eaee9d362a13a9e132228b5374386a6b9f950e9ef55e09285dfd83a7c865f49b3a6a2bd08185a367eb5d3e5e2e03ce912e655a5a406', 1, 'PostmanRuntime/7.23.0', 1, 0, '2021-03-23 07:03:33', '2020-03-23 07:59:33', '2020-03-23 08:13:22');
+INSERT INTO `app_user_access_tokens` VALUES (4, 'fe7d28371e931e2f1a07818e7f8d4849e91d4efbbf018014a8a2d01080a9318cbb8774a26ae3235c2d316a8e8334b03deb656bb3d724c462c6ca2ecae01c3fc0', 1, 'PostmanRuntime/7.24.1', 1, 0, '2021-05-04 09:05:08', '2020-05-04 09:28:08', '2020-05-04 09:28:08');
 
 -- ----------------------------
 -- Table structure for app_user_login
@@ -333,7 +305,7 @@ CREATE TABLE `app_user_login`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   INDEX `k_app_user`(`app_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of app_user_login
@@ -341,6 +313,7 @@ CREATE TABLE `app_user_login`  (
 INSERT INTO `app_user_login` VALUES (1, '2020-03-23 07:59:33', '::1', 1);
 INSERT INTO `app_user_login` VALUES (2, '2020-03-23 08:14:18', '::1', 1);
 INSERT INTO `app_user_login` VALUES (3, '2020-03-23 08:14:38', '::1', 1);
+INSERT INTO `app_user_login` VALUES (4, '2020-05-04 09:28:08', '::1', 1);
 
 -- ----------------------------
 -- Table structure for app_user_login_attempts
@@ -355,22 +328,6 @@ CREATE TABLE `app_user_login_attempts`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `id`(`id`) USING BTREE,
   INDEX `k_app_user`(`app_user`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
-
--- ----------------------------
--- Table structure for app_user_online
--- ----------------------------
-DROP TABLE IF EXISTS `app_user_online`;
-CREATE TABLE `app_user_online`  (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `sessions` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
-  `app_user` int(11) NULL DEFAULT NULL,
-  `times` int(25) NULL DEFAULT NULL,
-  `ip_address` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `PK_ID`(`id`) USING BTREE,
-  INDEX `FKAPPUSERLOGIN001`(`app_user`) USING BTREE,
-  CONSTRAINT `app_user_online_ibfk_1` FOREIGN KEY (`app_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -428,21 +385,6 @@ INSERT INTO `app_user_role_roles` VALUES (27, 3, 2, 3, '2019-04-03 00:33:56', 3,
 INSERT INTO `app_user_role_roles` VALUES (29, 6, 3, 6, '2019-04-03 17:05:30', 6, '2019-04-03 17:05:30');
 
 -- ----------------------------
--- Table structure for app_view_count
--- ----------------------------
-DROP TABLE IF EXISTS `app_view_count`;
-CREATE TABLE `app_view_count`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `day_count` date NULL DEFAULT NULL,
-  `month_count` date NULL DEFAULT NULL,
-  `day_view` int(11) NULL DEFAULT 0,
-  `month_view` int(11) NULL DEFAULT 0,
-  `total_view` int(11) NULL DEFAULT 0,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `PK_ID`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
-
--- ----------------------------
 -- Table structure for configuration
 -- ----------------------------
 DROP TABLE IF EXISTS `configuration`;
@@ -486,27 +428,6 @@ CREATE TABLE `user_log`  (
   INDEX `FK_USER_LOG_UPDATEDUSER`(`updated_user`) USING BTREE,
   CONSTRAINT `FK_USER_LOG_CREATEDUSER` FOREIGN KEY (`created_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_USER_LOG_UPDATEDUSER` FOREIGN KEY (`updated_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
-
--- ----------------------------
--- Table structure for user_log_copy1
--- ----------------------------
-DROP TABLE IF EXISTS `user_log_copy1`;
-CREATE TABLE `user_log_copy1`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `activity` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `act_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `img_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `created_user` int(11) NULL DEFAULT NULL,
-  `created_date` datetime NULL DEFAULT NULL,
-  `updated_user` int(11) NULL DEFAULT NULL,
-  `updated_date` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_USER_LOG_CREATEDUSER`(`created_user`) USING BTREE,
-  INDEX `FK_USER_LOG_UPDATEDUSER`(`updated_user`) USING BTREE,
-  CONSTRAINT `user_log_copy1_ibfk_1` FOREIGN KEY (`created_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `user_log_copy1_ibfk_2` FOREIGN KEY (`updated_user`) REFERENCES `app_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 SET FOREIGN_KEY_CHECKS = 1;

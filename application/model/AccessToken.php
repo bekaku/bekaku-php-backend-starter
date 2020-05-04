@@ -1,28 +1,33 @@
 <?php
-
 namespace application\model;
 
 use application\core\BaseModel;
-class ApiClientIp extends BaseModel
+class AccessToken extends BaseModel
 {
-    public static $tableName = 'api_client_ip';
+    public static $tableName = 'access_token';
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
     { 
         /* init data type for field*/
         $this->setTableField(array(
             'id' => self::TYPE_AUTO_INCREMENT,
-            'status' => self::TYPE_BOOLEAN,
-            'ip_address' => self::TYPE_STRING,
+            'name' => self::TYPE_STRING,
+            'token' => self::TYPE_STRING,
             'api_client' => self::TYPE_STRING,
+            'user' => self::TYPE_STRING,
+            'revoked' => self::TYPE_INTEGER,
             'created_at' => self::TYPE_DATE_TIME,
+            'expires_at' => self::TYPE_DATE_TIME,
             'updated_at' => self::TYPE_DATE_TIME,
         )); 
  
         /* init data type for field use in update mode*/
         $this->setTableFieldForEdit(array(
-            'status' => self::TYPE_BOOLEAN,
-            'ip_address' => self::TYPE_STRING,
+            'name' => self::TYPE_STRING,
+            'token' => self::TYPE_STRING,
             'api_client' => self::TYPE_STRING,
+            'user' => self::TYPE_STRING,
+            'revoked' => self::TYPE_INTEGER,
+            'expires_at' => self::TYPE_DATE_TIME,
             'updated_user' => self::TYPE_INTEGER,
             'updated_date' => self::TYPE_DATE_TIME
         ));

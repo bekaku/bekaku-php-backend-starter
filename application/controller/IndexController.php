@@ -16,13 +16,12 @@ class IndexController extends AppController
     public function __construct($databaseConnection)
     {
         $this->setDbConn($databaseConnection);
-        $this->isAuthRequired = false;
     }
 
     public function index()
     {
-        $this->pushDataToView = $this->setResponseStatus(array(), true, i18next::getTranslation('app.system_name'));
-        $this->jsonResponse($this->pushDataToView);
+        $this->pushDataToView = $this->setResponseStatus([], true, i18next::getTranslation('app.system_name'));
+        jsonResponse($this->pushDataToView);
 
     }
 }

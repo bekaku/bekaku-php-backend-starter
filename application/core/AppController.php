@@ -103,47 +103,6 @@ class AppController
         $this->rowPerPage = $rowPerPage;
     }
 
-    public function initBaseCreateData($data_array = array())
-    {
-        $data_array['created_user'] = ControllerUtils::getUserIdSession();
-        $data_array['created_date'] = DateUtil::getDateNow();
-        $data_array['updated_user'] = ControllerUtils::getUserIdSession();
-        $data_array['updated_date'] = DateUtil::getDateNow();
-        return $data_array;
-    }
-
-    public function initBaseCreateDataByUid($data_array, $uid)
-    {
-        $data_array['created_user'] = $uid;
-        $data_array['created_date'] = DateUtil::getDateNow();
-        $data_array['updated_user'] = $uid;
-        $data_array['updated_date'] = DateUtil::getDateNow();
-        return $data_array;
-    }
-
-    public function initBaseUpdateData($data_array)
-    {
-        $data_array['updated_user'] = ControllerUtils::getUserIdSession();
-        $data_array['updated_date'] = DateUtil::getDateNow();
-        return $data_array;
-    }
-
-    public function initBaseCreateDataRestApi($data, $uid)
-    {
-        $data->setCreatedUser($uid);
-        $data->setCreatedDate(DateUtil::getDateNow());
-        $data->setUpdatedUser($uid);
-        $data->setUpdatedDate(DateUtil::getDateNow());
-        return $data;
-    }
-
-    public function initBaseUpdateDataRestApi($data, $uid)
-    {
-        $data->setUpdatedUser($uid);
-        $data->setUpdatedDate(DateUtil::getDateNow());
-        return $data;
-    }
-
     public function initSearchParam($object)
     {
         $tableFiedArray = $object->getTableField();
@@ -230,22 +189,16 @@ class AppController
     public function getDefaultResponse($isOk = true)
     {
         if ($isOk) {
-            return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_STATUS_CODE_ATT => 200, SystemConstant::SERVER_MSG_ATT => "");
+            return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_MSG_ATT => null);
         }
-        return array(SystemConstant::SERVER_STATUS_ATT => false, SystemConstant::SERVER_STATUS_CODE_ATT => 200, SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.error_something_wrong'));
+        return array(SystemConstant::SERVER_STATUS_ATT => false, SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.error_something_wrong'));
     }
 
-    public function setResponseStatus($data = array(), $status = true, $msg = "")
+    public function setResponseStatus($data = [], $status = true, $msg = null)
     {
         $data[SystemConstant::SERVER_STATUS_ATT] = $status;
         $data[SystemConstant::SERVER_MSG_ATT] = $msg;
-        $data[SystemConstant::SERVER_STATUS_CODE_ATT] = 200;
-
         return $data;
     }
 
-    public function jsonResponse($data = [], $status = 200)
-    {
-        jsonResponse($data, $status);
-    }
 }

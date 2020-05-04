@@ -11,11 +11,10 @@ use application\util\FilterUtils;
 use application\util\i18next;
 use application\util\SystemConstant;
 
-$validateErrors = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW[SystemConstant::APP_VALIDATE_ERR_ATT])) ? $_V_DATA_TO_VIEW[SystemConstant::APP_VALIDATE_ERR_ATT] : array();
+$validateErrors = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['errors'])) ? $_V_DATA_TO_VIEW['errors'] : array();
 $appTable = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['appTable'])) ? $_V_DATA_TO_VIEW['appTable'] : array();
 $msgJsonGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['msgJsonGen'])) ? $_V_DATA_TO_VIEW['msgJsonGen'] : "";
 $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'])) ? $_V_DATA_TO_VIEW['routListGen'] : "";
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -80,7 +79,7 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                         <label class="label">Table Name</label>
                         <div class="control has-icons-left has-icons-right">
                             <input maxlength="80" placeholder="Table Name" type="text"
-                                   value="<?= $appTable->getAppTableName() ?>" name="app_table_name" id="app_table_name"
+                                   value="role" name="app_table_name" id="app_table_name"
                                    class="input <?= (array_key_exists('app_table_name', $validateErrors)) ? "is-danger" : "" ?>">
                             <span class="icon is-small is-left"><i class="fas fa-table"></i></span>
                         </div>
@@ -88,7 +87,7 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                     </div>
                     <div class="field">
                         <label class="label">Description</label>
-                            <textarea name="description" id="description" class="textarea <?= (array_key_exists('description', $validateErrors)) ? "is-danger" : "" ?>"><?=$appTable->getDescription()?></textarea>
+                            <textarea name="description" id="description" class="textarea <?= (array_key_exists('description', $validateErrors)) ? "is-danger" : "" ?>">role</textarea>
                         <?= (array_key_exists('description', $validateErrors)) ? " <p class=\"help is-danger\">" . $validateErrors['description'] . "</p>" : "" ?>
                     </div>
 
@@ -119,12 +118,19 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
 <!--                            Form View-->
 <!--                        </label>-->
                         <label class="checkbox">
-                            <input value="1" type="checkbox" name="vmsg" id="vmsg">
+                            <input value="1" checked type="checkbox" name="vmsg" id="vmsg">
                             Model Message
                         </label>
                         <label class="checkbox">
                             <input value="1" checked type="checkbox" name="vroute" id="vroute">
                             Route List
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label class="label">Model</label>
+                        <label class="checkbox">
+                            <input value="1" checked="checked" type="checkbox" name="auditInfo" id="auditInfo">
+                            Audit info
                         </label>
                     </div>
 

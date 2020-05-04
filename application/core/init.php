@@ -17,7 +17,7 @@ spl_autoload_register(function($class) {
     }
 });
 require __SITE_PATH .'/application/util/common.php';
-require __SITE_PATH.'/application/core/initRoutes.php';
+require __SITE_PATH.'/application/route/api.php';
 
 use application\util\AppUtil;
 use application\util\ControllerUtil;

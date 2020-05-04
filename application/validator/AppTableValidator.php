@@ -8,9 +8,9 @@
 
 namespace application\validator;
 
-use application\core\AppBaseValidator as BaseValidate;
+use application\core\BaseValidator;
 use application\model\AppTable;
-class AppTableValidator extends BaseValidate
+class AppTableValidator extends BaseValidator
 {
     public function __construct(AppTable $appTable)
     {
@@ -19,6 +19,5 @@ class AppTableValidator extends BaseValidate
         $this->objToValidate = $appTable;
         $this->validateField('app_table_name', self::VALIDATE_REQUIRED);
         $this->validateField('description', self::VALIDATE_REQUIRED);
-
     }
 }

@@ -2,13 +2,11 @@
 
 namespace application\middleware;
 
+use application\service\AccessTokenService;
 use application\service\ApiClientService;
-use application\service\AppUserAccessTokensService;
 use application\util\AppUtil;
 use application\util\DateUtils;
-use application\util\FilterUtils;
 use application\util\i18next;
-use application\util\JWT;
 use application\util\MessageUtils;
 use application\util\SecurityUtil;
 use application\util\SystemConstant;
@@ -16,11 +14,14 @@ use application\util\SystemConstant;
 class AuthApi
 {
 
-    private $appUserAccessTokensService;
     /**
      * @var ApiClientService
      */
     private $apiClientService;
+    /**
+     * @var AccessTokenService
+     */
+    private $accessTokenService;
 
     /**
      * AuthApi constructor.
@@ -28,10 +29,9 @@ class AuthApi
      */
     public function __construct($connection = null)
     {
-
         $verify = MessageUtils::getConfig('production_mode');
         if ($verify) {
-            $this->appUserAccessTokensService = new AppUserAccessTokensService($connection);
+            $this->accessTokenService = new AccessTokenService($connection);
             $this->apiClientService = new ApiClientService($connection);
             $this->requiredTokenAuthorization();
         }
@@ -52,20 +52,20 @@ class AuthApi
             return null;
         }
         //step 1
-        if (!$apiClient->isStatus()) {
+        if (!$apiClient->status) {
             return null;
         }
         //don't find in api_client_ip and return true if this api set to bypass
-        if ($apiClient->isBypass()) {
+        if ($apiClient->by_pass) {
             return $apiClient;
         }
 
         $ipAdress = AppUtil::getRealIpAddr();
-        $apiClientIp = $this->apiClientService->findIpByClientIdAndIp($apiClient->getId(), $ipAdress);
+        $apiClientIp = $this->apiClientService->findIpByClientIdAndIp($apiClient->id, $ipAdress);
         if (!$apiClientIp) {
             return null;
         }
-        if (!$apiClientIp->isStatus()) {
+        if (!$apiClientIp->status) {
             return null;
         }
         return $apiClient;
@@ -81,13 +81,13 @@ class AuthApi
             ], 401);
         }
 
-        $jwt = SecurityUtil::decodeJWT(true, $apiClient->getApiToken());
+        $jwt = SecurityUtil::decodeJWT(true, $apiClient->api_token);
         $payload =$jwt['payload'];
-        $accessTokenInDb = $this->appUserAccessTokensService->findByToken($payload->key, true);
+        $accessTokenInDb = $this->accessTokenService->findByToken($payload->key, true);
         $expired = null;
         if ($accessTokenInDb) {
             //check is time expired
-            $expired = $accessTokenInDb['expires_at'] ? DateUtils::convertDateToTimeStamp($accessTokenInDb['expires_at']) : null;
+            $expired = $accessTokenInDb->expires_at ? DateUtils::convertDateToTimeStamp($accessTokenInDb->expires_at) : null;
             if ($expired) {
                 if ($expired <= DateUtils::getTimeNow()) {
                     jsonResponse([

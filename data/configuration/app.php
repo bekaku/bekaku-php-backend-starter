@@ -9,7 +9,6 @@
 
 
 return array(
-    'secret_api_key' => '432646294A404E635266556A586E327235753778214125442A472D4B61506453',//Encription hex key 256bit https://www.allkeysgenerator.com/Random/Security-Encryption-Key-Generator.aspx
     'app_name' => 'begagu',
     'locale' => 'th',
     /*
@@ -145,15 +144,15 @@ return array(
     'db_default_driver' => 'mysql',
     'mysql' => array(
         'driver' => 'mysql',
-        'host' => 'localhost',
+        'host' => 'demo.appedr.com',
         'database' => 'bekaku_php',
         'username' => 'root',
-        'password' => '',
+        'password' => '@Dev@ats[]^9yl',
         'charset' => 'utf8',
         'collation' => 'utf8_general_ci',
         'prefix' => '',
-        'port' => '3306',
-        //'port'    => '13537',
+//        'port' => '3306',
+        'port'    => '13537',
         'strict' => false,
     ),
     'sqlite' => array(

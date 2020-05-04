@@ -8,18 +8,17 @@
 
 namespace application\controller;
 
-use application\core\AppBaseValidator;
 use application\core\AppController as BaseController;
-use application\core\AppModel;
-use application\model\AppTable as AppTable;
-use application\service\AppPermissionService;
-use application\service\AppTableService as AppTableService;
+use application\core\BaseModel;
+use application\core\BaseValidator;
+use application\model\AppTable;
+use application\service\AppTableService;
+use application\service\PermissionService;
 use application\util\AppUtil;
 use application\util\AppUtil as AppUtils;
 use application\util\ControllerUtil as ControllerUtils;
 use application\util\DateUtils;
 use application\util\FilterUtils as FilterUtil;
-use application\util\i18next;
 use application\util\SystemConstant;
 use application\validator\AppTableValidator;
 
@@ -50,14 +49,19 @@ class AppTableController extends BaseController
 
     private $appPermissionService;
 
-    private $autoGenerateTextWarn = "/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/";
+    private $isRequireAuditInfo = true;
 
+    private $autoGenerateTextWarn = "/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/";
+    /**
+     * @var PermissionService
+     */
+    private $permssionService;
     public function __construct($databaseConnection)
     {
 
         $this->setDbConn($databaseConnection);
         $this->appTableService = new AppTableService($this->getDbConn());
-        $this->appPermissionService = new AppPermissionService($this->getDbConn());
+        $this->permssionService = new PermissionService($this->getDbConn());
         $this->isAuthRequired = false;
         $this->headerContentType = SystemConstant::CONTENT_TYPE_TEXT_HTML;
     }
@@ -65,39 +69,22 @@ class AppTableController extends BaseController
     public function __destruct()
     {
         unset($this->appTableService);
-        unset($this->appPermissionService);
-    }
-
-    public function crudList()
-    {
-        $this->metaTitle = i18next::getTranslation('model.app_table.app_table');
-
-        $q_parameter = $this->initSearchParam(new AppTable());
-
-        $this->pushDataToView['appTableList'] = $this->appTableService->findAll($this->getRowPerPage(), $q_parameter);
-        $this->pushDataToView[SystemConstant::APP_PAGINATION_ATT] = $this->appTableService->getPagingLink();
-        $this->loadView($this->APP_TABLE_LIST_VIEW, $this->pushDataToView);
     }
 
     public function crudAdd()
     {
-        $this->pushDataToView['appTable'] = new AppTable(array());
+        $this->pushDataToView['appTable'] = new AppTable();
         $this->loadView($this->APP_TABLE_ADD_VIEW, $this->pushDataToView);
     }
 
     public function crudAddProcess()
     {
-
         $appTable = new AppTable();
         $appTable->populatePostData();
 
         $validator = new AppTableValidator($appTable);
-
-        $errors = $validator->getValidationErrors();
-        if ($errors) {
-            $this->pushDataToView[SystemConstant::APP_VALIDATE_ERR_ATT] = $errors;
-            $this->pushDataToView['appTable'] = $appTable;
-            $this->loadView($this->APP_TABLE_ADD_VIEW, $this->pushDataToView);
+        if ($validator->getValidationErrors()) {
+            $this->loadView($this->APP_TABLE_ADD_VIEW, $validator->getValidationErrors());
         } else {
 
             $isCreateModel = FilterUtil::filterPostInt('model');
@@ -108,12 +95,14 @@ class AppTableController extends BaseController
             $isCreateView = FilterUtil::filterPostInt('vview');
             $isCreateMsg = FilterUtil::filterPostInt('vmsg');
             $isCreateRoute = FilterUtil::filterPostInt('vroute');
-            $this->postTheme = FilterUtil::filterPostString('vtheme');
 
-            $this->appTableName = $appTable->getAppTableName();
+            $this->postTheme = FilterUtil::filterPostString('vtheme');
+            $this->isRequireAuditInfo = FilterUtil::filterPostInt('auditInfo') ? true : false;
+
+            $this->appTableName = $appTable->app_table_name;
             $this->appTableBaseField = $appTable->getTableBaseField();
-            $this->appTableColunm = $this->appTableService->getTableColunm($appTable->getAppTableName());
-            $this->appTableColunmMetaData = $this->appTableService->getTableColunmMetaData($appTable->getAppTableName());
+            $this->appTableColunm = $this->appTableService->getTableColunm($this->appTableName);
+            $this->appTableColunmMetaData = $this->appTableService->getTableColunmMetaData($this->appTableName);
 
             /*
              * Array
@@ -131,8 +120,8 @@ class AppTableController extends BaseController
 
 
             $this->appTableColunmCount = count($this->appTableColunmMetaData);
-            $this->appTableModuleName = AppUtils::genPublicMethodName($appTable->getAppTableName());
-            $this->appTableModuleSubName = AppUtils::genModuleNameFormat($appTable->getAppTableName());
+            $this->appTableModuleName = AppUtils::genPublicMethodName($this->appTableName);
+            $this->appTableModuleSubName = AppUtils::genModuleNameFormat($this->appTableName);
             $msgJsonGen = null;
             $routListGen = null;
 
@@ -180,21 +169,9 @@ class AppTableController extends BaseController
                 $routListGen = $this->createRouteFile($appTable);
             }
 
+            //create crud permission
+            $this->permssionService->createCrudPermission($this->appTableName);
 
-            /*
-            $appTableExit = $this->appTableService->findByTableName($appTable->getAppTableName());
-            if(empty($appTableExit)){
-                $lastInsertId = $this->appTableService->createByObject($appTable);
-                ControllerUtils::setSuccessMessage($lastInsertId.' '.i18next::getTranslation('success.save_genarate_system').$lastInsertId);
-                ControllerUtils::setSuccessMessage(i18next::getTranslation('helper.generated_permission',array('crud' => $appTable->getAppTableName())));
-            }else{
-                $effectRow = $this->appTableService->updateByObject($appTable, array('id'=> $appTableExit->getId()));
-//                $data_where['id'] = $appTableExit->getId();
-//                $effectRow = $this->appTableService->updateByObject($appTable, $data_where);
-                ControllerUtils::setSuccessMessage($effectRow.' '.i18next::getTranslation('success.update_succesfull'));
-            }
-            */
-//            v_rediect('apptableadd');
 
             //test
             $this->pushDataToView['msgJsonGen'] = $msgJsonGen;
@@ -244,31 +221,22 @@ class AppTableController extends BaseController
             $strText .= "" . "\r\n";
             $strText .= "namespace application\\model;" . "\r\n";
             $strText .= "" . "\r\n";
-            $strText .= "use application\\core\\AppModel;" . "\r\n";
-            $strText .= "use application\\util\\UploadUtil;" . "\r\n";
-            $strText .= "use application\\util\\DateUtils;" . "\r\n";
-            $strText .= "class " . $this->appTableModuleName . " extends AppModel" . "\r\n";
+            $strText .= "use application\\core\\BaseModel;" . "\r\n";
+            $strText .= "class " . $this->appTableModuleName . " extends BaseModel" . "\r\n";
             $strText .= "{" . "\r\n";
 
             /* attribute */
-            $strText .= "    public static $" . "tableName = '" . $appTable->getAppTableName() . "';" . "\r\n";
-            $strText .= "" . "\r\n";
-            foreach ($this->appTableColunmMetaData as $colunmMeta) {
-                if (!in_array($colunmMeta['Field'], $this->appTableBaseField)) {
-                    if ($colunmMeta['Field'] != 'status') {
-                        $strText .= "    private $" . $colunmMeta['Field'] . ";" . "\r\n";
-                    } else {
-                        $strText .= "    private $" . "status = true;" . "\r\n";
-                    }
-                }
-            }
-            $strText .= "" . "\r\n";
-            $strText .= "    /*optional field*/" . "\r\n";
-            $strText .= "" . "\r\n";
+            $strText .= "    public static $" . "tableName = '" . $appTable->app_table_name . "';" . "\r\n";
 
             /* __construct */
-            $strText .= "    public function __construct($" . "data = array())" . "\r\n";
+            $strText .= "    public function __construct(\stdClass $" . "jsonData = null, $" . "uid = null, $" . "isUpdate = false)" . "\r\n";
             $strText .= "    {" . " \r\n";
+
+            if (!$this->isRequireAuditInfo) {
+                $strText .= "       //not use audit info" . " \r\n";
+                $strText .= "        $" . "this->setAuditInfo(false);" . " \r\n";
+                $strText .= "" . " \r\n";
+            }
 
             /* init data type for field*/
             $strText .= "        /* init data type for field*/" . "\r\n";
@@ -276,7 +244,7 @@ class AppTableController extends BaseController
             foreach ($this->appTableColunmMetaData as $colunmMeta) {
 
                 if ($colunmMeta['Field'] != 'status') {
-                    $strText .= "            '" . $colunmMeta['Field'] . "' => " . AppModel::getColunmTypeStringByMysqlType($colunmMeta['vType'], $colunmMeta['Extra']) . "," . "\r\n";
+                    $strText .= "            '" . $colunmMeta['Field'] . "' => " . BaseModel::getColunmTypeStringByMysqlType($colunmMeta['vType'], $colunmMeta['Extra']) . "," . "\r\n";
                 } else {
                     $strText .= "            'status' => self::TYPE_BOOLEAN," . "\r\n";
                 }
@@ -292,16 +260,18 @@ class AppTableController extends BaseController
             foreach ($this->appTableColunmMetaData as $colunmMeta) {
                 if (!in_array($colunmMeta['Field'], $this->appTableBaseField)) {
                     if ($colunmMeta['Field'] != 'status') {
-                        $strText .= "            '" . $colunmMeta['Field'] . "' => " . AppModel::getColunmTypeStringByMysqlType($colunmMeta['vType'], $colunmMeta['Extra']) . "," . "\r\n";
+                        $strText .= "            '" . $colunmMeta['Field'] . "' => " . BaseModel::getColunmTypeStringByMysqlType($colunmMeta['vType'], $colunmMeta['Extra']) . "," . "\r\n";
                     } else {
                         $strText .= "            'status' => self::TYPE_BOOLEAN," . "\r\n";
                     }
 
                 }
             }
-            //audit updated
-            $strText .= "            'updated_user' => self::TYPE_INTEGER," . "\r\n";
-            $strText .= "            'updated_date' => self::TYPE_DATE_TIME" . "\r\n";
+            if ($this->isRequireAuditInfo) {
+                //audit updated
+                $strText .= "            'updated_user' => self::TYPE_INTEGER," . "\r\n";
+                $strText .= "            'updated_date' => self::TYPE_DATE_TIME" . "\r\n";
+            }
 
             $strText .= "        ));" . "\r\n";
             $strText .= "" . "\r\n";
@@ -313,8 +283,7 @@ class AppTableController extends BaseController
             $strText .= "        ));" . "\r\n";
             $strText .= "" . "\r\n";
 
-            $strText .= "        $" . "this->populate($" . "data, $" . "this);" . "\r\n";
-            $strText .= "        $" . "this->populateBase($" . "data);" . "\r\n";
+            $strText .= "        $" . "this->populate($" . "jsonData, $" . "this, $" . "uid, $" . "isUpdate);" . "\r\n";
             $strText .= "    }" . "\r\n";
             $strText .= "" . "\r\n";
 
@@ -324,79 +293,7 @@ class AppTableController extends BaseController
             $strText .= "        return self::$" . "tableName;" . "\r\n";
             $strText .= "    }" . "\r\n";
             $strText .= "" . "\r\n";
-
-            /* Getter and Setter*/
-            foreach ($this->appTableColunmMetaData as $colunmMeta) {
-                $field = $colunmMeta['Field'];
-                if (!in_array($field, $this->appTableBaseField)) {
-                    if ($field == 'status') {
-
-                        //getter
-                        $strText .= "    /**" . "\r\n";
-                        $strText .= "     * @return boolean" . "\r\n";
-                        $strText .= "     */" . "\r\n";
-                        $strText .= "    public function isStatus()" . "\r\n";
-                        $strText .= "    {" . "\r\n";
-                        $strText .= "        return $" . "this->status;" . "\r\n";
-                        $strText .= "    }" . "\r\n";
-                        $strText .= "" . "\r\n";
-
-
-                        //setter
-                        $strText .= "    /**" . "\r\n";
-                        $strText .= "     * @param boolean $" . "status" . "\r\n";
-                        $strText .= "     */" . "\r\n";
-                        $strText .= "    public function setStatus($" . "status)" . "\r\n";
-                        $strText .= "    {" . "\r\n";
-                        $strText .= "        $" . "this->status = $" . "status;" . "\r\n";
-                        $strText .= "    }" . "\r\n";
-                        $strText .= "" . "\r\n";
-
-                    } else {
-                        //getter
-                        $strText .= "    /**" . "\r\n";
-                        $strText .= "     * @return " . AppModel::getColunmGetSetTypeByMysqlType($colunmMeta['vType']) . "\r\n";
-                        $strText .= "     */" . "\r\n";
-                        $strText .= "    public function get" . AppUtils::genPublicMethodName($field) . "()" . "\r\n";
-                        $strText .= "    {" . " \r\n";
-
-                        if ($colunmMeta['vType'] == 'date' || $colunmMeta['vType'] == 'datetime') {
-                            $strText .= "        if(!empty($" . "this->" . $field . ")){" . "\r\n";
-                            $strText .= "            return $" . "this->" . $field . ";" . "\r\n";
-                            $strText .= "        }" . "\r\n";
-                            $strText .= "        return DateUtils::getDateNow(" . (($colunmMeta['vType'] == 'date') ? "false" : "true") . ");" . "\r\n";
-                        } else {
-                            $strText .= "        return $" . "this->" . $field . ";" . "\r\n";
-                        }
-
-                        $strText .= "    }" . "\r\n";
-                        $strText .= "" . "\r\n";
-
-                        //setter
-                        $strText .= "    /**" . "\r\n";
-                        $strText .= "     * @param " . AppModel::getColunmGetSetTypeByMysqlType($colunmMeta['vType']) . " $" . $field . "\r\n";
-                        $strText .= "     */" . "\r\n";
-                        $strText .= "    public function set" . AppUtils::genPublicMethodName($field) . "($" . $field . ")" . "\r\n";
-                        $strText .= "    {" . "\r\n";
-                        $strText .= "        $" . "this->" . $field . " = $" . $field . ";" . "\r\n";
-                        $strText .= "    }" . "\r\n";
-                        $strText .= "" . "\r\n";
-
-                        if ($field == 'img_name') {
-                            $strText .= "    /**" . "\r\n";
-                            $strText .= "     * @return bool|string" . "\r\n";
-                            $strText .= "     */" . "\r\n";
-                            $strText .= "    public function getImgNameThumbnail()" . "\r\n";
-                            $strText .= "    {" . "\r\n";
-                            $strText .= "        return UploadUtil::getThumnailImgPath($" . "this->getImgName(),$" . "this->getCreatedDate());" . "\r\n";
-                            $strText .= "    }" . "\r\n";
-                        }
-                    }
-
-                }
-            }
             $strText .= "}";//end of file
-
             fwrite($objFopen, $strText);
             fclose($objFopen);
         }
@@ -431,13 +328,13 @@ class AppTableController extends BaseController
             $strText .= "namespace application\\service;" . "\r\n";
             $strText .= "" . "\r\n";
 
-            $strText .= "use application\\core\\DatabaseSupport;" . "\r\n";
+            $strText .= "use application\\core\\BaseDatabaseSupport;" . "\r\n";
             $strText .= "use application\\serviceInterface\\" . $this->appTableModuleName . "ServiceInterface;" . "\r\n";
-            $strText .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
-            $strText .= "class " . $this->appTableModuleName . "Service extends DatabaseSupport implements " . $this->appTableModuleName . "ServiceInterface" . "\r\n";
+//            $strText .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
+            $strText .= "class " . $this->appTableModuleName . "Service extends BaseDatabaseSupport implements " . $this->appTableModuleName . "ServiceInterface" . "\r\n";
             $strText .= "{" . "\r\n";
 
-            $strText .= "    protected $" . "tableName = '" . $appTable->getAppTableName() . "';" . "\r\n";
+            $strText .= "    protected $" . "tableName = '" . $appTable->app_table_name . "';" . "\r\n";
             $strText .= "" . "\r\n";
 
             /* __construct */
@@ -457,22 +354,22 @@ class AppTableController extends BaseController
             $isFirst = false;
 //            foreach ($this->appTableColunm as $field) {
 //                if (!$isFirst) {
-//                    $strText .= "        $" . "query = \"SELECT " . $appTable->getAppTableName() . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
+//                    $strText .= "        $" . "query = \"SELECT " . $appTable->app_table_name . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
 //                    $isFirst = true;
 //                } else {
-//                    $strText .= "        $" . "query .=\"," . $appTable->getAppTableName() . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
+//                    $strText .= "        $" . "query .=\"," . $appTable->app_table_name . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
 //                }
 //            }
             $strText .= "        $" . "query = \"SELECT *  \";" . "\r\n";
 
             $strText .= "" . "\r\n";
-            $strText .= "        $" . "query .=\"FROM " . $appTable->getAppTableName() . " AS " . $appTable->getAppTableName() . " \";" . "\r\n";
+            $strText .= "        $" . "query .=\"FROM " . $appTable->app_table_name . " AS " . $appTable->app_table_name . " \";" . "\r\n";
             $strText .= "" . "\r\n";
 
             $strText .= "		//default where query" . "\r\n";
-            $strText .= "        $" . "query .=\" WHERE " . $appTable->getAppTableName() . ".`id` IS NOT NULL \";" . "\r\n";
+            $strText .= "        $" . "query .=\" WHERE " . $appTable->app_table_name . ".`id` IS NOT NULL \";" . "\r\n";
             $strText .= "		//custom where query" . "\r\n";
-            $strText .= "       //$"."query .= \"WHERE ".$appTable->getAppTableName().".custom_field =:customParam \";" . "\r\n";
+            $strText .= "       //$" . "query .= \"WHERE " . $appTable->app_table_name . ".custom_field =:customParam \";" . "\r\n";
             $strText .= "" . "\r\n";
             $strText .= "        //gen additional query and sort order" . "\r\n";
             $strText .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPage($" . "q_parameter, $" . "this->tableName);" . "\r\n";
@@ -485,9 +382,9 @@ class AppTableController extends BaseController
             $strText .= "           }" . "\r\n";
             $strText .= "       }" . "\r\n";
             $strText .= "" . "\r\n";
-            
-            $strText .= "        //custom where paramier" . "\r\n";
-            $strText .= "       // $"."data_bind_where['custom_field']=$"."paramValue;" . "\r\n";
+
+            $strText .= "        //custom where paramiter" . "\r\n";
+            $strText .= "       // $" . "data_bind_where['custom_field']=$" . "paramValue;" . "\r\n";
             $strText .= "       //end" . "\r\n";
 
             $strText .= "        //paging buider" . "\r\n";
@@ -518,22 +415,22 @@ class AppTableController extends BaseController
             $strText .= "        $" . "this->genBindParamAndWhereForListPage($" . "data_bind_where);" . "\r\n";
             $strText .= "" . "\r\n";
 
-            $strText .= "        //Return as Object Class" . "\r\n";
-            $strText .= "        /*" . "\r\n";
-            $strText .= "        $" . "resaultList =  $" . "this->resultset();" . "\r\n";
-            $strText .= "		if (is_array($" . "resaultList) || is_object($" . "resaultList)){" . "\r\n";
-            $strText .= "            $" . "findList = array();" . "\r\n";
-            $strText .= "            foreach($" . "resaultList as $" . "obj){" . "\r\n";
-            $strText .= "                $" . "singleObj = null;" . "\r\n";
-            $strText .= "                $" . "singleObj = new " . $this->appTableModuleName . "($" . "obj);" . "\r\n";
-            $strText .= "                array_push($" . "findList, $" . "singleObj);" . "\r\n";
-            $strText .= "            }" . "\r\n";
-            $strText .= "            return $" . "findList;" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "        */" . "\r\n";
+//            $strText .= "        //Return as Object Class" . "\r\n";
+//            $strText .= "        /*" . "\r\n";
+//            $strText .= "        $" . "resaultList =  $" . "this->resultset();" . "\r\n";
+//            $strText .= "		if (is_array($" . "resaultList) || is_object($" . "resaultList)){" . "\r\n";
+//            $strText .= "            $" . "findList = array();" . "\r\n";
+//            $strText .= "            foreach($" . "resaultList as $" . "obj){" . "\r\n";
+//            $strText .= "                $" . "singleObj = null;" . "\r\n";
+//            $strText .= "                $" . "singleObj = new " . $this->appTableModuleName . "($" . "obj);" . "\r\n";
+//            $strText .= "                array_push($" . "findList, $" . "singleObj);" . "\r\n";
+//            $strText .= "            }" . "\r\n";
+//            $strText .= "            return $" . "findList;" . "\r\n";
+//            $strText .= "        }" . "\r\n";
+//            $strText .= "        */" . "\r\n";
 
 
-            $strText .= "        return  $" . "this->resultset();" . "\r\n";
+            $strText .= "        return  $" . "this->list();" . "\r\n";
             $strText .= "    }" . "\r\n";
             $strText .= "" . "\r\n";
 
@@ -544,16 +441,16 @@ class AppTableController extends BaseController
             $isFirst = false;
 //            foreach ($this->appTableColunm as $findByField) {
 //                if (!$isFirst) {
-//                    $strText .= "        $" . "query = \"SELECT " . $appTable->getAppTableName() . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
+//                    $strText .= "        $" . "query = \"SELECT " . $appTable->app_table_name . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
 //                    $isFirst = true;
 //                } else {
-//                    $strText .= "        $" . "query .=\"," . $appTable->getAppTableName() . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
+//                    $strText .= "        $" . "query .=\"," . $appTable->app_table_name . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
 //                }
 //            }
             $strText .= "        $" . "query = \"SELECT *  \";" . "\r\n";
             $strText .= "" . "\r\n";
-            $strText .= "        $" . "query .=\"FROM " . $appTable->getAppTableName() . " AS " . $appTable->getAppTableName() . " \";" . "\r\n";
-            $strText .= "        $" . "query .=\"WHERE " . $appTable->getAppTableName() . ".`id`=:id \";" . "\r\n";
+            $strText .= "        $" . "query .=\"FROM " . $appTable->app_table_name . " AS " . $appTable->app_table_name . " \";" . "\r\n";
+            $strText .= "        $" . "query .=\"WHERE " . $appTable->app_table_name . ".`id`=:id \";" . "\r\n";
             $strText .= "" . "\r\n";
 
 
@@ -561,14 +458,14 @@ class AppTableController extends BaseController
             $strText .= "        $" . "this->bind(\":id\", (int)$" . "id);" . "\r\n";
 
 
-            $strText .= "        //Return as Object Class" . "\r\n";
-            $strText .= "        /*" . "\r\n";
-            $strText .= "        $" . "result =  $" . "this->single();" . "\r\n";
-            $strText .= "		if (is_array($" . "result) || is_object($" . "result)){" . "\r\n";
-            $strText .= "            $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "($" . "result);" . "\r\n";
-            $strText .= "            return $" . "$this->appTableModuleSubName;" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "        */" . "\r\n";
+//            $strText .= "        //Return as Object Class" . "\r\n";
+//            $strText .= "        /*" . "\r\n";
+//            $strText .= "        $" . "result =  $" . "this->single();" . "\r\n";
+//            $strText .= "		if (is_array($" . "result) || is_object($" . "result)){" . "\r\n";
+//            $strText .= "            $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "($" . "result);" . "\r\n";
+//            $strText .= "            return $" . "$this->appTableModuleSubName;" . "\r\n";
+//            $strText .= "        }" . "\r\n";
+//            $strText .= "        */" . "\r\n";
 
 
             $strText .= "        return  $" . "this->single();" . "\r\n";
@@ -623,9 +520,9 @@ class AppTableController extends BaseController
             $strText .= $this->autoGenerateTextWarn . "\r\n";
             $strText .= "namespace application\\validator;" . "\r\n";
             $strText .= "" . "\r\n";
-            $strText .= "use application\\core\\AppBaseValidator;" . "\r\n";
+            $strText .= "use application\\core\\BaseValidator;" . "\r\n";
             $strText .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
-            $strText .= "class " . $this->appTableModuleName . "Validator extends AppBaseValidator" . "\r\n";
+            $strText .= "class " . $this->appTableModuleName . "Validator extends BaseValidator" . "\r\n";
             $strText .= "{" . "\r\n";
             $strText .= "    public function __construct($this->appTableModuleName $" . $this->appTableModuleSubName . ")" . "\r\n";
             $strText .= "    {" . "\r\n";
@@ -639,7 +536,7 @@ class AppTableController extends BaseController
                     if ($colunmMeta['Null'] == 'NO') {
                         $strText .= "        $" . "this->validateField('" . $colunmMeta['Field'] . "', self::VALIDATE_REQUIRED);" . "\r\n";
                     }
-                    $typeValidate = AppBaseValidator::getColunmValidatorByMysqlType($colunmMeta['vType']);
+                    $typeValidate = BaseValidator::getColunmValidatorByMysqlType($colunmMeta['vType']);
                     if (!AppUtils::isEmpty($typeValidate)) {
                         $strText .= "        $" . "this->validateField('" . $colunmMeta['Field'] . "', " . $typeValidate . ");" . "\r\n";
                     }
@@ -678,17 +575,14 @@ class AppTableController extends BaseController
 
             $strText .= "use application\\core\\AppController;" . "\r\n";
             $strText .= "use application\\util\\FilterUtils;" . "\r\n";
-//            $strText .= "use application\\util\\ControllerUtil;" . "\r\n";
-//            $strText .= "use application\\util\\AppUtil;" . "\r\n";
             $strText .= "use application\\util\\i18next;" . "\r\n";
-//            $strText .= "use application\\util\\MessageUtils;" . "\r\n";
             $strText .= "use application\\util\\SystemConstant;" . "\r\n";
             $strText .= "use application\\util\\SecurityUtil;" . "\r\n";
             $strText .= "" . "\r\n";
 
             $strText .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
             $strText .= "use application\\service\\" . $this->appTableModuleName . "Service " . ";" . "\r\n";
-//            $strText .= "use application\\validator\\" . $this->appTableModuleName . "Validator " . ";" . "\r\n";
+            $strText .= "use application\\validator\\" . $this->appTableModuleName . "Validator " . ";" . "\r\n";
             $strText .= "class " . $this->appTableModuleName . "Controller extends  AppController" . "\r\n";
             $strText .= "{" . "\r\n";
             $strText .= "    /**" . "\r\n";
@@ -701,7 +595,6 @@ class AppTableController extends BaseController
             $strText .= "    {" . "\r\n";
             $strText .= "        $" . "this->setDbConn($" . "databaseConnection);" . "\r\n";
             $strText .= "        $" . "this->" . $this->appTableModuleSubName . "Service = new " . $this->appTableModuleName . "Service($" . "this->getDbConn());" . "\r\n";
-            $strText .= "        $" . "this->isAuthRequired = false;" . "\r\n";
             $strText .= "" . "\r\n";
 
             $strText .= "    }" . "\r\n";
@@ -723,7 +616,7 @@ class AppTableController extends BaseController
             $strText .= "        $" . "this->pushDataToView = $" . "this->getDefaultResponse();" . "\r\n";
             $strText .= "        $" . "this->pushDataToView[SystemConstant::DATA_LIST_ATT] = $" . "this->" . $this->appTableModuleSubName . "Service->findAll($" . "this->getRowPerPage(), $" . "q_parameter);" . "\r\n";
             $strText .= "        $" . "this->pushDataToView[SystemConstant::APP_PAGINATION_ATT] = $" . "this->" . $this->appTableModuleSubName . "Service->getTotalPaging();" . "\r\n";
-            $strText .= "        $" . "this->jsonResponse($" . "this->pushDataToView);" . "\r\n";
+            $strText .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
 
             $strText .= "    }" . "\r\n";
             //end crudList
@@ -736,15 +629,18 @@ class AppTableController extends BaseController
             $strText .= "        $" . "this->pushDataToView = $" . "this->getDefaultResponse(false);" . "\r\n";
             $strText .= "" . "\r\n";
             $strText .= "        if(!empty($" . "jsonData) && !empty($" . "uid)) {" . "\r\n";
-            $strText .= "           $" . "entity = new " . $this->appTableModuleName . "();" . "\r\n";
-            $strText .= "           $" . "entity->populatePostDataRestApi($" . "jsonData, $" . "uid, false);" . "\r\n";
-//            $strText .= "           $"."entity = $"."this->initBaseCreateDataRestApi($"."entity, $"."uid);"."\r\n";
-            $strText .= "           $" . "lastInsertId = $" . "this->" . $this->appTableModuleSubName . "Service->createByObject($" . "entity);" . "\r\n";
-            $strText .= "           if ($" . "lastInsertId) {" . "\r\n";
-            $strText .= "               $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
+            $strText .= "           $" . "entity = new " . $this->appTableModuleName . "($" . "jsonData, $" . "uid, false);" . "\r\n";
+            $strText .= "           $" . "validator = new " . $this->appTableModuleName . "Validator($" . "entity);" . "\r\n";
+            $strText .= "           if ($" . "validator->getValidationErrors()) {" . "\r\n";
+            $strText .= "               jsonResponse($" . "this->setResponseStatus($" . "validator->getValidationErrors(), false, null), 400);" . "\r\n";
+            $strText .= "           } else {" . "\r\n";
+            $strText .= "               $" . "lastInsertId = $" . "this->" . $this->appTableModuleSubName . "Service->createByObject($" . "entity);" . "\r\n";
+            $strText .= "               if ($" . "lastInsertId) {" . "\r\n";
+            $strText .= "                   $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
+            $strText .= "                }" . "\r\n";
             $strText .= "           }" . "\r\n";
-            $strText .= "         }" . "\r\n";
-            $strText .= "        $" . "this->jsonResponse($" . "this->pushDataToView);" . "\r\n";
+            $strText .= "        }" . "\r\n";
+            $strText .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
             $strText .= "" . "\r\n";
             $strText .= "    }" . "\r\n";
             //end crudAdd
@@ -759,11 +655,11 @@ class AppTableController extends BaseController
             $strText .= "        if ($" . "id > 0) {" . "\r\n";
             $strText .= "            $" . "item = $" . "this->" . $this->appTableModuleSubName . "Service->findById($" . "id);" . "\r\n";
             $strText .= "            if ($" . "item) {" . "\r\n";
-            $strText .= "                $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, \"\");" . "\r\n";
+            $strText .= "                $" . "this->pushDataToView = $" . "this->getDefaultResponse(true);" . "\r\n";
             $strText .= "            }" . "\r\n";
             $strText .= "        }" . "\r\n";
             $strText .= "        $" . "this->pushDataToView[SystemConstant::ENTITY_ATT] = $" . "item;" . "\r\n";
-            $strText .= "        $" . "this->jsonResponse($" . "this->pushDataToView);" . "\r\n";
+            $strText .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
             $strText .= "    }" . "\r\n";
             //end crudReadSingle
 
@@ -776,16 +672,20 @@ class AppTableController extends BaseController
             $strText .= "        $" . "this->pushDataToView = $" . "this->getDefaultResponse(false);" . "\r\n";
             $strText .= "		" . "\r\n";
             $strText .= "        if(!empty($" . "jsonData) && !empty($" . "uid)) {" . "\r\n";
-            $strText .= "            $" . "entity = new " . $this->appTableModuleName . "();" . "\r\n";
-            $strText .= "            $" . "entity->populatePostDataRestApi($" . "jsonData, $" . "uid, true);" . "\r\n";
-            $strText .= "           if ($" . "entity->getId() > 0) {" . "\r\n";
-            $strText .= "               $" . "effectRow = $" . "this->" . $this->appTableModuleSubName . "Service->updateByObject($" . "entity, array('id' => $" . "entity->getId()));" . "\r\n";
-            $strText .= "               if ($" . "effectRow) {" . "\r\n";
-            $strText .= "                   $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.update_succesfull')));" . "\r\n";
+            $strText .= "           $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "($" . "jsonData, $" . "uid, true);" . "\r\n";
+            $strText .= "           $" . "validator = new " . $this->appTableModuleName . "Validator($" . $this->appTableModuleSubName . ");" . "\r\n";
+            $strText .= "           if ($" . "validator->getValidationErrors()) {" . "\r\n";
+            $strText .= "               jsonResponse($" . "this->setResponseStatus($" . "validator->getValidationErrors(), false, null), 400);" . "\r\n";
+            $strText .= "           } else {" . "\r\n";
+            $strText .= "                if (isset($" . $this->appTableModuleSubName . "->id)) {" . "\r\n";
+            $strText .= "                   $" . "effectRow = $" . "this->" . $this->appTableModuleSubName . "Service->updateByObject($" . $this->appTableModuleSubName . ", array('id' => $" . $this->appTableModuleSubName . "->id));" . "\r\n";
+            $strText .= "                   if ($" . "effectRow) {" . "\r\n";
+            $strText .= "                       $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.update_succesfull')));" . "\r\n";
+            $strText .= "                   }" . "\r\n";
             $strText .= "               }" . "\r\n";
             $strText .= "           }" . "\r\n";
             $strText .= "       }" . "\r\n";
-            $strText .= "        $" . "this->jsonResponse($" . "this->pushDataToView);" . "\r\n";
+            $strText .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
             $strText .= "    }" . "\r\n";
             //end crudEditProcess
 
@@ -808,254 +708,9 @@ class AppTableController extends BaseController
             $strText .= "                }" . "\r\n";
             $strText .= "            }" . "\r\n";
             $strText .= "        }" . "\r\n";
-            $strText .= "        $" . "this->jsonResponse($" . "this->pushDataToView);" . "\r\n";
+            $strText .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
             $strText .= "    }" . "\r\n";
             //end crudDelete
-
-            $strText .= "" . "\r\n";
-            $strText .= "}";//end of controller file
-
-            fwrite($objFopen, $strText);
-            fclose($objFopen);
-        }
-    }
-
-    private function createControllerFile_COPY(AppTable $appTable)
-    {
-        if ($this->isThisFileCanOverwrite($this->validatorPath)) {
-            $objFopen = fopen($this->controllerlPath, 'w');
-            $strText = "<?php" . "\r\n";
-            $strText .= $this->autoGenerateTextWarn . "\r\n";
-            $strText .= "namespace application\\controller;" . "\r\n";
-            $strText .= "" . "\r\n";
-
-            $strText .= "use application\\core\\AppController as BaseController;" . "\r\n";
-            $strText .= "use application\\util\\FilterUtils as FilterUtil;" . "\r\n";
-            $strText .= "use application\\util\\ControllerUtil as ControllerUtils;" . "\r\n";
-            $strText .= "use application\\util\\AppUtil as AppUtils;" . "\r\n";
-            $strText .= "use application\\util\\MessageUtils as MessageUtil;" . "\r\n";
-            $strText .= "//use application\\util\\UploadUtil as UploadUtils;" . "\r\n";
-            $strText .= "" . "\r\n";
-
-            $strText .= "use application\\model\\" . $this->appTableModuleName . " as " . $this->appTableModuleName . ";" . "\r\n";
-            $strText .= "use application\\service\\" . $this->appTableModuleName . "Service as " . $this->appTableModuleName . "Service;" . "\r\n";
-            $strText .= "use application\\validator\\" . $this->appTableModuleName . "Validator as " . $this->appTableModuleName . "Validator;" . "\r\n";
-            $strText .= "class " . $this->appTableModuleName . "Controller extends  BaseController" . "\r\n";
-            $strText .= "{" . "\r\n";
-            $strText .= "    private $" . $this->appTableModuleSubName . "Service;" . "\r\n";
-            $strText .= "    private $" . AppUtils::getUpperString($appTable->getAppTableName()) . "_LIST_VIEW = '" . $this->appTableModuleSubName . "List';" . "\r\n";
-            $strText .= "    private $" . AppUtils::getUpperString($appTable->getAppTableName()) . "_ADD_VIEW = '" . $this->appTableModuleSubName . "';" . "\r\n";
-
-            /*__construct*/
-            $strText .= "    public function __construct($" . "databaseConnection)" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        $" . "this->setDbConn($" . "databaseConnection);" . "\r\n";
-            $strText .= "        $" . "this->" . $this->appTableModuleSubName . "Service = new " . $this->appTableModuleName . "Service($" . "this->getDbConn());" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*__destruct*/
-            $strText .= "    public function __destruct()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        unset($" . "this->" . $this->appTableModuleSubName . "Service);" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*crudList*/
-            $strText .= "    public function crudList()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        //start meta tag" . "\r\n";
-            $strText .= "        $" . "this->metaTitle = MessageUtil::getMessage('model_" . $this->appTableName . "');" . "\r\n";
-            $strText .= "        $" . "this->metaDescription = MessageUtil::getMessage('model_" . $this->appTableName . "');" . "\r\n";
-            $strText .= "        $" . "this->metaKeyword = MessageUtil::getMessage('model_" . $this->appTableName . "');" . "\r\n";
-            $strText .= "        //end meta tag" . "\r\n";
-            $strText .= "" . "\r\n";
-            $strText .= "        $" . "q_parameter = $" . "this->initSearchParam(new " . $this->appTableModuleName . "());" . "\r\n";
-            $strText .= "        //manual add q_parameter" . "\r\n";
-            $strText .= "        // $" . "q_parameter['param'] = 'value';" . "\r\n";
-            $strText .= "" . "\r\n";
-
-            $strText .= "        $" . "this->pushDataToView['" . $this->appTableModuleSubName . "List'] = $" . "this->" . $this->appTableModuleSubName . "Service->findAll($" . "this->getRowPerPage(), $" . "q_parameter);" . "\r\n";
-            $strText .= "        $" . "this->pushDataToView['appPaging'] = $" . "this->" . $this->appTableModuleSubName . "Service->getPagingLink();" . "\r\n";
-            $strText .= "        $" . "this->loadView($" . "this->" . AppUtils::getUpperString($appTable->getAppTableName()) . "_LIST_VIEW, $" . "this->pushDataToView);" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*crudAdd*/
-            $strText .= "    public function crudAdd()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        //start meta tag" . "\r\n";
-            $strText .= "        $" . "this->metaTitle = MessageUtil::getMessage('app_form').' '.MessageUtil::getMessage('model_" . $this->appTableName . "');" . "\r\n";
-            $strText .= "        $" . "this->metaDescription = MessageUtil::getMessage('app_form').' '.MessageUtil::getMessage('model_" . $this->appTableName . "');" . "\r\n";
-            $strText .= "        $" . "this->metaKeyword = MessageUtil::getMessage('app_form').' '.MessageUtil::getMessage('model_" . $this->appTableName . "');" . "\r\n";
-            $strText .= "        //end meta tag" . "\r\n";
-            $strText .= "        $" . "this->pushDataToView['" . $this->appTableModuleSubName . "'] = new " . $this->appTableModuleName . "(array());" . "\r\n";
-            $strText .= "        $" . "this->loadView($" . "this->" . AppUtils::getUpperString($appTable->getAppTableName()) . "_ADD_VIEW, $" . "this->pushDataToView);" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*crudAddProcess*/
-            $strText .= "    public function crudAddProcess()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "();" . "\r\n";
-            $strText .= "        $" . $this->appTableModuleSubName . "->populatePostData();" . "\r\n";
-            $strText .= "" . "\r\n";
-            $strText .= "        $" . "validator = new " . $this->appTableModuleName . "Validator($" . $this->appTableModuleSubName . ");" . "\r\n";
-            $strText .= "        $" . "errors = $" . "validator->getValidationErrors();" . "\r\n";
-            $strText .= "        if($" . "errors){" . "\r\n";
-            $strText .= "            $" . "this->pushDataToView['validateErrors'] = $" . "errors;" . "\r\n";
-            $strText .= "            $" . "this->pushDataToView['" . $this->appTableModuleSubName . "'] = $" . $this->appTableModuleSubName . ";" . "\r\n";
-            $strText .= "            $" . "this->loadView($" . "this->" . AppUtils::getUpperString($appTable->getAppTableName()) . "_ADD_VIEW, $" . "this->pushDataToView);" . "\r\n";
-            $strText .= "        }else{" . "\r\n";
-
-            $strText .= "			//upload img" . "\r\n";
-            $strText .= "			/*" . "\r\n";
-            $strText .= "			if (is_uploaded_file($" . "_FILES['img_upload']['tmp_name'])) {" . "\r\n";
-            $strText .= "				$" . "imgName = UploadUtils::uploadImgFiles($" . "_FILES['img_upload'],$" . $this->appTableModuleSubName . "->getCreatedDate());" . "\r\n";
-            $strText .= "				if($" . "imgName){" . "\r\n";
-            $strText .= "					$" . $this->appTableModuleSubName . "->setImgName($" . "imgName);" . "\r\n";
-            $strText .= "				}" . "\r\n";
-            $strText .= "			}" . "\r\n";
-            $strText .= "			*/" . "\r\n";
-            $strText .= "			//end upload file" . "\r\n";
-            $strText .= "" . "\r\n";
-
-            $strText .= "            $" . "lastInsertId = $" . "this->" . $this->appTableModuleSubName . "Service->createByObject($" . $this->appTableModuleSubName . ");" . "\r\n";
-//        $strText .= "            ControllerUtils::setSuccessMessage('save success last insert id = '.$"."lastInsertId);"."\r\n";
-            $strText .= "            ControllerUtils::setSuccessMessage(MessageUtil::" . "getMessage('app_insert_succesfull').'<br> save success last insert id = '.$" . "lastInsertId);" . "\r\n";
-            $strText .= "            v_rediect('" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "list');" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*crudEdit*/
-            $strText .= "    public function crudEdit()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        $" . "id = FilterUtil::validateGetInt(ControllerUtils::encodeParamId(" . $this->appTableModuleName . "::$" . "tableName));" . "\r\n";
-            $strText .= "        if(AppUtils::isEmpty($" . "id)) {" . "\r\n";
-            $strText .= "            ControllerUtils::f404Static();" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "        $" . $this->appTableModuleSubName . " = $" . "this->" . $this->appTableModuleSubName . "Service->findById($" . "id);" . "\r\n";
-            $strText .= "        if(!$" . $this->appTableModuleSubName . "){" . "\r\n";
-            $strText .= "            ControllerUtils::f404Static();" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "        //start meta tag" . "\r\n";
-            $strText .= "        $" . "this->metaTitle = $" . $this->appTableModuleSubName . "->getId();" . "\r\n";
-            $strText .= "        $" . "this->metaDescription = $" . $this->appTableModuleSubName . "->getId();" . "\r\n";
-            $strText .= "        $" . "this->metaKeyword = $" . $this->appTableModuleSubName . "->getId();" . "\r\n";
-            $strText .= "        //end meta tag" . "\r\n";
-
-            $strText .= "        $" . "this->pushDataToView['" . $this->appTableModuleSubName . "'] = $" . $this->appTableModuleSubName . ";" . "\r\n";
-            $strText .= "        $" . "this->loadView($" . "this->" . AppUtils::getUpperString($appTable->getAppTableName()) . "_ADD_VIEW, $" . "this->pushDataToView);" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*crudEditProcess*/
-            $strText .= "    public function crudEditProcess()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-            $strText .= "        $" . "id = FilterUtil::validateGetInt(ControllerUtils::encodeParamId(" . $this->appTableModuleName . "::$" . "tableName));" . "\r\n";
-            $strText .= "        if(AppUtils::isEmpty($" . "id)) {" . "\r\n";
-            $strText .= "            ControllerUtils::f404Static();" . "\r\n";
-            $strText .= "        }" . "\r\n";
-
-
-            $strText .= "		$" . $this->appTableModuleSubName . "Old = $" . "this->" . $this->appTableModuleSubName . "Service->findById($" . "id);" . "\r\n";
-            $strText .= "		if(!$" . $this->appTableModuleSubName . "Old){" . "\r\n";
-            $strText .= "			ControllerUtils::f404Static();" . "\r\n";
-            $strText .= "		}" . "\r\n";
-            $strText .= "		//$" . "isDeleteImg = FilterUtil::validatePostInt('img_del');" . "\r\n";
-            $strText .= "" . "\r\n";
-
-            $strText .= "        $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "();" . "\r\n";
-            $strText .= "        $" . $this->appTableModuleSubName . "->populatePostData();" . "\r\n";
-            $strText .= "        $" . $this->appTableModuleSubName . "->setId($" . "id);" . "\r\n";
-            $strText .= "" . "\r\n";
-            $strText .= "        $" . "validator = new " . $this->appTableModuleName . "Validator($" . $this->appTableModuleSubName . ");" . "\r\n";
-            $strText .= "        $" . "errors = $" . "validator->getValidationErrors();" . "\r\n";
-            $strText .= "        if($" . "errors){" . "\r\n";
-            $strText .= "            $" . "this->pushDataToView['validateErrors'] = $" . "errors;" . "\r\n";
-            $strText .= "            $" . "this->pushDataToView['" . $this->appTableModuleSubName . "'] = $" . $this->appTableModuleSubName . ";" . "\r\n";
-            $strText .= "            $" . "this->loadView($" . "this->" . AppUtils::getUpperString($appTable->getAppTableName()) . "_ADD_VIEW, $" . "this->pushDataToView);" . "\r\n";
-            $strText .= "        }else{" . "\r\n";
-
-            $strText .= "			//upload img" . "\r\n";
-            $strText .= "           /*" . "\r\n";
-            $strText .= "			if (is_uploaded_file($" . "_FILES['img_upload']['tmp_name'])) {" . "\r\n";
-            $strText .= "				//delete imf file from server first" . "\r\n";
-            $strText .= "				if(!AppUtils::isEmpty($" . $this->appTableModuleSubName . "Old->getImgName())){" . "\r\n";
-            $strText .= "					UploadUtils::delImgfileFromYearMonthFolder($" . $this->appTableModuleSubName . "Old->getImgName(),$" . $this->appTableModuleSubName . "Old->getCreatedDate());" . "\r\n";
-            $strText .= "				}" . "\r\n";
-            $strText .= "				$" . "imgName = UploadUtils::uploadImgFiles($" . "_FILES['img_upload'],$" . $this->appTableModuleSubName . "Old->getCreatedDate());" . "\r\n";
-            $strText .= "				if($" . "imgName){" . "\r\n";
-            $strText .= "					$" . $this->appTableModuleSubName . "->setImgName($" . "imgName);" . "\r\n";
-            $strText .= "				}" . "\r\n";
-            $strText .= "			}elseif ($" . "isDeleteImg){" . "\r\n";
-            $strText .= "				//delete imf file from server first" . "\r\n";
-            $strText .= "				if(!AppUtils::isEmpty($" . $this->appTableModuleSubName . "Old->getImgName())){" . "\r\n";
-            $strText .= "					UploadUtils::delImgfileFromYearMonthFolder($" . $this->appTableModuleSubName . "Old->getImgName(),$" . $this->appTableModuleSubName . "Old->getCreatedDate());" . "\r\n";
-            $strText .= "					$" . $this->appTableModuleSubName . "->setImgName('');" . "\r\n";
-            $strText .= "				}" . "\r\n";
-            $strText .= "			}" . "\r\n";
-            $strText .= "           */" . "\r\n";
-            $strText .= "			//end upload file" . "\r\n";
-            $strText .= "" . "\r\n";
-
-
-            $strText .= "            $" . "data_where['id'] = $" . $this->appTableModuleSubName . "->getId();" . "\r\n";
-            $strText .= "            $" . "effectRow = $" . "this->" . $this->appTableModuleSubName . "Service->updateByObject($" . $this->appTableModuleSubName . ", $" . "data_where);" . "\r\n";
-//        $strText .= "            ControllerUtils::setSuccessMessage('update state = '.$"."effectRow);"."\r\n";
-            $strText .= "            ControllerUtils::setSuccessMessage(MessageUtil::" . "getMessage('app_update_succesfull').'<br> effect row = '.$" . "effectRow);" . "\r\n";
-
-            $strText .= "            v_rediect('" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "list');" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "    }" . "\r\n";
-
-            /*crudDelete*/
-            $strText .= "    public function crudDelete()" . "\r\n";
-            $strText .= "    {" . "\r\n";
-
-            //normal way to delete
-
-//        $strText .= "        $"."id = FilterUtil::validateGetInt(ControllerUtils::encodeParamId(".$this->appTableModuleName."::$"."tableName));"."\r\n";
-//        $strText .= "        if(AppUtils::isEmpty($"."id)) {"."\r\n";
-//        $strText .= "            ControllerUtils::f404Static();"."\r\n";
-//        $strText .= "        }"."\r\n";
-//        $strText .= "        $".$this->appTableModuleSubName." = $"."this->".$this->appTableModuleSubName."Service->findById($"."id);"."\r\n";
-//        $strText .= "        if(!$".$this->appTableModuleSubName."){"."\r\n";
-//        $strText .= "            ControllerUtils::f404Static();"."\r\n";
-//        $strText .= "        }"."\r\n";
-//
-//        $strText .= "		//delete img"."\r\n";
-//        $strText .= "		/*"."\r\n";
-//        $strText .= "		if(!AppUtils::isEmpty($".$this->appTableModuleSubName."->getImgName())){"."\r\n";
-//        $strText .= "			UploadUtils::delImgfileFromYearMonthFolder($".$this->appTableModuleSubName."->getImgName(),$".$this->appTableModuleSubName."->getCreatedDate());"."\r\n";
-//        $strText .= "		}"."\r\n";
-//        $strText .= "		*/"."\r\n";
-//        $strText .= ""."\r\n";
-//        $strText .= "        $"."effectRow = $"."this->".$this->appTableModuleSubName."Service->deleteById($"."id);"."\r\n";
-//        $strText .= "        ControllerUtils::setSuccessMessage('Delete state = '.$"."effectRow);"."\r\n";
-//        $strText .= "        v_rediect('".AppUtils::getUrlFromTableName($appTable->getAppTableName())."list');"."\r\n";
-
-            //ajax delete
-            $strText .= "        $" . "id = FilterUtil::validateGetInt(ControllerUtils::encodeParamId(" . $this->appTableModuleName . "::$" . "tableName));" . "\r\n";
-            $strText .= "        $" . "isOk = true;" . "\r\n";
-            $strText .= "        if(AppUtils::isEmpty($" . "id)) {" . "\r\n";
-            $strText .= "            $" . "isOk = false;" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "        $" . $this->appTableModuleSubName . " = $" . "this->" . $this->appTableModuleSubName . "Service->findById($" . "id);" . "\r\n";
-            $strText .= "        if(!$" . $this->appTableModuleSubName . "){" . "\r\n";
-            $strText .= "            $" . "isOk = false;" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            $strText .= "        if($" . "isOk){" . "\r\n";
-
-            $strText .= "		    //delete img" . "\r\n";
-            $strText .= "		    /*" . "\r\n";
-            $strText .= "		    if(!AppUtils::isEmpty($" . $this->appTableModuleSubName . "->getImgName())){" . "\r\n";
-            $strText .= "		    	UploadUtils::delImgfileFromYearMonthFolder($" . $this->appTableModuleSubName . "->getImgName(),$" . $this->appTableModuleSubName . "->getCreatedDate());" . "\r\n";
-            $strText .= "		    }" . "\r\n";
-            $strText .= "		    */" . "\r\n";
-
-            $strText .= "          $" . "this->" . $this->appTableModuleSubName . "Service->deleteById($" . "id);" . "\r\n";
-            $strText .= "        }" . "\r\n";
-            //end of CrudDelete
-
-
-            $strText .= "    }" . "\r\n";
-
 
             $strText .= "" . "\r\n";
             $strText .= "}";//end of controller file
@@ -1092,7 +747,7 @@ class AppTableController extends BaseController
             $strText .= "            <div class=\"page-header-title\">" . "\r\n";
             $strText .= "                <i class=\"icofont icofont-list bg-c-blue\"></i>" . "\r\n";
             $strText .= "                <div class=\"d-inline\">" . "\r\n";
-            $strText .= "                    <h4><?= i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $appTable->getAppTableName() . "') ?></h4>" . "\r\n";
+            $strText .= "                    <h4><?= i18next::getTranslation('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "') ?></h4>" . "\r\n";
             $strText .= "                    <span><?= i18next::getTranslation('base.list') ?></span>" . "\r\n";
             $strText .= "                </div>" . "\r\n";
             $strText .= "            </div>" . "\r\n";
@@ -1105,7 +760,7 @@ class AppTableController extends BaseController
             $strText .= "                            <i class=\"icofont icofont-home\"></i>" . "\r\n";
             $strText .= "                        </a>" . "\r\n";
             $strText .= "                    </li>" . "\r\n";
-            $strText .= "                    <li class=\"breadcrumb-item\"><a href=\"javascript:void(0)\"><?= i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $appTable->getAppTableName() . "') ?></a></li>" . "\r\n";
+            $strText .= "                    <li class=\"breadcrumb-item\"><a href=\"javascript:void(0)\"><?= i18next::getTranslation('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "') ?></a></li>" . "\r\n";
             $strText .= "                </ul>" . "\r\n";
             $strText .= "            </div>" . "\r\n";
             $strText .= "        </div>" . "\r\n";
@@ -1124,9 +779,9 @@ class AppTableController extends BaseController
             $strText .= "                        <button type=\"button\" class=\"btn btn-primary btn-outline-primary app_open_searchbox\">" . "\r\n";
             $strText .= "                            <i class=\"icofont icofont-ui-search\"></i>" . "\r\n";
             $strText .= "                        </button>" . "\r\n";
-            $strText .= "                        <a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "add'?>\" class=\"btn btn-outline-primary\"><i class=\"icofont icofont-ui-add\"></i> <?= i18next::getTranslation('base.add_new') ?></a>" . "\r\n";
+            $strText .= "                        <a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->app_table_name) . "add'?>\" class=\"btn btn-outline-primary\"><i class=\"icofont icofont-ui-add\"></i> <?= i18next::getTranslation('base.add_new') ?></a>" . "\r\n";
             $strText .= "                        <button type=\"button\" class=\"btn btn-danger btn-outline-danger app-delete-seleted-confirm\"" . "\r\n";
-            $strText .= "                                app-parameter=\"<?=ControllerUtil::encodeParamId(" . $this->appTableModuleName . "::$" . "tableName)?>\" app-delete-all-url=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "delete'?>\">" . "\r\n";
+            $strText .= "                                app-parameter=\"<?=ControllerUtil::encodeParamId(" . $this->appTableModuleName . "::$" . "tableName)?>\" app-delete-all-url=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->app_table_name) . "delete'?>\">" . "\r\n";
             $strText .= "                            <i class=\"icofont icofont-delete-alt\"></i> <?= i18next::getTranslation('base.delete_seleted') ?>" . "\r\n";
             $strText .= "                        </button>" . "\r\n";
 
@@ -1156,7 +811,7 @@ class AppTableController extends BaseController
                     $strText .= "                                        <label class=\"col-form-label\">&nbsp;</label>" . "\r\n";
                     $strText .= "                                        <input id=\"q_" . $fieldName . "\" name=\"q_" . $fieldName . "\" value=\"<?=FilterUtils::filterGetString('q_" . $fieldName . "')?>\" type=\"text\" " . "\r\n";
                     $strText .= "										class=\"form-control form-control-normal\" " . "\r\n";
-                    $strText .= "										placeholder=\"<?= i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $fieldName . "') ?>\">" . "\r\n";
+                    $strText .= "										placeholder=\"<?= i18next::getTranslation('model." . $appTable->app_table_name . "." . $fieldName . "') ?>\">" . "\r\n";
                     $strText .= "                                    </div>" . "\r\n";
                 }
             }
@@ -1200,7 +855,7 @@ class AppTableController extends BaseController
 
                         $strText .= "                                    <th style=\"vertical-align: middle;\">" . "\r\n";
                         $strText .= "                                        <a href=\"<" . "?=ControllerUtil::uriSortConcat('" . $field . "','ASC')?>\">" . "\r\n";
-                        $strText .= "                                            <?= i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $field . "') ?>" . "\r\n";
+                        $strText .= "                                            <?= i18next::getTranslation('model." . $appTable->app_table_name . "." . $field . "') ?>" . "\r\n";
                         $strText .= "                                        </a>" . "\r\n";
                         $strText .= "                                        <span id=\"displaySort_" . $field . "\"></i></span>" . "\r\n";
                         $strText .= "                                    </th>" . "\r\n";
@@ -1255,11 +910,11 @@ class AppTableController extends BaseController
             }
 
             $strText .= "                                        <td class=\"action-icon\">" . "\r\n";
-            $strText .= "                                            <a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "edit?'.ControllerUtil::genParamId($" . $this->appTableModuleSubName . ")?>\" class=\"m-r-15 text-muted\" data-toggle=\"tooltip\"" . "\r\n";
+            $strText .= "                                            <a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->app_table_name) . "edit?'.ControllerUtil::genParamId($" . $this->appTableModuleSubName . ")?>\" class=\"m-r-15 text-muted\" data-toggle=\"tooltip\"" . "\r\n";
             $strText .= "                                               data-placement=\"top\" title=\"\" data-original-title=\"<?=i18next::getTranslation('base.edit')?>\">" . "\r\n";
             $strText .= "                                                <i class=\"icofont icofont-ui-edit\"></i>" . "\r\n";
             $strText .= "                                            </a>" . "\r\n";
-            $strText .= "                                            <a href=\"javascript:void(0)\" data-href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "delete?'.ControllerUtil::genParamId($" . $this->appTableModuleSubName . ")?>\"" . "\r\n";
+            $strText .= "                                            <a href=\"javascript:void(0)\" data-href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->app_table_name) . "delete?'.ControllerUtil::genParamId($" . $this->appTableModuleSubName . ")?>\"" . "\r\n";
             $strText .= "                                               data-id-hide=\"hide_tr_<?=$" . $this->appTableModuleSubName . "->getId()?>\"" . "\r\n";
             $strText .= "                                               class=\"app-delete-single-confirm\"" . "\r\n";
             $strText .= "                                               data-toggle=\"tooltip\" data-placement=\"top\" title=\"\" data-original-title=\"<?=i18next::getTranslation('base.delete')?>\">" . "\r\n";
@@ -1326,7 +981,7 @@ class AppTableController extends BaseController
             $strText .= "            <div class=\"page-header-title\">" . "\r\n";
             $strText .= "                <i class=\"icofont icofont-file-code bg-c-blue\"></i>" . "\r\n";
             $strText .= "                <div class=\"d-inline\">" . "\r\n";
-            $strText .= "                    <h4><?= i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $appTable->getAppTableName() . "') ?></h4>" . "\r\n";
+            $strText .= "                    <h4><?= i18next::getTranslation('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "') ?></h4>" . "\r\n";
             $strText .= "                    <span><?= i18next::getTranslation('base.form') ?></span>" . "\r\n";
             $strText .= "                </div>" . "\r\n";
             $strText .= "            </div>" . "\r\n";
@@ -1339,8 +994,8 @@ class AppTableController extends BaseController
             $strText .= "                            <i class=\"icofont icofont-home\"></i>" . "\r\n";
             $strText .= "                        </a>" . "\r\n";
             $strText .= "                    </li>" . "\r\n";
-            $strText .= "                    <li class=\"breadcrumb-item\"><a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "list'?>\"><?= i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $appTable->getAppTableName() . "') ?></a></li>" . "\r\n";
-            $strText .= "                    <li class=\"breadcrumb-item\"><a href=\"javascript:void(0)\"><?= i18next::getTranslation('base.arr_form_page', array('page' => i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $appTable->getAppTableName() . "'))) ?></a></li>" . "\r\n";
+            $strText .= "                    <li class=\"breadcrumb-item\"><a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->app_table_name) . "list'?>\"><?= i18next::getTranslation('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "') ?></a></li>" . "\r\n";
+            $strText .= "                    <li class=\"breadcrumb-item\"><a href=\"javascript:void(0)\"><?= i18next::getTranslation('base.arr_form_page', array('page' => i18next::getTranslation('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "'))) ?></a></li>" . "\r\n";
             $strText .= "                </ul>" . "\r\n";
             $strText .= "            </div>" . "\r\n";
             $strText .= "        </div>" . "\r\n";
@@ -1430,7 +1085,7 @@ class AppTableController extends BaseController
                         $strText .= "                        </div>" . "\r\n";
                     } else {//Textbox form
                         $strText .= "                        <div class=\"form-group <?=(array_key_exists('" . $field . "', $" . "validateErrors)) ? \"has-danger\" : \"\"?> row\">" . "\r\n";
-                        $strText .= "                            <label class=\"col-sm-2 col-form-label\" for=\"" . $field . "\"><?=i18next::getTranslation('model." . $appTable->getAppTableName() . "." . $field . "')?>" . $requireSpan . "</label>" . "\r\n";
+                        $strText .= "                            <label class=\"col-sm-2 col-form-label\" for=\"" . $field . "\"><?=i18next::getTranslation('model." . $appTable->app_table_name . "." . $field . "')?>" . $requireSpan . "</label>" . "\r\n";
                         $strText .= "                            <div class=\"col-sm-10\">" . "\r\n";
 
                         if ($isTextArea) {
@@ -1461,7 +1116,7 @@ class AppTableController extends BaseController
             $strText .= "                        <div class=\"form-group row\">" . "\r\n";
             $strText .= "                            <div class=\"col-sm-12\">" . "\r\n";
             $strText .= "                                <button type=\"submit\" class=\"btn btn-success m-b-0\"><i class=\"ti-save\"></i> <?= i18next::getTranslation('base.save') ?></button>" . "\r\n";
-            $strText .= "                                <a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->getAppTableName()) . "list'?>\" class=\"btn m-b-0\"><i class=\"ti-back-right\"></i> <?= i18next::getTranslation('base.cancel') ?></a>" . "\r\n";
+            $strText .= "                                <a href=\"<?=_BASEURL.'" . AppUtils::getUrlFromTableName($appTable->app_table_name) . "list'?>\" class=\"btn m-b-0\"><i class=\"ti-back-right\"></i> <?= i18next::getTranslation('base.cancel') ?></a>" . "\r\n";
             $strText .= "                            </div>" . "\r\n";
             $strText .= "                        </div>" . "\r\n";
             $strText .= "                    </form>" . "\r\n";
@@ -1487,8 +1142,8 @@ class AppTableController extends BaseController
     {
 
         $msgString = ",<br>";
-        $msgString .= "\"" . $appTable->getAppTableName() . "\": {" . "<br>";
-        $msgString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"" . $appTable->getAppTableName() . "\": \"" . $appTable->getAppTableName() . "\"," . "<br>";
+        $msgString .= "\"" . $appTable->app_table_name . "\": {" . "<br>";
+        $msgString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"" . $appTable->app_table_name . "\": \"" . $appTable->app_table_name . "\"," . "<br>";
         $noOfColumn = count($this->appTableColunmMetaData);
         $i = 0;
         foreach ($this->appTableColunmMetaData as $colunmMeta) {
@@ -1520,12 +1175,12 @@ class AppTableController extends BaseController
 //        $strText = ""."\r\n";
 //        $strText .="    /*". " \r\n";
 //        $strText .="    |--------------------------------------------------------------------------". " \r\n";
-//        $strText .="    | ".$appTable->getAppTableName()." \r\n";
+//        $strText .="    | ".$appTable->app_table_name." \r\n";
 //        $strText .="    |--------------------------------------------------------------------------". " \r\n";
 //        $strText .="    */". " \r\n";
-//        $strText .="    'model_".$appTable->getAppTableName()."' => '".$appTable->getAppTableName()."',". " \r\n";
+//        $strText .="    'model_".$appTable->app_table_name."' => '".$appTable->app_table_name."',". " \r\n";
 //        foreach($this->appTableColunm as $field) {
-//            $strText .= "    'model_".$appTable->getAppTableName()."_".$field."' => '".$field."'," . " \r\n";
+//            $strText .= "    'model_".$appTable->app_table_name."_".$field."' => '".$field."'," . " \r\n";
 //        }
 //        $strText .= ");";
 //        fwrite($objFopen, $strText);
@@ -1544,12 +1199,12 @@ class AppTableController extends BaseController
 //        $strText .="| ".$this->appTableModuleName."Controller \r\n";
 //        $strText .="|--------------------------------------------------------------------------". " \r\n";
 //        $strText .="*/". " \r\n";
-//        $strText .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->getAppTableName())."list\",\"".$this->appTableModuleName."\",\"crudList\",\"".$appTable->getAppTableName()."_list\");"."\r\n";
-//        $strText .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->getAppTableName())."add\",\"".$this->appTableModuleName."\",\"crudAdd\",\"".$appTable->getAppTableName()."_add\");"."\r\n";
-//        $strText .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->getAppTableName())."add\",\"".$this->appTableModuleName."\",\"crudAddProcess\",\"".$appTable->getAppTableName()."_add\");"."\r\n";
-//        $strText .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->getAppTableName())."edit\",\"".$this->appTableModuleName."\",\"crudEdit\",\"".$appTable->getAppTableName()."_edit\");"."\r\n";
-//        $strText .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->getAppTableName())."edit\",\"".$this->appTableModuleName."\",\"crudEditProcess\",\"".$appTable->getAppTableName()."_edit\");"."\r\n";
-//        $strText .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->getAppTableName())."delete\",\"".$this->appTableModuleName."\",\"crudDelete\",\"".$appTable->getAppTableName()."_delete\");";
+//        $strText .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."list\",\"".$this->appTableModuleName."\",\"crudList\",\"".$appTable->app_table_name."_list\");"."\r\n";
+//        $strText .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."add\",\"".$this->appTableModuleName."\",\"crudAdd\",\"".$appTable->app_table_name."_add\");"."\r\n";
+//        $strText .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."add\",\"".$this->appTableModuleName."\",\"crudAddProcess\",\"".$appTable->app_table_name."_add\");"."\r\n";
+//        $strText .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."edit\",\"".$this->appTableModuleName."\",\"crudEdit\",\"".$appTable->app_table_name."_edit\");"."\r\n";
+//        $strText .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."edit\",\"".$this->appTableModuleName."\",\"crudEditProcess\",\"".$appTable->app_table_name."_edit\");"."\r\n";
+//        $strText .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."delete\",\"".$this->appTableModuleName."\",\"crudDelete\",\"".$appTable->app_table_name."_delete\");";
 //        fwrite($objFopen, $strText);
 //        fclose($objFopen);
 
@@ -1558,11 +1213,11 @@ class AppTableController extends BaseController
         $strText .= "| " . $this->appTableModuleName . "Controller <br>";
         $strText .= "|--------------------------------------------------------------------------" . " <br>";
         $strText .= "*/" . " <br>";
-        $strText .= "Route::get(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudList\",\"" . $appTable->getAppTableName() . "_list\");" . "<br>";
-        $strText .= "Route::post(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudAdd\",\"" . $appTable->getAppTableName() . "_add\");" . "<br>";
-        $strText .= "Route::get(['AuthApi'],\"" . $this->appTableModuleSubName . "ReadSingle\",\"" . $this->appTableModuleName . "Controller\",\"crudReadSingle\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
-        $strText .= "Route::put(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudEdit\",\"" . $appTable->getAppTableName() . "_edit\");" . "<br>";
-        $strText .= "Route::delete(['AuthApi'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudDelete\",\"" . $appTable->getAppTableName() . "_delete\");";
+        $strText .= "Route::get(['AuthApi','PermissionGrant'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudList\",\"" . $appTable->app_table_name . "_list\");" . "<br>";
+        $strText .= "Route::post(['AuthApi','PermissionGrant'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudAdd\",\"" . $appTable->app_table_name . "_add\");" . "<br>";
+        $strText .= "Route::get(['AuthApi','PermissionGrant'],\"" . $this->appTableModuleSubName . "ReadSingle\",\"" . $this->appTableModuleName . "Controller\",\"crudReadSingle\",\"" . $appTable->app_table_name . "_view\");" . "<br>";
+        $strText .= "Route::put(['AuthApi','PermissionGrant'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudEdit\",\"" . $appTable->app_table_name . "_edit\");" . "<br>";
+        $strText .= "Route::delete(['AuthApi','PermissionGrant'],\"" . $this->appTableModuleSubName . "\",\"" . $this->appTableModuleName . "Controller\",\"crudDelete\",\"" . $appTable->app_table_name . "_delete\");";
         return $strText;
     }
 
@@ -1577,9 +1232,9 @@ class AppTableController extends BaseController
             ControllerUtils::f404Static();
         }
 
-        $this->metaTitle = $appTable->getAppTableName();
-        $this->metaDescription = $appTable->getAppTableName();
-        $this->metaKeyword = $appTable->getAppTableName();
+        $this->metaTitle = $appTable->app_table_name;
+        $this->metaDescription = $appTable->app_table_name;
+        $this->metaKeyword = $appTable->app_table_name;
 
 
         $this->pushDataToView['appTable'] = $appTable;
@@ -1622,20 +1277,20 @@ class AppTableController extends BaseController
         }
         $themePath = "";
         if (!empty($appTable->getVtheme())) {
-            $themePath = $appTable->getVtheme() . "/" . $appTable->getAppTableName() . "/";
+            $themePath = $appTable->getVtheme() . "/" . $appTable->app_table_name . "/";
         }
 
 
         //fix path for all rile to want delete
-        $this->appTableModuleName = AppUtils::genPublicMethodName($appTable->getAppTableName());
+        $this->appTableModuleName = AppUtils::genPublicMethodName($appTable->app_table_name);
 
         $this->modelPath = __SITE_PATH . '/application/model/' . $this->appTableModuleName . '.php';
         $this->serviceInterfacePath = __SITE_PATH . '/application/serviceInterface/' . $this->appTableModuleName . 'ServiceInterface.php';
         $this->servicePath = __SITE_PATH . '/application/service/' . $this->appTableModuleName . 'Service.php';
         $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
         $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
-        $this->listPath = __SITE_PATH . '/application/views/' . $themePath . AppUtils::genModuleNameFormat($appTable->getAppTableName());
-        $this->viewPath = __SITE_PATH . '/application/views/' . $themePath . AppUtils::genModuleNameFormat($appTable->getAppTableName());
+        $this->listPath = __SITE_PATH . '/application/views/' . $themePath . AppUtils::genModuleNameFormat($appTable->app_table_name);
+        $this->viewPath = __SITE_PATH . '/application/views/' . $themePath . AppUtils::genModuleNameFormat($appTable->app_table_name);
 
 
         AppUtils::doDelfileFromPath($this->modelPath);
@@ -1649,7 +1304,7 @@ class AppTableController extends BaseController
         AppUtils::deleteFolder($this->viewPath);
 
         //delete permission and role permission
-        $permissionList = $this->appPermissionService->findPermissionListByTableName($appTable->getAppTableName());
+        $permissionList = $this->appPermissionService->findPermissionListByTableName($appTable->app_table_name);
         if ($permissionList) {
             foreach ($permissionList as $permission) {
                 $permissionId = $permission['id'];
@@ -1664,7 +1319,7 @@ class AppTableController extends BaseController
         //delete permisstion
         if ($effectRow) {
             //drop table after everything deleted
-            $this->appTableService->dropTable($appTable->getAppTableName());
+            $this->appTableService->dropTable($appTable->app_table_name);
         }
         if ($effectRow) {
             //return tr id for remove from table list

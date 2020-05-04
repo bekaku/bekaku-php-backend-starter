@@ -18,7 +18,6 @@ class TestController extends AppController
 {
     public function __construct($databaseConnection){
         $this->setDbConn($databaseConnection);
-        $this->isAuthRequired = false;
     }
     public function index(){
         echoln("TestController");

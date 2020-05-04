@@ -63,6 +63,8 @@ class SystemConstant
     const ID_PARAM = '_id';
     const ID_PARAMS = '_ids';
     const UNDER_SCORE = '_';
+    const SORT_FIELD_ATT = 'sortField';
+    const SORT_MODE_ATT = 'sortMode';
 
     //header
     const CONTENT_TYPE_TEXT_HTML = "Content-Type: text/html; charset=utf-8";

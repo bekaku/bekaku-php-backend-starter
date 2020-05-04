@@ -2,7 +2,7 @@
 
 namespace application\middleware;
 
-use application\service\AppPermissionService;
+use application\service\PermissionService;
 use application\util\i18next;
 use application\util\MessageUtils;
 use application\util\SecurityUtil;
@@ -23,8 +23,8 @@ class PermissionGrant
         $mode = MessageUtils::getConfig('production_mode');
         $verify = $mode == SystemConstant::PRODUCTION_MODE_PRODUCTION ? true : false;
         if ($verify) {
-            $this->permissionService = new AppPermissionService($connection);
-            $isPermised = $this->permissionService->checkPermissionByUserId(SecurityUtil::getAppuserIdFromJwtPayload(), $permissionName);
+            $this->permissionService = new PermissionService($connection);
+            $isPermised = $this->permissionService->isHavePermission(SecurityUtil::getAppuserIdFromJwtPayload(), $permissionName);
             if (!$isPermised) {
                 jsonResponse([
                     SystemConstant::SERVER_STATUS_ATT => false,
