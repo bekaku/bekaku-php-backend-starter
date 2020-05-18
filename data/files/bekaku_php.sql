@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : EDR_CLOUD_DEMO
+ Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 50562
- Source Host           : demo.appedr.com:13537
+ Source Server Version : 50539
+ Source Host           : localhost:3306
  Source Schema         : bekaku_php
 
  Target Server Type    : MySQL
- Target Server Version : 50562
+ Target Server Version : 50539
  File Encoding         : 65001
 
- Date: 12/05/2020 13:01:14
+ Date: 18/05/2020 17:12:29
 */
 
 SET NAMES utf8mb4;
