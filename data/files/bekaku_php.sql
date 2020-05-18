@@ -11,7 +11,7 @@
  Target Server Version : 50539
  File Encoding         : 65001
 
- Date: 18/05/2020 17:12:29
+ Date: 18/05/2020 18:03:41
 */
 
 SET NAMES utf8mb4;
@@ -212,9 +212,7 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'bekaku', 'baekaku@gmail.com', NULL, '55be81a4f0b53f445d515474e85bdaf2ae186332ff7424964e73a842caa69db757df3d0a16ca9cc523fb7c1fd6b848b4647cd00302c31bef7105f7675f82600c', 'd54f6c95d3f21288dfc5be75033b6d6bc98cb1fb1f82db6b19f5dacf8c44807509e3d2017cd0b228289b1afb4f3c7f376a1b2c8de8f72f4b2ce1c7065a7310bf', 1, '2020-04-27 11:23:19', '2020-04-27 11:23:19', NULL, NULL);
-INSERT INTO `user` VALUES (11, 'admin', 'admin@ggg.com', NULL, '535c68af1f4c172d60847043dfcf102f7023322d9035fdd94e1094906889594928e6f57d7bb83bf61aeca5de346db366220b6a2d6ca0f96d971f5641e0ab7177', '0998aaaefcb8ef4c12fc92e02d41800c3201601c0862484a9311d8389c1df0c8c2e99dfa55d4f5b9336c759321119cc2d5ac483d295b788834ab2835dc4535fa', 1, '2020-05-04 17:20:56', '2020-05-04 18:01:58', 1, 1);
-INSERT INTO `user` VALUES (12, 'admin1', 'admin1@ggg.com', NULL, 'f52c408825c09f29aae45eb90a3ba819c1d0fe18dd5d5c75055ee68b981ac521f7281907b7bb1d8e2a28580afa2a82a9eae837b0284201e2ac09f9ac82fa96be', '6d5a0b4f18a238e77478115b5841ed23d5426d9cc9c0b99a1c3a55532db8427cf1cb53996181cf80f06303deb297af5743d99b671883fb2929a8abd59fd457a8', 1, '2020-05-04 17:26:53', '2020-05-04 17:26:53', 1, 1);
+INSERT INTO `user` VALUES (1, 'admin', 'admin@gmail.com', NULL, '2b80c2a4acbfbb1dd8d289f92e8193750ceadfd2bbc8b5a5d842f7aa6cfe223f4c321c6530e8df74d0bf1abe7a0c2c21f1671d356775113583ce4cdf949e277c', '01bf5d6e94a31637ddfb7c02e2fc54c08e8e73bd7088f5fe0b6995e2f0ed7d0d9e474e8a8144cd8b8e61800c5652bc46c6e5a50bc7cc74b2dbdbd36331c85414', 1, '2020-04-27 11:23:19', '2020-04-27 11:23:19', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for user_login_attempts
@@ -284,7 +282,5 @@ CREATE TABLE `user_role`  (
 -- Records of user_role
 -- ----------------------------
 INSERT INTO `user_role` VALUES (1, 1);
-INSERT INTO `user_role` VALUES (3, 11);
-INSERT INTO `user_role` VALUES (3, 12);
 
 SET FOREIGN_KEY_CHECKS = 1;

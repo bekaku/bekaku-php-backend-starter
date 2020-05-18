@@ -108,6 +108,19 @@ if ( ! function_exists('is_really_writable'))
 	}
 }
 	
+if (!function_exists('get_env')) {
+    function get_env($key = null)
+    {
+        if(!$key){
+            return null;
+        }
+        $parsed = parse_ini_file(__SITE_PATH . '/.env');
+        if (isset($parsed[$key])) {
+            return $parsed[$key];
+        }
+        return null;
+    }
+}
 /*
  *
  * Enter description here ...
