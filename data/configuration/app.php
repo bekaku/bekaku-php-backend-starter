@@ -144,15 +144,14 @@ return array(
     'db_default_driver' => 'mysql',
     'mysql' => array(
         'driver' => 'mysql',
-        'host' => 'demo.appedr.com',
+        'host' => 'localhost',
         'database' => 'bekaku_php',
         'username' => 'root',
-        'password' => '@Dev@ats[]^9yl',
+        'password' => '',
         'charset' => 'utf8',
         'collation' => 'utf8_general_ci',
         'prefix' => '',
-//        'port' => '3306',
-        'port'    => '13537',
+        'port' => '3306',
         'strict' => false,
     ),
     'sqlite' => array(
