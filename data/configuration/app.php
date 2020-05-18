@@ -30,7 +30,7 @@ return array(
     */
     'log' => array(
         'log_threshold' => 4,
-        'log_path' => getenv('PROJECT_DATA_HOME') . '/logs/',
+        'log_path' => get_env('PROJECT_DATA_HOME') . '/logs/',
         'log_date_format' => 'Y-m-d H:i:s',
         'can_log' => true,
     ),
@@ -143,15 +143,15 @@ return array(
     */
     'db_default_driver' => 'mysql',
     'mysql' => array(
-        'driver' => 'mysql',
-        'host' => 'localhost',
-        'database' => 'bekaku_php',
-        'username' => 'root',
-        'password' => '',
+        'driver' => get_env('DB_CONNECTION'),
+        'host' => get_env('DB_HOST'),
+        'database' => get_env('DB_DATABASE'),
+        'username' => get_env('DB_USERNAME'),
+        'password' => get_env('DB_PASSWORD'),
         'charset' => 'utf8',
         'collation' => 'utf8_general_ci',
         'prefix' => '',
-        'port' => '3306',
+        'port' => get_env('DB_PORT'),//3306
         'strict' => false,
     ),
     'sqlite' => array(
@@ -198,15 +198,15 @@ return array(
     'url' => 'localhost',//your server's domain or ip
     'url_port' => '80',//your http port
     'ssl_port' => '443',//your https port
-    'url_rewriting_project_path' => getenv('PROJECT_HOME')."/",
-    'base_project_path' => getenv('PROJECT_HOME')."/",
-    'base_project_resources_path' => getenv('PROJECT_HOME') . '/resources',
+    'url_rewriting_project_path' => get_env('PROJECT_HOME')."/",
+    'base_project_path' => get_env('PROJECT_HOME')."/",
+    'base_project_resources_path' => get_env('PROJECT_HOME') . '/resources',
 
     /*
      | can use "index.php" will be like "index.php?module=login" or "" empty string will be like "?module=login"
      | config .htaccess for xample.com/login for hide 'index.php?module='
      */
     'base_index_name' => 'index.php',
-    'base_data_path' => getenv('PROJECT_DATA_HOME'),
-    'base_data_display' => getenv('PROJECT_DATA_DISPLAY'),
+    'base_data_path' => get_env('PROJECT_DATA_HOME'),
+    'base_data_display' => get_env('PROJECT_DATA_DISPLAY'),
 );

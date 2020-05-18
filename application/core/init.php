@@ -28,7 +28,8 @@ use application\util\MessageUtils;
 | Reuire Application Configuration
 |--------------------------------------------------------------------------
 */
-$configPath = getenv('PROJECT_DATA_HOME');
+// $configPath = getenv('PROJECT_DATA_HOME');
+$configPath = get_env('PROJECT_DATA_HOME');
 if (empty($configPath)) {
     ControllerUtil::displayError('Config file not found.');
 }
