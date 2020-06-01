@@ -10,7 +10,6 @@ use application\util\ControllerUtil;
 use application\util\DateUtils;
 use application\util\FilterUtils;
 use application\util\i18next;
-use application\util\SystemConstant;
 use stdClass;
 
 class AuthService extends BaseDatabaseSupport
@@ -25,6 +24,7 @@ class AuthService extends BaseDatabaseSupport
     {
         $this->setDbh($dbConn);
         $this->userService = new UserService($this->getDbh());
+
     }
 
     public function signin($email, $password, $newSalt = false)
@@ -52,6 +52,7 @@ class AuthService extends BaseDatabaseSupport
                 $result->message = i18next::getTranslation('error.accountLocked');
             } else {
                 $inputHashPassword = ControllerUtil::genHashPassword($password, $userSaltInDb);
+
                 // Check if the password in the database matches the password the user submitted.
                 if ($inputHashPassword == $hashPasswordInDb) {
                     //update user logined to db
@@ -63,7 +64,7 @@ class AuthService extends BaseDatabaseSupport
                     // Get the user-agent string of the user. for apiKey
                     $hashUserDescription = ControllerUtil::genHashPassword(FilterUtils::filterServer('HTTP_USER_AGENT'), $userIdInDb . DateUtils::getTimeNow());
                     $result->apiKey = ControllerUtil::genHashPassword(ControllerUtil::getRadomSault(), $hashUserDescription);
-                    $result->message = null;
+                    $result->message = i18next::getTranslation('success.loginSuccess');
                     $result->status = true;
 
                 } else {

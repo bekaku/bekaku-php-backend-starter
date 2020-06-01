@@ -11,11 +11,11 @@ class PermissionValidator extends BaseValidator
         //call parent construct
         parent::__construct();
         $this->objToValidate = $permission;
-        $this->validateField('crud_table', self::VALIDATE_REQUIRED);
-        $this->validateField('description', self::VALIDATE_REQUIRED);
         $this->validateField('name', self::VALIDATE_REQUIRED);
+        $this->validateField('description', self::VALIDATE_REQUIRED);
+        $this->validateField('crud_table', self::VALIDATE_REQUIRED);
         $this->validateField('status', self::VALIDATE_REQUIRED);
-        $this->validateField('status', self::VALIDATE_INT);
+        $this->validateField('status', self::VALIDATE_BOOLEAN);
 
         //Custom Validate
         /*

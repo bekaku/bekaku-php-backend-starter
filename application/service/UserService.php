@@ -20,7 +20,7 @@ class UserService extends BaseDatabaseSupport implements UserServiceInterface
         //if have param
         $data_bind_where = null;
 
-        $query = "SELECT id, username, email, image, created_at ";
+        $query = "SELECT id, username, email, image, status, created_at ";
 
         $query .= "FROM user AS user ";
 
@@ -61,7 +61,10 @@ class UserService extends BaseDatabaseSupport implements UserServiceInterface
         if ($listTmp) {
             foreach ($listTmp AS $item) {
                 $item->id = (int)$item->id;
-                $item->picture = UploadUtil::getUserAvatarApi($item->image, $item->created_at);
+                $item->picture = UploadUtil::getProfilePicApi($item->image, $item->created_at);
+                $item->status = (bool)$item->status;
+                $item->userRoles = $this->findUserRolesId($item->id);
+                unset($item->image);
                 array_push($list, $item);
             }
         }
@@ -71,26 +74,35 @@ class UserService extends BaseDatabaseSupport implements UserServiceInterface
     public function findById($id)
     {
         $query = "SELECT *  ";
-
         $query .= "FROM user AS user ";
         $query .= "WHERE user.`id`=:id ";
 
         $this->query($query);
         $this->bind(":id", (int)$id);
-        return $this->single();
+        $item = $this->single();
+        if ($item) {
+            $item->id = (int)$item->id;
+            $item->picture = UploadUtil::getProfilePicApi($item->image, $item->created_at);
+            $item->status = (bool)$item->status;
+            $item->userRoles = $this->findUserRolesId($item->id);
+            return $item;
+        }
+        return null;
     }
 
     public function findUserDataById($id)
     {
-        $query = "SELECT id, username, email, image, created_at, status  FROM `user` WHERE `id`=:id ";
+        $query = "SELECT user.id, username, email, image, created_at, user.status, GROUP_CONCAT(r.name) AS rolesText  FROM `user`
+         LEFT JOIN user_role ur ON user.`id` = ur.user 
+         LEFT JOIN role r ON r.`id` = ur.role
+         WHERE user.`id`=:id ";
         $this->query($query);
         $this->bind(":id", (int)$id);
         $data = $this->single();
         if ($data) {
-            $data->picture = UploadUtil::getUserAvatarApi($data->image, $data->created_at);
+            $data->picture = UploadUtil::getProfilePicApi($data->image, $data->created_at);
             $data->status = (bool)$data->status;
             $data->userRoles = $this->findUserRolesId($data->id);
-            unset($data->image);
             return $data;
         }
         return null;
@@ -128,7 +140,11 @@ class UserService extends BaseDatabaseSupport implements UserServiceInterface
 
     public function deleteById($id)
     {
-        $query = "DELETE FROM " . $this->tableName . " WHERE id=:id";
+        //delete reference table
+        $query = "DELETE FROM user_role WHERE user=:id;";
+        $query .= "DELETE FROM user_login_log WHERE user=:id;";
+        $query .= "DELETE FROM user_login_attempts WHERE user=:id;";
+        $query .= "DELETE FROM " . $this->tableName . " WHERE id=:id;";
         $this->query($query);
         $this->bind(":id", (int)$id);
         return $this->execute();

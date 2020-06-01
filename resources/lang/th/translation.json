@@ -52,7 +52,12 @@
       "forgot_pwd": "ลืมรหัสผ่าน?",
       "arr_form_page": "ฟอร์ม __page__",
       "other": "อื่นๆ",
-      "layout_type": "โหมดสว่าง/มืด"
+      "layout_type": "โหมดสว่าง/มืด",
+      "crud_list": "รายการ",
+      "crud_add": "เพิ่ม",
+      "crud_view": "ดู",
+      "crud_edit": "แก้ไข",
+      "crud_delete": "ลบ"
     },
     "paging": {
       "page": "หน้า",
@@ -77,6 +82,7 @@
     "error": {
       "email_format": "อีเมล์ไม่ถูกต้อง",
       "password_wrong": "รหัสผ่านไม่ถูกต้อง",
+      "passwordCurrentWrong": "รหัสผ่านเก่าไม่ถูกต้อง",
       "404": "ไม่พบหน้าที่ต้องการ",
       "error": "ผิดพลาด",
       "oops": "Oops!!",
@@ -89,6 +95,7 @@
       "validate_unique": "ข้อมูลนี้ถูกใช้ไปแล้วไม่สามารถใช้ได้อีก",
       "validate_int": "ข้อมูลนี้ต้องกรอกเป็นตัวเลขเท่านั้น",
       "validate_email": "รูปแบบอีเมล์ไม่ถูกต้อง",
+      "validate_boolean": "รูปแบบ Boolean ไม่ถูกต้อง",
       "validate_number": "ข้อมูลนี้ต้องกรอกเป็นตัวเลขเท่านั้น",
       "validate_positive_number": "ข้อมูลนี้ต้องกรอกเป็นตัวเลขเท่านั้น",
       "validate_datetime": "รูปแบบวันที่ไม่ถูกต้อง 'yyyy-MM-dd HH:mm:ss'",
@@ -96,15 +103,20 @@
       "contact_admin": "เกิดข้อผิดพลาดกรุณาติดต่อผู้ดูแลระบบ",
       "error_something_wrong": "เกิดข้อผิดพลาด !!",
       "permissionDeny": "ผู้ใช้ไม่ได้รับสิทธิ์ในการเข้าถึงข้อมูลนี้",
-      "err_404": "ไม่พบหน้าที่ต้องการ"
+      "err_404": "ไม่พบหน้าที่ต้องการ",
+      "duplicateEmail": "อีเมล์ __email__ มีคนใช้แล้ว กรุณาเปลี่ยนอีเมล์และลองอีกครั้ง",
+      "duplicateUsername": "ชื่อผู้ใช้ __username__ มีคนใช้แล้ว กรุณาเปลี่ยนชื่อผู้ใช้และลองอีกครั้ง"
     },
     "success": {
-      "success": "สำเร็จ",
+      "success": "ดำเนินการสำเร็จ",
+      "loginSuccess": "เข้าสู่ระบบสำเร็จ",
+      "logoutSuccess": "ออกจากระบบสำเร็จ",
       "update_succesfull": "แก้ไขข้อมูลสำเร็จ",
       "insert_succesfull": "เพิ่มข้อมูลสำเร็จ",
       "save_genarate_system": "สร้างไฟล์พื้นฐานสำเร็จ",
       "update_genarate_system": "แก้ไขไฟล์พื้นฐานสำเร็จ",
-      "delete_succesfull": "ลบข้อมูลสำเร็จ"
+      "delete_succesfull": "ลบข้อมูลสำเร็จ",
+      "changePasswordOk": "เปลี่ยนรหัสผ่านสำเร็จ ท่านสามารถเข้าสู่ระบบด้วยรหัสผ่านที่เพิ่งได้เปลี่ยนไป"
     },
     "helper": {
       "login_to_system": "เข้าสู่ระบบ __system__",
@@ -144,24 +156,30 @@
         "description": "Description"
       },
       "permission": {
-        "permission": "permission",
-        "crud_table": "crud_table",
-        "description": "description",
-        "name": "name",
-        "status": "status"
+        "id": "รหัส",
+        "crud_table": "ตาราง",
+        "permission": "สิทธิ์การใช้งาน",
+        "name": "ชื่อสิทธิ์",
+        "status": "สถานะ",
+        "description": "รายละเอียด"
       },
       "role": {
-        "role": "role",
-        "description": "description",
-        "name": "name",
-        "status": "status"
+        "role": "กลุ่มผู้ใช้งาน",
+        "name": "ชื่อกลุ่ม",
+        "id": "รหัสกลุ่ม",
+        "description": "รายละเอียด",
+        "status": "สถานะ",
+        "test_field": "test_field"
       },
       "api_client": {
-        "api_client": "api_client",
-        "api_name": "api_name",
-        "api_token": "api_token",
-        "by_pass": "by_pass",
-        "status": "status"
+        "api_client": "Api client",
+        "id": "id",
+        "api_name": "Api name",
+        "api_token": "Token",
+        "by_pass": "By pass",
+        "status": "status",
+        "created_at": "สร้างเมื่อ",
+        "updated_at": "แก้ไขเมื่อ"
       },
       "api_client_ip": {
         "api_client_ip": "api_client_ip",
@@ -179,13 +197,23 @@
         "expires_at": "expires_at"
       },
       "user": {
-        "user": "user",
-        "username": "username",
+        "user": "ผู้ใช้ระบบ",
+        "username": "ชื่อผู้ใช้",
+        "login_password": "รหัสผ่าน",
+        "comfirm_password": "ยืนยันรหัสผ่าน",
+        "email": "อีเมล์",
         "salt": "salt",
-        "email": "email",
-        "image": "image",
-        "password": "password",
-        "status": "status"
+        "status": "สถานะ",
+        "img_name": "รูปภาพ"
+      },
+
+      "edr_youtube_mapper": {
+        "no": "ลำดับที่",
+        "edr_youtube_mapper": "ผูก Url ยูทูป",
+        "description": "รายการที่ต้องจัดทำ Youtube",
+        "actiive": "ดำเนินการแล้ว",
+        "youtube_link": "ลิงค์ Youtube",
+        "edr_link": "ลิงค์ Edr"
       }
     },
     "httpStatus": {

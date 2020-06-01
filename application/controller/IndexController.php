@@ -22,6 +22,5 @@ class IndexController extends AppController
     {
         $this->pushDataToView = $this->setResponseStatus([], true, i18next::getTranslation('app.system_name'));
         jsonResponse($this->pushDataToView);
-
     }
 }

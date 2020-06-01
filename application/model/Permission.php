@@ -1,4 +1,5 @@
 <?php
+/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
 
 namespace application\model;
 
@@ -8,23 +9,24 @@ class Permission extends BaseModel
     public static $tableName = 'permission';
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
     { 
+       //not use audit info 
+        $this->setAuditInfo(false); 
+ 
         /* init data type for field*/
         $this->setTableField(array(
             'id' => self::TYPE_AUTO_INCREMENT,
-            'crud_table' => self::TYPE_STRING,
-            'description' => self::TYPE_STRING,
             'name' => self::TYPE_STRING,
+            'description' => self::TYPE_STRING,
+            'crud_table' => self::TYPE_STRING,
             'status' => self::TYPE_BOOLEAN,
         )); 
  
         /* init data type for field use in update mode*/
         $this->setTableFieldForEdit(array(
-            'crud_table' => self::TYPE_STRING,
-            'description' => self::TYPE_STRING,
             'name' => self::TYPE_STRING,
+            'description' => self::TYPE_STRING,
+            'crud_table' => self::TYPE_STRING,
             'status' => self::TYPE_BOOLEAN,
-            'updated_user' => self::TYPE_INTEGER,
-            'updated_date' => self::TYPE_DATE_TIME
         ));
 
         /* init optional field*/

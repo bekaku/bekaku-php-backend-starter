@@ -104,10 +104,16 @@ class UploadUtil
         return false;
     }
 
-    public static function uploadProfilePic($files, $yearMonthFolder = null, $limitDimention = 0)
+    public static function uploadProfilePic($files, $yearMonthFolder = null, $limitDimention = 0, $nameCustom = null)
     {
 
         $uploadPath = self::$UPLOAD_PATH_IMAGE;
+        //generate new img name with user id + time now + random string
+        if ($nameCustom) {
+            $imagNameGenerate = $nameCustom;
+        } else {
+            $imagNameGenerate = self::generateFileName();
+        }
         if ($yearMonthFolder) {
             $yearMonthFolder = DateUtil::getYearAndMonthFromDate($yearMonthFolder);
             //create folder if not exit
@@ -115,7 +121,7 @@ class UploadUtil
             $uploadPath = $uploadPath . "/" . $yearMonthFolder;
         }
         //generate new img name with user id + time now + random string
-        $imagNameGenerate = self::generateFileName();
+
         $upload = new Upload($files);
         if ($upload->uploaded) {
 
@@ -171,7 +177,7 @@ class UploadUtil
             $upload->Process($uploadPath);
             if ($upload->processed) {
                 $upload->Clean();
-                return $imagNameGenerate;
+                return $imagNameGenerate . '.jpg';
             } else {
                 ControllerUtils::setErrorMessage($upload->error);
             }
@@ -180,102 +186,91 @@ class UploadUtil
         return false;
     }
 
+    public static function getProfilePicApi($imgName, $dateCreate, $isUpload = false)
+    {
+        $displayPath = AppUtils::getServerIp() . MessageUtil::getConfig('base_data_display');
+        $uploadPath = MessageUtil::getConfig('base_data_path');
+
+        if ($imgName) {
+            $splitFileName = explode(".", $imgName);
+            $filePreName = $splitFileName[0];
+
+            $x = $filePreName . '_x.jpg';
+            $xx = $filePreName . '_xx.jpg';
+            $xxx = $filePreName . '_xxx.jpg';
+
+            $imgFolder = $displayPath . "/img";
+            $checkFolder = $uploadPath . "/img";
+            $filePath = "";
+            $checkPath = "";
+            if ($dateCreate) {
+                $filePath .= $imgFolder . "/" . DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
+                $checkPath .= $checkFolder . "/" . DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
+            }
+            return [
+                'path' => self::isFileExist($checkPath . $imgName) ? ($isUpload ? $checkPath . $imgName : $filePath . $imgName) : self::defaultProfilePic($displayPath, $isUpload)['path'],
+                'x' => self::isFileExist($checkPath . $x) ? ($isUpload ? $checkPath . $x : $filePath . $x) : self::defaultProfilePic($displayPath, $isUpload)['x'],
+                'xx' => self::isFileExist($checkPath . $xx) ? ($isUpload ? $checkPath . $xx : $filePath . $xx) : self::defaultProfilePic($displayPath, $isUpload)['xx'],
+                'xxx' => self::isFileExist($checkPath . $xxx) ? ($isUpload ? $checkPath . $xxx : $filePath . $xxx) : self::defaultProfilePic($displayPath, $isUpload)['xxx'],
+            ];
+        } else {
+            return self::defaultProfilePic($displayPath, $isUpload);
+        }
+    }
+
+    public static function defaultProfilePic($displayPath, $isUpload)
+    {
+        return [
+            'path' => $isUpload ? null : $displayPath . "/img/default.jpg",
+            'x' => $isUpload ? null : $displayPath . "/img/default_x.jpg",
+            'xx' => $isUpload ? null : $displayPath . "/img/default_xx.jpg",
+            'xxx' => $isUpload ? null : $displayPath . "/img/default_xxx.jpg",
+        ];
+    }
+
+    public static function isFileExist($filePath)
+    {
+        return file_exists($filePath);
+    }
+
     public static function generateFileName()
     {
         return (ControllerUtils::getUserIdSession() ? ControllerUtils::getUserIdSession() : 0) . '_' . DateUtil::getTimeNow() . '_' . AppUtils::generateRandID();
     }
 
-    public static function displayImgFromUpload($imgName, $yearMonthFolder)
+    public static function getImageApi($imgName, $dateCreate, $isUpload = false)
     {
-
-
-        $filePath = __UPLOAD_PATH_IMG;
-        if ($yearMonthFolder) {
-            $filePath .= "/" . DateUtil::getYearAndMonthFromDate($yearMonthFolder) . "/";
-        }
-        if ($imgName) {
-            $imgPath = $filePath . $imgName;
-            if (file_exists($imgPath)) {
-                return $imgPath;
-
-            } else {
-                return __UPLOAD_PATH_IMG . "/no_picture.jpg";
-            }
-        } else {
-            return __UPLOAD_PATH_IMG . "/no_picture.jpg";
-        }
-
-    }
-
-    public static function displayImgThumnailPubic($imgName, $yearMonthFolder)
-    {
-
-        $imgPath = self::getThumnailImgPath($imgName, $yearMonthFolder);
-        if ($imgPath) {
-            return $imgPath;
-        } else {
-            return self::$DISPLAY_PATH_IMAGE . "/no_picture.jpg";
-        }
-
-
-    }
-
-    public static function getThumnailImgPath($imgName, $yearMonthFolder)
-    {
-        $splitFileName = explode(".", $imgName);
-        $filePreName = $splitFileName[0];
-        $imgThumbName = $filePreName . MessageUtil::getConfig('upload_image.create_thumbnail_exname') . '.jpg';
-
-        $imgFolder = self::$DISPLAY_PATH_IMAGE;
-        $filePath = "";
-        if ($yearMonthFolder) {
-            $filePath .= $imgFolder . "/" . DateUtil::getYearAndMonthFromDate($yearMonthFolder) . "/";
-        }
-        $imgPath = $filePath . $imgThumbName;
-        if (self::isFileExitFromUrl($imgPath)) {
-//        if(file_exists($imgPath)){
-            return $imgPath;
-        } else {
-            return self::$DISPLAY_PATH_IMAGE . "/no_picture.jpg";
-        }
-    }
-
-    public static function displayAvatarThumnailPubic($imgName, $yearMonthFolder)
-    {
-
+        $displayPath = AppUtils::getServerIp() . MessageUtil::getConfig('base_data_display');
+        $uploadPath = MessageUtil::getConfig('base_data_path');
 
         if ($imgName) {
-            $imgPath = self::getThumnailImgPath($imgName, $yearMonthFolder);
-            if (self::isFileExitFromUrl($imgPath)) {
-                return $imgPath;
-            } else {
-                return self::$DISPLAY_PATH_IMAGE . "/default.png";
+            $splitFileName = explode(".", $imgName);
+            $filePreName = $splitFileName[0];
+            $thumbName = $filePreName . MessageUtil::getConfig('upload_image.create_thumbnail_exname') . '.jpg';
+
+            $imgFolder = $displayPath . "/img";
+            $checkFolder = $uploadPath . "/img";
+            $filePath = "";
+            $checkPath = "";
+            if ($dateCreate) {
+                $filePath .= $imgFolder . "/" . DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
+                $checkPath .= $checkFolder . "/" . DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
             }
+            return [
+                'path' => self::isFileExist($checkPath . $imgName) ? ($isUpload ? $checkPath . $imgName : $filePath . $imgName) : self::defaultImage($displayPath, $isUpload)['path'],
+                'thumbnail' => self::isFileExist($checkPath . $thumbName) ? ($isUpload ? $checkPath . $thumbName : $filePath . $thumbName) : self::defaultImage($displayPath, $isUpload)['thumbnail'],
+            ];
         } else {
-            return self::$DISPLAY_PATH_IMAGE . "/default.png";
+            return self::defaultImage($displayPath, $isUpload);
         }
     }
 
-    public static function displayImgFullPublic($imgName, $yearMonthFolder)
+    public static function defaultImage($displayPath, $isUpload)
     {
-
-        $uploadImgFolder = self::$DISPLAY_PATH_IMAGE;
-        $filePath = "";
-        if ($yearMonthFolder) {
-            $filePath .= $uploadImgFolder . "/" . DateUtil::getYearAndMonthFromDate($yearMonthFolder) . "/";
-        }
-        if ($imgName) {
-            $imgPath = $filePath . $imgName;
-            if (self::isFileExitFromUrl($imgPath)) {
-                return $imgPath;
-            } else {
-                return self::$DISPLAY_PATH_IMAGE . "/no_picture.jpg";
-            }
-
-        } else {
-            return self::$DISPLAY_PATH_IMAGE . "/no_picture.jpg";
-        }
-
+        return [
+            'path' => $isUpload ? null : $displayPath . "/img/no_picture.jpg",
+            'thumbnail' => $isUpload ? null : $displayPath . "/img/no_picture_thumb.jpg",
+        ];
     }
 
     public static function delImgfileFromYearMonthFolder($file_name, $yearMonthFolder = null)
@@ -300,7 +295,7 @@ class UploadUtil
         return AppUtils::doDelfileFromPath($pathDelete);
     }
 
-    public static function delProfileImgfile($file_name, $yearMonthFolder = null)
+    public static function delProfileImagefile($file_name, $yearMonthFolder = null)
     {
 
         $splitFileName = explode(".", $file_name);
@@ -486,40 +481,6 @@ class UploadUtil
         ob_flush();
         flush();
     }
-
-    public static function getUserAvatarApi($imgName, $dateCreate)
-    {
-
-        $httpPort = MessageUtils::getConfig('url_port');
-        $httpsPort = MessageUtils::getConfig('ssl_port');
-        $port = MessageUtils::getConfig('secure') ? ($httpsPort != 443 ? ":" . $httpsPort : "") : ($httpPort != 80 ? ":" . $httpPort : "");
-
-        $http = MessageUtils::getConfig('secure') ? SystemConstant::HTTPS_STR : SystemConstant::HTTP_STR;
-        $url = $http . MessageUtils::getConfig('url') . $port;
-
-        $path = self::getThumnailImgPathApi($imgName, $dateCreate);
-        return $url . $path;
-    }
-
-    public static function getThumnailImgPathApi($imgName, $yearMonthFolder)
-    {
-
-        if ($imgName) {
-            $splitFileName = explode(".", $imgName);
-            $filePreName = $splitFileName[0];
-            $imgThumbName = $filePreName . MessageUtil::getConfig('upload_image.create_thumbnail_exname') . '.jpg';
-
-            $imgFolder = MessageUtil::getConfig('base_data_display') . "/img";
-            $filePath = "";
-            if ($yearMonthFolder) {
-                $filePath .= $imgFolder . "/" . DateUtil::getYearAndMonthFromDate($yearMonthFolder) . "/";
-            }
-            return $filePath . $imgThumbName;
-        } else {
-            return MessageUtil::getConfig('base_data_display') . "/img/default.png";
-        }
-    }
-
     //Thailand Post
     public static function uploadApiFiles($files, $yearMonthFolder = null, $fileName = null)
     {
@@ -553,6 +514,7 @@ class UploadUtil
         $getExtension = explode("/", $info);
         return count($getExtension) > 0 ? $getExtension[1] : null;
     }
+
     public static function getUploadFileName($userId, $randomId = true)
     {
         return $userId . SystemConstant::UNDER_SCORE . DateUtils::getTimeNow() . ($randomId ? SystemConstant::UNDER_SCORE . AppUtil::generateRandStr(5) : '');

@@ -4,6 +4,7 @@ namespace application\service;
 
 use application\core\BaseDatabaseSupport;
 use application\serviceInterface\PermissionServiceInterface;
+use application\util\i18next;
 
 class PermissionService extends BaseDatabaseSupport implements PermissionServiceInterface
 {
@@ -60,7 +61,13 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
         //bind param for search param
         $this->genBindParamAndWhereForListPage($data_bind_where);
 
-        return $this->list();
+        $list = [];
+        $reasult = $this->list();
+        foreach ($reasult AS $t) {
+            $t->status = boolval($t->status);
+            array_push($list, $t);
+        }
+        return $list;
     }
 
     public function findById($id)
@@ -72,7 +79,37 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
 
         $this->query($query);
         $this->bind(":id", (int)$id);
-        return $this->single();
+        $t = $this->single();
+        if ($t) {
+            $t->status = boolval($t->status);
+        }
+        return $t;
+    }
+
+    public function findAllCrudTable()
+    {
+        $query = "SELECT DISTINCT(p.crud_table) FROM permission p  ";
+        $this->query($query);
+        return $this->list();
+    }
+
+    public function findAllByCrudTbl($tbl)
+    {
+        $query = "SELECT *  ";
+        $query .= "FROM permission AS permission ";
+        $query .= "WHERE permission.`crud_table`=:name ";
+        $this->query($query);
+        $this->bind(":name", (string)$tbl);
+        return $this->list();
+    }
+
+    public function findAllByEmptyCrudTbl()
+    {
+        $query = "SELECT *  ";
+        $query .= "FROM permission AS p ";
+        $query .= "WHERE p.crud_table IS NULL OR p.crud_table='' ";
+        $this->query($query);
+        return $this->list();
     }
 
     public function findByName($name)
@@ -96,16 +133,17 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
         return $this->execute();
     }
 
-    public function createCrudPermission(string $crud)
+    public function createCrudPermission($crud)
     {
         foreach ($this->cruds AS $c) {
             $permissionName = $crud . '_' . $c;
             $permissionExist = $this->findByName($permissionName);
+            $crudDes = i18next::getTranslation('base.crud_' . $c);
             if (empty($permissionExist)) {
                 $this->createByArray([
-                    'crud_table' => $crud,
-                    'description' => $crud . ' ' . $c,
                     'name' => $permissionName,
+                    'crud_table' => $crud,
+                    'description' => $crud . '(' . $crudDes . ')',
                     'status' => 1,
                 ]);
             }
@@ -161,7 +199,7 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
         return $this->insertHelper('role_permission', $data_array);
     }
 
-    public function deleteRolePermissionByRole(int $roleId)
+    public function deleteRolePermissionByRole($roleId)
     {
         $query = "DELETE FROM role_permission WHERE role=:role";
         $this->query($query);
@@ -177,11 +215,21 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
         return $this->execute();
     }
 
-    public function findPermissionListByRole($roleId)
+    public function findPermissionListByRole($roleId, $removeKey = false)
     {
         $query = "SELECT permission FROM role_permission WHERE role=:role";
         $this->query($query);
         $this->bind(":role", $roleId);
+        if ($removeKey) {
+            $tmpList = $this->list();
+            $list = array();
+            if (count($tmpList) > 0) {
+                foreach ($tmpList AS $t) {
+                    array_push($list, $t->permission);
+                }
+            }
+            return $list;
+        }
         return $this->list();
     }
 
@@ -197,6 +245,7 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
         $this->bind(":permission_name", $permissionName);
         return $this->list();
     }
+
     public function isHavePermission($userId, $permission)
     {
         $roles = $this->findUserRolesByUser($userId);
@@ -215,11 +264,21 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
     }
 
     //user_role
-    public function findUserRolesByUser($userId)
+    public function findUserRolesByUser($userId, $removeKey = false)
     {
         $query = "SELECT role FROM user_role WHERE user=:user";
         $this->query($query);
         $this->bind(":user", $userId);
+        if ($removeKey) {
+            $tmpList = $this->list();
+            $list = array();
+            if (count($tmpList) > 0) {
+                foreach ($tmpList AS $t) {
+                    array_push($list, $t->role);
+                }
+            }
+            return $list;
+        }
         return $this->list();
     }
 

@@ -10,7 +10,7 @@ class AccessToken extends BaseModel
         /* init data type for field*/
         $this->setTableField(array(
             'id' => self::TYPE_AUTO_INCREMENT,
-            'name' => self::TYPE_STRING,
+            'user_agent' => self::TYPE_INTEGER,
             'token' => self::TYPE_STRING,
             'api_client' => self::TYPE_STRING,
             'user' => self::TYPE_STRING,
@@ -22,7 +22,7 @@ class AccessToken extends BaseModel
  
         /* init data type for field use in update mode*/
         $this->setTableFieldForEdit(array(
-            'name' => self::TYPE_STRING,
+            'user_agent' => self::TYPE_STRING,
             'token' => self::TYPE_STRING,
             'api_client' => self::TYPE_STRING,
             'user' => self::TYPE_STRING,

@@ -13,8 +13,8 @@ class ApiClientValidator extends BaseValidator
         $this->objToValidate = $apiClient;
         $this->validateField('api_name', self::VALIDATE_REQUIRED);
         $this->validateField('api_token', self::VALIDATE_REQUIRED);
-        $this->validateField('by_pass', self::VALIDATE_INT);
-        $this->validateField('status', self::VALIDATE_INT);
+        $this->validateField('by_pass', self::VALIDATE_BOOLEAN);
+        $this->validateField('status', self::VALIDATE_BOOLEAN);
 
         //Custom Validate
         /*

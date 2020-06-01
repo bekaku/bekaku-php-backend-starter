@@ -9,8 +9,10 @@
 namespace application\controller;
 
 use application\core\AppController;
+use application\util\AppUtil;
 use application\util\ControllerUtil;
 use application\util\DateUtils;
+use application\util\FilterUtils;
 
 class UtilController extends AppController
 {
@@ -30,5 +32,9 @@ class UtilController extends AppController
     public function jsonGetUniqeToken()
     {
         jsonResponse(['uniqeTokenCookie' => ControllerUtil::getUniqeTokenCookie()]);
+    }
+    public function getSiteMetadata()
+    {
+        jsonResponse(AppUtil::getSiteMetaData(FilterUtils::filterGetString('uri')));
     }
 }

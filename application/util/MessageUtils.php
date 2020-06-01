@@ -19,54 +19,30 @@ class MessageUtils
     {
         $confString = null;
         if ($params) {
-            // if(file_exists(__SITE_PATH.'/application/configuration/app.php')) {
-            //     $configArray = require __SITE_PATH . "/application/configuration/app.php";
-            //     $confString = self::getValueFromArray($configArray, $params);
-            // }
-//             $configPath=null;
-//            if(AppUtil::getCurrentOS() == SystemConstant::OS_WIN){
-//                $configPath = 'D:/php_htdocs/github/php/bekaku-php-backend-starter/data/configuration/app.php';
-//            }else if(AppUtil::getCurrentOS() == SystemConstant::OS_LINUX){
-//                $configPath = '/var/bekaku-php-backend-starter/data/configuration/app.php';
-//            }else if(AppUtil::getCurrentOS() == SystemConstant::OS_OSX){
-//                $configPath = '/Users/bekaku/bekaku-php-backend-starter/data/configuration/app.php';
-//            }else{
-//                ControllerUtil::displayError('Config file not found.');
-//            }
-//            $configPath = getenv('BEKAKU_DATA_HOME');
-//            if(empty($configPath)){
-//                ControllerUtil::displayError('Config file not found.');
-//            }
-//            $configPath .="configuration/app.php";
-//            if (file_exists($configPath)) {
-//                $configArray = require $configPath;
-//                $confString = self::getValueFromArray($configArray, $params);
-//            }
-            $applicaionConfigArray =__APP_CONFIG;
-            $confString = self::getValueFromArray($applicaionConfigArray, $params);
+            $configArray =__APP_CONFIG;
+            $confString = self::getValueFromArray($configArray, $params);
         }
         return $confString;
     }
 
-    public static function getVendorConfig($params = null, $isInternalFile = true)
-    {
-        $cdnOnline = self::getConfig('cdn_online');
-//        echoln('cdn-Mode====>'.$cdnOnline);
-        $confString = null;
-        if ($params) {
-
-            if (file_exists(__SITE_PATH . '/application/configuration/vendorConf.php')) {
-                $configArray = require __SITE_PATH . "/application/configuration/vendorConf.php";
-                $confString = self::getValueFromArray($configArray, $params);
-            }
-        }
-        if ($isInternalFile || !$cdnOnline) {
-            return __RESOURCES . $confString;
-        } else {
-            return $confString;
-        }
-
-    }
+//    public static function getVendorConfig($params = null, $isInternalFile = true)
+//    {
+//        $cdnOnline = self::getConfig('cdn_online');
+//        $confString = null;
+//        if ($params) {
+//
+//            if (file_exists(__SITE_PATH . '/application/configuration/vendorConf.php')) {
+//                $configArray = require __SITE_PATH . "/application/configuration/vendorConf.php";
+//                $confString = self::getValueFromArray($configArray, $params);
+//            }
+//        }
+//        if ($isInternalFile || !$cdnOnline) {
+//            return __RESOURCES . $confString;
+//        } else {
+//            return $confString;
+//        }
+//
+//    }
     public static function genScriptCustom($list = array())
     {
         if (!AppUtil::isArrayEmpty($list)) {

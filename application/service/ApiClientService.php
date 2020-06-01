@@ -1,5 +1,4 @@
 <?php
-/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
 
 namespace application\service;
 
@@ -21,7 +20,6 @@ class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceIn
         $data_bind_where = null;
 
         $query = "SELECT *  ";
-
         $query .= "FROM api_client AS api_client ";
 
         //default where query
@@ -58,7 +56,14 @@ class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceIn
         //bind param for search param
         $this->genBindParamAndWhereForListPage($data_bind_where);
 
-        return $this->list();
+        $list = [];
+        $reasult = $this->list();
+        foreach ($reasult AS $t) {
+            $t->by_pass = boolval($t->by_pass);
+            $t->status = boolval($t->status);
+            array_push($list, $t);
+        }
+        return $list;
     }
 
     public function findById($id)
@@ -70,7 +75,12 @@ class ApiClientService extends BaseDatabaseSupport implements ApiClientServiceIn
 
         $this->query($query);
         $this->bind(":id", (int)$id);
-        return $this->single();
+        $t = $this->single();
+        if ($t) {
+            $t->by_pass = boolval($t->by_pass);
+            $t->status = boolval($t->status);
+        }
+        return $t;
     }
 
     public function findByApiName($name)

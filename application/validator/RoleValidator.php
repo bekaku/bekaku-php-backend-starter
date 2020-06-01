@@ -11,7 +11,8 @@ class RoleValidator extends BaseValidator
         //call parent construct
         parent::__construct();
         $this->objToValidate = $role;
-        $this->validateField('status', self::VALIDATE_INT);
+        $this->validateField('name', self::VALIDATE_REQUIRED);
+        $this->validateField('status', self::VALIDATE_BOOLEAN);
 
         //Custom Validate
         /*

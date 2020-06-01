@@ -9,20 +9,41 @@
 namespace application\controller;
 
 use application\core\AppController;
+use application\util\AppUtil;
 use application\util\ControllerUtil;
 use application\util\FilterUtils;
 use application\util\JWT;
 use application\util\SystemConstant;
+use application\util\UploadUtil;
 
 class TestController extends AppController
 {
-    public function __construct($databaseConnection){
+    public function __construct($databaseConnection)
+    {
         $this->setDbConn($databaseConnection);
     }
-    public function index(){
-        echoln("TestController");
-        echoln('pwd : '.ControllerUtil::hashSha512('P@ssw0rd'));
+
+    public function index()
+    {
+        jsonResponse([
+            'profilePicture' =>UploadUtil::getProfilePicApi('1_1590998310_V7hQJ.jpg','2020-04-27 11:23:19', false),
+            'profilePictureDefault' =>UploadUtil::getProfilePicApi('xxxxxxxx.jpg','2020-04-27 11:23:19', false),
+            'pictureApi' =>UploadUtil::getImageApi('xxxxxxxx.jpg','2020-04-27 11:23:19', false),
+            'hashPwd' => ControllerUtil::hashSha512('P@ssw0rd')
+        ]);
     }
+    private function env($key = null)
+    {
+        if(!$key){
+            return null;
+        }
+        $parsed = parse_ini_file(__SITE_PATH . '/.env');
+//        if (isset($parsed[$key])) {
+//            return $parsed[$key];
+//        }
+        return $parsed;
+    }
+
     private function testEncodeJWT($secretServerkey)
     {
         $payload = array([
@@ -37,7 +58,7 @@ class TestController extends AppController
 
 //        $data['payloadEncode']=$payload;
         // Create token header as a JSON string
-        echoln('jwt > '.$jwt );
+        echoln('jwt > ' . $jwt);
 
         $jwtDecode = JWT::decode($jwt, $secretServerkey, true);
 //        $data['jwtDecode'] = $jwtDecode;
@@ -49,17 +70,23 @@ class TestController extends AppController
         return $jwt;
 
     }
-    public function testGetMultiParam(){
+
+    public function testGetMultiParam()
+    {
         $module = FilterUtils::filterGetString('module');
         $module_param2 = FilterUtils::filterGetString('module_param2');
-        echoln('$module=>'.$module.', $module_param2=>'.$module_param2);
+        echoln('$module=>' . $module . ', $module_param2=>' . $module_param2);
     }
-    public function edrPhpIndex(){
+
+    public function edrPhpIndex()
+    {
         echoln("edrPhpIndex");
     }
-    private function readFileFromFolder(){
-        $somePath='D:\studentPicture\appuser';
-        $dir=opendir($somePath);
+
+    private function readFileFromFolder()
+    {
+        $somePath = 'D:\studentPicture\appuser';
+        $dir = opendir($somePath);
 
         //looping through filenames
         while (false !== ($file = readdir($dir))) {
@@ -67,18 +94,19 @@ class TestController extends AppController
         }
     }
 
-    private function findWhere($array, $matching) {
+    private function findWhere($array, $matching)
+    {
         foreach ($array as $item) {
             $is_match = true;
             foreach ($matching as $key => $value) {
 
                 if (is_object($item)) {
-                    if (! isset($item->$key)) {
+                    if (!isset($item->$key)) {
                         $is_match = false;
                         break;
                     }
                 } else {
-                    if (! isset($item[$key])) {
+                    if (!isset($item[$key])) {
                         $is_match = false;
                         break;
                     }
@@ -105,7 +133,8 @@ class TestController extends AppController
         return false;
     }
 
-    private function arrayTest(){
+    private function arrayTest()
+    {
         $data = array(
             array("firstname" => "Mary", "lastname" => "Johnson", "age" => 25),//key 0
             array("firstname" => "Amanda", "lastname" => "Miller", "age" => 18),//key 1
@@ -117,7 +146,7 @@ class TestController extends AppController
         );
         $phpMinimumVersion = '5.5.0';
 
-        if(phpversion() >= (float)$phpMinimumVersion) {
+        if (phpversion() >= (float)$phpMinimumVersion) {
 
 
             $key = array_search('Michael', array_column($data, 'firstname'));

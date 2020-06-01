@@ -7,15 +7,19 @@
 namespace application\controller;
 
 use application\core\AppController;
+use application\service\AccessTokenService;
 use application\service\RoleService;
+use application\util\AppUtil;
 use application\util\ControllerUtil;
 use application\util\FilterUtils;
 use application\util\i18next;
+use application\util\MessageUtils;
 use application\util\SystemConstant;
 use application\util\SecurityUtil;
 
 use application\model\User;
 use application\service\UserService;
+use application\util\UploadUtil;
 use application\validator\UserValidator;
 
 class UserController extends AppController
@@ -28,12 +32,17 @@ class UserController extends AppController
      * @var RoleService
      */
     private $roleService;
+    /**
+     * @var AccessTokenService
+     */
+    private $accessTokenService;
 
     public function __construct($databaseConnection)
     {
         $this->setDbConn($databaseConnection);
         $this->userService = new UserService($this->getDbConn());
         $this->roleService = new RoleService($this->getDbConn());
+        $this->accessTokenService = new AccessTokenService($this->getDbConn());
     }
 
     public function __destruct()
@@ -68,12 +77,12 @@ class UserController extends AppController
             //validate duplicate user name
             $appUserfindUsername = $this->userService->findByUsername($jsonData->username);
             if (!empty($appUserfindUsername)) {
-                $validator->addError('username', 'The username ' . $jsonData->username . ' has already been taken. Please choose different username  ');
+                $validator->addError('username', i18next::getTranslation('error.duplicateEmail', ['email' => $jsonData->username]));
             }
             //validate duplicate email
             $appUserfindEmail = $this->userService->findByEmail($jsonData->email);
             if (!empty($appUserfindEmail)) {
-                $validator->addError('email', 'The email ' . $jsonData->email . ' has already been taken. Please choose different email  ');
+                $validator->addError('email', i18next::getTranslation('error.duplicateUsername', ['username' => $jsonData->email]));
             }
             if ($validator->getValidationErrors()) {
                 jsonResponse($this->setResponseStatus($validator->getValidationErrors(), false, null));
@@ -82,16 +91,13 @@ class UserController extends AppController
                 $entity->password = ControllerUtil::genHashPassword($entity->password, $randomSalt);
                 $entity->salt = $randomSalt;
                 $entity->image = null;
-                $entity->status = true;
 
                 $lastInsertId = $this->userService->createByObject($entity);
                 if ($lastInsertId) {
-
                     //create user_role
                     $userRoles = isset($jsonData->userRoles) ? $jsonData->userRoles : null;
                     $this->createRoles($userRoles, $lastInsertId);
-
-                    $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));
+                    $this->pushDataToView = $this->setResponseStatus([SystemConstant::ENTITY_ATT => $this->userService->findUserDataById($lastInsertId)], true, i18next::getTranslation(('success.insert_succesfull')));
                 }
             }
         }
@@ -141,7 +147,6 @@ class UserController extends AppController
 
             $user = new User($jsonData, $uid, true);
             $validator = new UserValidator($user);
-
             $appUserOld = $this->userService->findById($user->id);
             if (!$appUserOld) {
                 ControllerUtil::f404Static();
@@ -151,7 +156,7 @@ class UserController extends AppController
             if ($appUserOld->username != $jsonData->username) {
                 $appUserfindUsername = $this->userService->findByUsername($jsonData->username);
                 if (!empty($appUserfindUsername)) {
-                    $validator->addError('username', 'The username ' . $jsonData->username . ' has already been taken. Please choose different username  ');
+                    $validator->addError('username', i18next::getTranslation('error.duplicateEmail', ['email' => $jsonData->username]));
                 }
             }
 
@@ -159,12 +164,12 @@ class UserController extends AppController
             if ($appUserOld->email != $jsonData->email) {
                 $appUserfindEmail = $this->userService->findByEmail($jsonData->email);
                 if (!empty($appUserfindEmail)) {
-                    $validator->addError('email', 'The email ' . $jsonData->email . ' has already been taken. Please choose different email  ');
+                    $validator->addError('email', i18next::getTranslation('error.duplicateUsername', ['username' => $jsonData->email]));
                 }
             }
 
+            //update avatar
             $user->image = $appUserOld->image;
-            $user->status = $jsonData->status;
 
             if ($validator->getValidationErrors()) {
                 jsonResponse($this->setResponseStatus($validator->getValidationErrors(), false, null), 400);
@@ -183,6 +188,61 @@ class UserController extends AppController
         }
         jsonResponse($this->pushDataToView);
     }
+
+    //reset user's password by admin
+    public function resetPassword()
+    {
+        $uid = SecurityUtil::getAppuserIdFromJwtPayload();
+        $this->pushDataToView = $this->setResponseStatus([], false, i18next::getTranslation('error.error_something_wrong'));
+        $jsonData = $this->getJsonData();
+
+        if (!empty($jsonData) && !empty($uid)) {
+            $user = $this->userService->findUserDataById($jsonData->user_id);
+            if ($user) {
+                $newPwd = ControllerUtil::hashSha512(get_env("APP_DEFAULT_PASSWORD"));
+                $randomSalt = ControllerUtil::getRadomSault();
+                $effectRow = $this->userService->update([
+                    'password' => ControllerUtil::genHashPassword($newPwd, $randomSalt),
+                    'salt' => $randomSalt
+                ], ['id' => $jsonData->user_id]);
+                if ($effectRow) {
+                    $this->accessTokenService->logoutAllAction();
+                    $this->pushDataToView = $this->setResponseStatus([], true, i18next::getTranslation(('success.update_succesfull')));
+                }
+            }
+        }
+        jsonResponse($this->pushDataToView);
+    }
+
+    public function changeAvatar()
+    {
+        $uid = SecurityUtil::getAppuserIdFromJwtPayload();
+        $this->pushDataToView = $this->setResponseStatus([], false, i18next::getTranslation('error.error_something_wrong'));
+        if (!empty($uid)) {
+            $user = $this->userService->findUserDataById($uid);
+            if (isset($_FILES[SystemConstant::APP_IMAGE_FILE_UPLOAD_ATT]) && is_uploaded_file($_FILES[SystemConstant::APP_IMAGE_FILE_UPLOAD_ATT]['tmp_name'])) {
+                $newName = UploadUtil::getUploadFileName($uid);
+                $imagName = UploadUtil::uploadProfilePic($_FILES[SystemConstant::APP_IMAGE_FILE_UPLOAD_ATT], $user->created_at, MessageUtils::getConfig('upload_image.default_width'), $newName);
+                if ($imagName) {
+                    //delete old image
+                    if ($user->image) {
+                        UploadUtil::delProfileImagefile($user->image, $user->created_at);
+                    }
+                    //update new image name in db
+                    $effectRow = $this->userService->update([
+                        'image' => $imagName
+                    ], ['id' => $uid]);
+                    if ($effectRow) {
+                        $this->pushDataToView = $this->setResponseStatus([
+                            'picture' => UploadUtil::getProfilePicApi($imagName, $user->created_at)
+                        ], true);
+                    }
+                }
+            }
+        }
+        jsonResponse($this->pushDataToView);
+    }
+
     public function crudDelete()
     {
         $this->pushDataToView = $this->getDefaultResponse(true);

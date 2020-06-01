@@ -52,7 +52,12 @@
       "forgot_pwd": "Forgot Password?",
       "arr_form_page": "Form __page__",
       "other": "Other",
-      "layout_type": "Mode Light/Dark"
+      "layout_type": "Mode Light/Dark",
+      "crud_list": "รายการ",
+      "crud_add": "เพิ่ม",
+      "crud_view": "ดู",
+      "crud_edit": "แก้ไข",
+      "crud_delete": "ลบ"
     },
     "paging": {
       "page": "Page",
@@ -78,6 +83,7 @@
       "email_format": "Invalid E-mail address",
       "err_username_or_passwd_notfound": "Login failed Please check that you have enter a valid username and password, or have been disabled.",
       "password_wrong": "Password is incorrect",
+      "passwordCurrentWrong": "Current password is incorrect",
       "accountLocked": "Your account is locked",
       "404": "Unable to find page",
       "error": "Error",
@@ -93,18 +99,24 @@
       "validate_positive_number": "Positive number is required",
       "validate_datetime": "Wrong format datetime 'yyy-MM-dd HH:mm:ss'",
       "validate_date": "Wrong format date 'yyy-MM-dd'",
+      "validate_boolean": "Invalid boolean format",
       "contact_admin": "There was an error, please contact the administrator.",
       "error_something_wrong": "Something went wrong!!",
       "permissionDeny": "Users do not have permission to access this information.",
-      "err_404": "Page not found."
+      "err_404": "Page not found.",
+      "duplicateEmail": "The email __email__ has already been taken. Please choose different email.",
+      "duplicateUsername": "The username __username__ has already been taken. Please choose different username."
     },
     "success": {
       "success": "Success",
+      "loginSuccess": "Logined Successful",
+      "logoutSuccess": "Logouted Successful",
       "update_succesfull": "Update Successful",
       "insert_succesfull": "Saved Successful ",
       "save_genarate_system": "Generated system base file Successful",
       "update_genarate_system": "Updated system base file Successful",
-      "delete_succesfull": "Deleted Successful"
+      "delete_succesfull": "Deleted Successful",
+      "changePasswordOk": "Change password successfully. You can log in with a password that has recently changed."
     },
     "helper": {
       "login_to_system": "Sign into your __system__ account",
@@ -146,24 +158,30 @@
         "description": "Description"
       },
       "permission": {
-        "permission": "permission",
+        "id": "Id",
+        "permission": "Permission",
         "crud_table": "crud_table",
-        "description": "description",
-        "name": "name",
-        "status": "status"
+        "name": "Permission name",
+        "status": "Status",
+        "description": "Description"
       },
       "role": {
-        "role": "role",
-        "description": "description",
-        "name": "name",
-        "status": "status"
+        "role": "Role",
+        "name": "Name",
+        "id": "Role id",
+        "description": "Description",
+        "status": "status",
+        "test_field": "test_field"
       },
       "api_client": {
-        "api_client": "api_client",
-        "api_name": "api_name",
-        "api_token": "api_token",
-        "by_pass": "by_pass",
-        "status": "status"
+        "api_client": "Api client",
+        "id": "id",
+        "api_name": "Api name",
+        "api_token": "Token",
+        "by_pass": "By pass",
+        "status": "status",
+        "created_at": "Created at",
+        "updated_at": "Updated at"
       },
       "api_client_ip": {
         "api_client_ip": "api_client_ip",
@@ -181,13 +199,22 @@
         "expires_at": "expires_at"
       },
       "user": {
-        "user": "user",
-        "username": "username",
-        "salt": "salt",
+        "user": "Users",
+        "username": "Username",
+        "login_password": "Password",
+        "comfirm_password": "Confirm password",
         "email": "email",
-        "image": "image",
-        "password": "password",
-        "status": "status"
+        "salt": "salt",
+        "status": "status",
+        "img_name": "Image"
+      },
+      "edr_youtube_mapper": {
+        "no": "No",
+        "edr_youtube_mapper": "Youtube link manager",
+        "description": "Description",
+        "actiive": "Active",
+        "youtube_link": "Youtube link",
+        "edr_link": "Edr link"
       }
     },
     "httpStatus": {

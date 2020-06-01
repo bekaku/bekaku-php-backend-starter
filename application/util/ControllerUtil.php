@@ -148,48 +148,6 @@ class ControllerUtil
         setcookie($name, $value, time() + SystemConstant::COOKIE_TIME_1YEAR, "/");
     }
 
-    /**
-     * @param $connection can get from AppController->getDbConn()
-     * @param $permission
-     * @return bool
-     */
-    public static function isPermission($connection, $permission)
-    {
-        $permissionService = new AppPermissionService($connection);
-        $isPermised = $permissionService->checkPermissionByUserSessionId($permission);
-
-        unset($permissionService);
-        return $isPermised;
-    }
-
-    public static function checkNavPermissionByUrl($connection, $url)
-    {
-        $routFind = AppUtil::findObjectInArray(Route::$routeList, $url, 'url');
-        if (!empty($routFind)) {
-            $permissionRequir = $routFind['permission'];
-            if (!empty($permissionRequir)) {
-                return self::isPermission($connection, $permissionRequir);
-            }
-        }
-        return true;
-    }
-
-    public static function isPermissionByUserId($connection, $userId, $permission)
-    {
-        $permissionService = new AppPermissionService($connection);
-        $isPermised = $permissionService->checkPermissionByUserId($userId, $permission);
-        unset($permissionService);
-        return $isPermised;
-    }
-
-    public static function getAppUserLoged($connection)
-    {
-        $appUserServices = new AppUserService($connection);
-        $appUser = $appUserServices->findById(self::getUserIdSession());
-        unset($appUserServices);
-        return $appUser;
-    }
-
 
     /**
      * @param $stringTableName
@@ -216,16 +174,18 @@ class ControllerUtil
     }
 
     /**
+     * @param int $length
      * @return mixed
      */
-    public static function getRadomSault()
+    public static function getRadomSault($length = 16)
     {
-        return hash('sha512', uniqid(openssl_random_pseudo_bytes(16), true));
+        return hash('sha512', uniqid(openssl_random_pseudo_bytes($length), true));
     }
 
     public static function genHashPassword($passString, $random_salt)
     {
-        return hash('sha512', $passString . $random_salt);
+//        return hash('sha512',  $passString . $random_salt);
+        return hash('sha512', get_env('APP_KEY') . $passString . $random_salt);
     }
 
     public static function hashSha512($string)
@@ -312,10 +272,10 @@ class ControllerUtil
 
     public static function f404Static($theme = "default")
     {
-	 jsonResponse([
+        jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
             SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.err_404')
-        ],404);
+        ], 404);
     }
 
     public static function f401Static($msg, $responseArray = null)
@@ -323,7 +283,7 @@ class ControllerUtil
         jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
             SystemConstant::SERVER_MSG_ATT => $msg
-        ],401);
+        ], 401);
     }
 
     public static function displaySqlError($err_msg_str, $theme = "default")
@@ -331,7 +291,7 @@ class ControllerUtil
         jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
             SystemConstant::SERVER_MSG_ATT => $err_msg_str
-        ],200);
+        ], 200);
     }
 
     public static function displayError($err_msg_str, $theme = "default")
@@ -339,7 +299,7 @@ class ControllerUtil
         jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => false,
             SystemConstant::SERVER_MSG_ATT => $err_msg_str
-        ],200);
+        ], 200);
     }
 
     public static function setErrorMessage($err_msg_str)

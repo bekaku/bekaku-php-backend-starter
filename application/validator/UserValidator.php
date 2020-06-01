@@ -12,6 +12,7 @@ class UserValidator extends BaseValidator
         //call parent construct
         parent::__construct();
         $this->objToValidate = $user;
+        $this->validateField('email', self::VALIDATE_REQUIRED);
         $this->validateField('username', self::VALIDATE_REQUIRED);
 
         //Custom Validate

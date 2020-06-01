@@ -151,7 +151,7 @@ return array(
         'charset' => 'utf8',
         'collation' => 'utf8_general_ci',
         'prefix' => '',
-        'port' => get_env('DB_PORT'),//3306
+        'port' => get_env('DB_PORT'),//3306, 13537
         'strict' => false,
     ),
     'sqlite' => array(

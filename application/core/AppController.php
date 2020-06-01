@@ -124,11 +124,11 @@ class AppController
 
 
         //init sort order
-        if (FilterUtil::filterGetString('sortField')) {
-            $q_parameter['sortField'] = FilterUtil::filterGetString('sortField');
+        if (FilterUtil::filterGetString(SystemConstant::SORT_FIELD_ATT)) {
+            $q_parameter[SystemConstant::SORT_FIELD_ATT] = FilterUtil::filterGetString(SystemConstant::SORT_FIELD_ATT);
         }
-        if (FilterUtil::filterGetString('sortMode')) {
-            $q_parameter['sortMode'] = FilterUtil::filterGetString('sortMode');
+        if (FilterUtil::filterGetString(SystemConstant::SORT_MODE_ATT)) {
+            $q_parameter[SystemConstant::SORT_MODE_ATT] = FilterUtil::filterGetString(SystemConstant::SORT_MODE_ATT);
         }
 
 
@@ -189,7 +189,7 @@ class AppController
     public function getDefaultResponse($isOk = true)
     {
         if ($isOk) {
-            return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_MSG_ATT => null);
+            return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('success.success'));
         }
         return array(SystemConstant::SERVER_STATUS_ATT => false, SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.error_something_wrong'));
     }

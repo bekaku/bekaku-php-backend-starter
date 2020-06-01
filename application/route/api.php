@@ -34,6 +34,7 @@ Route::post(['AuthApi','PermissionGrant'],"permission","PermissionController","c
 Route::get(['AuthApi','PermissionGrant'],"permissionReadSingle","PermissionController","crudReadSingle","permission_view");
 Route::put(['AuthApi','PermissionGrant'],"permission","PermissionController","crudEdit","permission_edit");
 Route::delete(['AuthApi','PermissionGrant'],"permission","PermissionController","crudDelete","permission_delete");
+Route::get([],"permissionsCrudtbl","PermissionController","permissionsCrudtbl");
 /*
 |--------------------------------------------------------------------------
 | RoleController
@@ -53,6 +54,7 @@ Route::get(['AuthApi','PermissionGrant'],"apiClient","ApiClientController","crud
 Route::post(['AuthApi','PermissionGrant'],"apiClient","ApiClientController","crudAdd","api_client_add");
 Route::get(['AuthApi','PermissionGrant'],"apiClientReadSingle","ApiClientController","crudReadSingle","api_client_view");
 Route::put(['AuthApi','PermissionGrant'],"apiClient","ApiClientController","crudEdit","api_client_edit");
+Route::put(['AuthApi','PermissionGrant'],"apiClientRefreshToken","ApiClientController","refreshToken","api_client_edit");
 Route::delete(['AuthApi','PermissionGrant'],"apiClient","ApiClientController","crudDelete","api_client_delete");
 /*
 |--------------------------------------------------------------------------
@@ -73,17 +75,32 @@ Route::get(['AuthApi','PermissionGrant'],"user","UserController","crudList","use
 Route::post(['AuthApi','PermissionGrant'],"user","UserController","crudAdd","user_add");
 Route::get(['AuthApi','PermissionGrant'],"userReadSingle","UserController","crudReadSingle","user_view");
 Route::put(['AuthApi','PermissionGrant'],"user","UserController","crudEdit","user_edit");
+Route::put(['AuthApi','PermissionGrant'],"resetUserPassword","UserController","resetPassword","user_edit");
 Route::delete(['AuthApi','PermissionGrant'],"user","UserController","crudDelete","user_delete");
+Route::post(['AuthApi'],"changeAvatar","UserController","changeAvatar");
 /*
 |--------------------------------------------------------------------------
 | AuthController
 |--------------------------------------------------------------------------
 */
 Route::post([],"signin","AuthController","signin");
-Route::post(['AuthApi'],"userLogout","AuthenApiController","userLogout");
+Route::post(['AuthApi'],"userLogout","AuthController","userLogout");
 Route::get(['AuthApi'],"userCheckAuth","AuthController","userCheckAuth");
 Route::post(['AuthApi'],"userChangePwd","AuthController","changePwd");
+Route::post(['AuthApi'],"userCheckAuth","AuthController","userCheckAuth");
 
+/*
+|--------------------------------------------------------------------------
+| EdrYoutubeMapperController
+|--------------------------------------------------------------------------
+*/
+Route::get(['AuthApi','PermissionGrant'],"edrYoutubeMapper","EdrYoutubeMapperController","crudList","edr_youtube_mapper_list");
+Route::post(['AuthApi','PermissionGrant'],"edrYoutubeMapper","EdrYoutubeMapperController","crudAdd","edr_youtube_mapper_add");
+Route::get(['AuthApi','PermissionGrant'],"edrYoutubeMapperReadSingle","EdrYoutubeMapperController","crudReadSingle","edr_youtube_mapper_view");
+Route::put(['AuthApi','PermissionGrant'],"edrYoutubeMapper","EdrYoutubeMapperController","crudEdit","edr_youtube_mapper_edit");
+Route::delete(['AuthApi','PermissionGrant'],"edrYoutubeMapper","EdrYoutubeMapperController","crudDelete","edr_youtube_mapper_delete");
+
+Route::get([],"check-youtube-api","EdrYoutubeMapperController","checkYtLink");
 /*
 |--------------------------------------------------------------------------
 | UtilController
@@ -91,6 +108,7 @@ Route::post(['AuthApi'],"userChangePwd","AuthController","changePwd");
 */
 Route::get([], "jsonGetServerDateAndTime", "UtilController", "jsonGetServerDateAndTime");
 Route::get([], "jsongetuniqetoken", "UtilController", "jsonGetUniqeToken");
+Route::get([],"getSiteMetadata","UtilController","getSiteMetadata");
 
 /* TestContronller*/
 Route::get([], "test", "TestController", "index");

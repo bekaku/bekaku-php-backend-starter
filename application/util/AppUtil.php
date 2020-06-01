@@ -42,6 +42,13 @@ class AppUtil
 
     }
 
+    public static function genComponentNameFormat($stringTableName)
+    {//app_user_login -> app-user-login
+
+        return str_replace("_", "-", $stringTableName);
+
+    }
+
     public static function genPublicMethodName($stringTableName)
     {//app_user_login -> AppUserLogin
 
@@ -624,13 +631,14 @@ class AppUtil
     /*
      * YOUTUBE PLUGIN
      */
-    public static function getYoutubeThumbnail($youtube_url, $type=0)
+    public static function getYoutubeThumbnail($youtube_url, $type = 0)
     {
         //0.jpg,2.jpg,hq1.jpg, hq2.jpg, hq3.jpg , hqdefault.jpg,default.jpg
         $yu_id = explode('www.youtube.com/watch?v=', $youtube_url);
         $thumb = "http://img.youtube.com/vi/" . $yu_id[1] . "/" . $type . ".jpg";
         return $thumb;
     }
+
     public static function uniqueMultidimArray($array, $key)
     {
         $temp_array = array();
@@ -796,5 +804,23 @@ class AppUtil
     public static function getDisplayDataPath()
     {
         return self::getServerIp() . MessageUtils::getConfig('base_data_display');
+    }
+
+    public static function getSiteMetaData($url, $atts = ['url', 'title', 'image', 'description'])
+    {
+        if (empty($url)) {
+            return null;
+        }
+        $graph = OpenGraph::fetch($url);
+        if (!$graph) {
+            return null;
+        }
+        $metas = $graph->getDetail($graph);
+        $item = null;
+        foreach ($atts as $key) {
+            $item[$key] = isset($metas[$key]) ? $metas[$key] : null;
+        }
+
+        return $item;
     }
 }

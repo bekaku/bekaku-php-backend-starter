@@ -1,5 +1,4 @@
 <?php
-/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
 
 namespace application\service;
 
@@ -15,10 +14,15 @@ use application\util\SystemConstant;
 class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServiceInterface
 {
     protected $tableName = 'access_token';
+    /**
+     * @var UserAgentService
+     */
+    private $userAgentService;
 
     public function __construct($dbConn)
     {
         $this->setDbh($dbConn);
+        $this->userAgentService = new UserAgentService($this->getDbh());
     }
 
     public function findAll($perpage = 0, $q_parameter = array())
@@ -112,6 +116,7 @@ class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServi
         $this->bind(":id", (int)$id);
         return $this->execute();
     }
+
     public function deleteByToken($token)
     {
         $query = "DELETE FROM " . $this->tableName . " WHERE token=:token";
@@ -119,15 +124,28 @@ class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServi
         $this->bind(":token", (string)$token);
         return $this->execute();
     }
+
     public function createNewToken(string $key, int $uid, int $apiClient, string $secretKey): string
     {
+        $userAgentName = FilterUtils::filterServer('HTTP_USER_AGENT');
+        $userAgent = $this->userAgentService->findByName($userAgentName);
+        $userAgentId = null;
+        if (!$userAgent) {
+            $userAgentId = $this->userAgentService->createByArray([
+                'agent' => $userAgentName,
+            ]);
+        } else {
+            $userAgentId = $userAgent->id;
+        }
+
+
         $expireDatetime = DateUtils::plusDateByYear(DateUtils::dateNow(), 1);
         $state = $this->createByArray([
             'token' => $key,
             'user' => $uid,
             'api_client' => $apiClient,
             'expires_at' => DateUtils::getDateByDateFormat($expireDatetime),
-            'name' => FilterUtils::filterServer('HTTP_USER_AGENT'),
+            'user_agent' => $userAgentId,
             'created_at' => DateUtils::getDateNow(),
             'updated_at' => DateUtils::getDateNow(),
         ]);
@@ -138,6 +156,7 @@ class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServi
             "exp" => $expireDatetime->getTimestamp(),
         ], $secretKey) : null;
     }
+
     public function createByArray($data_array)
     {
         return $this->insertHelper($this->tableName, $data_array);
@@ -157,6 +176,7 @@ class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServi
     {
         return $this->updateObjectHelper($object, $where_array, $whereType);
     }
+
     //logout by token key
     public function logoutAction()
     {
@@ -172,7 +192,7 @@ class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServi
 
         $efectRow = 0;
         if ($accessTokenInDb) {
-            $this->update(['revoked' => 1, 'updated_at' => DateUtils::getDateNow()], ['id' => $accessTokenInDb['id']]);
+            $this->update(['revoked' => 1, 'updated_at' => DateUtils::getDateNow()], ['id' => $accessTokenInDb->id]);
         }
         return $efectRow;
     }

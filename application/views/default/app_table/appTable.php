@@ -39,16 +39,20 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
             <div class="column">
 
                 <?php
-                if(!empty($msgJsonGen)||!empty($routListGen)){?>
+                if (!empty($msgJsonGen) || !empty($routListGen)) {
+                    ?>
                     <div style="margin-bottom: 25px;">
 
                         <?php
-                        if(!AppUtil::isEmpty($msgJsonGen)){
+                        if (!AppUtil::isEmpty($msgJsonGen)) {
                             ?>
                             <div>
-                                <div  style="margin-top: 25px;margin-bottom: 25px;">Copy this code inside "model": {} at /resources/lang/[all your lang folder]/translation.json and delete last ',' comma sign </div>
+                                <div style="margin-top: 25px;margin-bottom: 25px;">Copy this code inside "model": {} at
+                                    /resources/lang/[all your lang folder]/translation.json and delete last ',' comma
+                                    sign
+                                </div>
                                 <code>
-                                    <?=$msgJsonGen?>
+                                    <?= $msgJsonGen ?>
                                 </code>
                             </div>
                             <?php
@@ -56,12 +60,14 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                         }
                         ?>
                         <?php
-                        if(!AppUtil::isEmpty($routListGen)){
+                        if (!AppUtil::isEmpty($routListGen)) {
                             ?>
                             <div>
-                                <div  style="margin-top: 25px;margin-bottom: 25px;">Copy this code to bottom line of /application/core/initRoutes.php</div>
+                                <div style="margin-top: 25px;margin-bottom: 25px;">Copy this code to bottom line of
+                                    /application/core/initRoutes.php
+                                </div>
                                 <code>
-                                    <?=$routListGen?>
+                                    <?= $routListGen ?>
                                 </code>
                             </div>
                             <?php
@@ -69,7 +75,7 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                         }
                         ?>
                     </div>
-                <?php }                ?>
+                <?php } ?>
 
 
                 <form role="form" id="form_search" action="<?= FilterUtils::filterServerUrl('REQUEST_URI') ?>"
@@ -79,7 +85,7 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                         <label class="label">Table Name</label>
                         <div class="control has-icons-left has-icons-right">
                             <input maxlength="80" placeholder="Table Name" type="text"
-                                   value="role" name="app_table_name" id="app_table_name"
+                                   value="" name="app_table_name" id="app_table_name"
                                    class="input <?= (array_key_exists('app_table_name', $validateErrors)) ? "is-danger" : "" ?>">
                             <span class="icon is-small is-left"><i class="fas fa-table"></i></span>
                         </div>
@@ -87,7 +93,8 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                     </div>
                     <div class="field">
                         <label class="label">Description</label>
-                            <textarea name="description" id="description" class="textarea <?= (array_key_exists('description', $validateErrors)) ? "is-danger" : "" ?>">role</textarea>
+                        <textarea name="description" id="description"
+                                  class="textarea <?= (array_key_exists('description', $validateErrors)) ? "is-danger" : "" ?>">description</textarea>
                         <?= (array_key_exists('description', $validateErrors)) ? " <p class=\"help is-danger\">" . $validateErrors['description'] . "</p>" : "" ?>
                     </div>
 
@@ -102,21 +109,21 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                             Service
                         </label>
                         <label class="checkbox">
-                            <input value="1"  checked type="checkbox" name="controller" id="controller">
+                            <input value="1" checked type="checkbox" name="controller" id="controller">
                             Controller
                         </label>
                         <label class="checkbox">
                             <input value="1" checked type="checkbox" name="validator" id="validator">
                             Validator
                         </label>
-<!--                        <label class="checkbox">-->
-<!--                            <input value="1" type="checkbox" name="vlist" id="vlist">-->
-<!--                            List View-->
-<!--                        </label>-->
-<!--                        <label class="checkbox">-->
-<!--                            <input value="1" type="checkbox" name="vview" id="vview">-->
-<!--                            Form View-->
-<!--                        </label>-->
+                        <label class="checkbox">
+                            <input value="1" checked type="checkbox" name="vlist" id="vlist">
+                            List View
+                        </label>
+                        <label class="checkbox">
+                            <input value="1" checked type="checkbox" name="vview" id="vview">
+                            Form View
+                        </label>
                         <label class="checkbox">
                             <input value="1" checked type="checkbox" name="vmsg" id="vmsg">
                             Model Message
@@ -129,7 +136,7 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
                     <div class="field">
                         <label class="label">Model</label>
                         <label class="checkbox">
-                            <input value="1" checked="checked" type="checkbox" name="auditInfo" id="auditInfo">
+                            <input value="1" checked type="checkbox" name="auditInfo" id="auditInfo">
                             Audit info
                         </label>
                     </div>

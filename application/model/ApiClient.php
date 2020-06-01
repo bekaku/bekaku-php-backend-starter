@@ -1,4 +1,5 @@
 <?php
+/** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
 
 namespace application\model;
 
@@ -17,6 +18,8 @@ class ApiClient extends BaseModel
             'status' => self::TYPE_BOOLEAN,
             'created_at' => self::TYPE_DATE_TIME,
             'updated_at' => self::TYPE_DATE_TIME,
+            'updated_user' => self::TYPE_INTEGER,
+            'created_user' => self::TYPE_INTEGER,
         )); 
  
         /* init data type for field use in update mode*/
@@ -26,7 +29,7 @@ class ApiClient extends BaseModel
             'by_pass' => self::TYPE_INTEGER,
             'status' => self::TYPE_BOOLEAN,
             'updated_user' => self::TYPE_INTEGER,
-            'updated_date' => self::TYPE_DATE_TIME
+            'updated_at' => self::TYPE_DATE_TIME
         ));
 
         /* init optional field*/

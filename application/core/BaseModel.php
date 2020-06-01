@@ -27,10 +27,13 @@ class BaseModel
     const TYPE_DATE = 10;
     const TYPE_DATE_TIME = 11;
     const TYPE_BIT = 12;
+    const TYPE_TEXT_AREA = 13;
+    const TYPE_IMAGE = 14;
 
     //mysql usual type
     const MYSQL_TYPE_VARCHAR = "varchar";
     const MYSQL_TYPE_INT = "int";
+    const MYSQL_TYPE_BIG_INT = "bigint";
     const MYSQL_TYPE_TINYINT = "tinyint";
     const MYSQL_TYPE_DATE = "date";
     const MYSQL_TYPE_DATETIME = "datetime";
@@ -103,6 +106,7 @@ class BaseModel
                 return "self::TYPE_STRING";
                 break;
             case self::MYSQL_TYPE_INT:
+            case self::MYSQL_TYPE_BIG_INT:
                 if ($extra == 'auto_increment') {
                     return "self::TYPE_AUTO_INCREMENT";
                 } else {

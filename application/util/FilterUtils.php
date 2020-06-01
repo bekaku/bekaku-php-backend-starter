@@ -251,10 +251,14 @@ class FilterUtils
      |--------------------------------------------------------------------------
     */
     public static function isValidBoolean($var){
-        if (!filter_var($var, FILTER_VALIDATE_BOOLEAN) === false) {
-            return true;
-        }
-        return false;
+
+        $var = (string) $var;
+        $var = strtolower($var);
+//        if (!filter_var($var, FILTER_VALIDATE_BOOLEAN) === false) {
+//            return true;
+//        }
+//        return false;
+        return $var===1 || $var===0 || $var==='1' || $var==='0' || $var==='true' || $var==='false';
     }
     public static function isValidFloat($var){
         if (!filter_var($var, FILTER_VALIDATE_FLOAT) === false) {

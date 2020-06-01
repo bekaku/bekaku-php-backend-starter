@@ -90,13 +90,18 @@ class AuthController extends AppController
         $this->accessTokenService->logoutAction();
         jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => true,
+            SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.logoutSuccess'),
         ]);
     }
 
     public function userCheckAuth()
     {
         $uid = SecurityUtil::getAppuserIdFromJwtPayload();
-        jsonResponse($this->userService->findUserDataById($uid));
+//        jsonResponse($this->userService->findUserDataById($uid));
+        jsonResponse([
+            SystemConstant::SERVER_STATUS_ATT => true,
+            'userData' => $this->userService->findUserDataById($uid),
+        ]);
     }
 
     public function changePwd()
@@ -106,7 +111,7 @@ class AuthController extends AppController
         $jsonData = $this->getJsonData();
         if (!empty($jsonData) && !empty($uid)) {
 
-            //valicate old pwd
+            //validate old pwd
             $user = $this->userService->findUserDataById($uid);
             $userpwd = FilterUtils::filterVarString($jsonData->oldPassword);
 
@@ -128,10 +133,12 @@ class AuthController extends AppController
                         $this->accessTokenService->logoutAction();
                     }
 
-                    $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, true, i18next::getTranslation(('success.update_succesfull')));
+                    $this->pushDataToView = $this->setResponseStatus([], true, i18next::getTranslation(('success.changePasswordOk')));
                 } else {
-                    $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, false, i18next::getTranslation('error.error_something_wrong'));
+                    $this->pushDataToView = $this->setResponseStatus([], false, i18next::getTranslation('error.error_something_wrong'));
                 }
+            }else{
+                $this->pushDataToView = $this->setResponseStatus([], false, i18next::getTranslation('error.passwordCurrentWrong'));
             }
         }
         jsonResponse($this->pushDataToView);

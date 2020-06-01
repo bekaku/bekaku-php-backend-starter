@@ -27,6 +27,7 @@ class BaseValidator
     const VALIDATE_POSITIVE_NUMBER = 6;
     const VALIDATE_DATE_TIME = 7;
     const VALIDATE_DATE = 8;
+    const VALIDATE_BOOLEAN = 9;
 
     public function __construct()
     {
@@ -39,6 +40,7 @@ class BaseValidator
             self::VALIDATE_POSITIVE_NUMBER => i18next::getTranslation('error.validate_positive_number'),
             self::VALIDATE_DATE_TIME => i18next::getTranslation('error.validate_datetime'),
             self::VALIDATE_DATE => i18next::getTranslation('error.validate_date'),
+            self::VALIDATE_BOOLEAN => i18next::getTranslation('error.validate_boolean'),
         );
     }
 
@@ -82,6 +84,11 @@ class BaseValidator
             case self::VALIDATE_DATE:
                 if (!FilterUtils::isValidateDate($this->objToValidate->{$fieldName}, 'Y-m-d')) {
                     $this->addError($fieldName, $this->defaultErrorMsg[self::VALIDATE_DATE]);
+                }
+                break;
+            case self::VALIDATE_BOOLEAN:
+                if (!FilterUtils::isValidBoolean($this->objToValidate->{$fieldName})) {
+                    $this->addError($fieldName, $this->defaultErrorMsg[self::VALIDATE_BOOLEAN]);
                 }
                 break;
         }
