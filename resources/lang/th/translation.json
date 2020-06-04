@@ -206,7 +206,6 @@
         "status": "สถานะ",
         "img_name": "รูปภาพ"
       },
-
       "edr_youtube_mapper": {
         "no": "ลำดับที่",
         "edr_youtube_mapper": "ผูก Url ยูทูป",
@@ -214,6 +213,32 @@
         "actiive": "ดำเนินการแล้ว",
         "youtube_link": "ลิงค์ Youtube",
         "edr_link": "ลิงค์ Edr"
+      },
+      "edr_std_mapper": {
+        "edr_std_mapper": "Edr VS std field map",
+        "id": "id",
+        "function_name": "Function name",
+        "std": "Std2018",
+        "edr": "Edr"
+      },
+      "edr_colleage": {
+        "edr_colleage": "วิทยาลัย",
+        "id": "รหัส",
+        "ipaddress": "ไอพี",
+        "domain": "โดเมน",
+        "school_id": "รหัสประจำตัววิทยาลัย",
+        "college_code": "รหัส",
+        "name_th": "ชื่อไทย",
+        "name_en": "ชื่ออังกฤษ",
+        "java_ipaddress": "พาธ JAVA API",
+        "php_ipaddress": "พาธ PHP API",
+        "sockets_path": "พาธ Web socket ",
+        "use_std_api": "ใช้ Std2018 Api",
+        "ssl_expire": "SSL หมดอายุ",
+        "storage": "ฮาร์ดดิส",
+        "ram": "แรม",
+        "cpu": "ซีพียู",
+        "status": "สถานะ"
       }
     },
     "httpStatus": {

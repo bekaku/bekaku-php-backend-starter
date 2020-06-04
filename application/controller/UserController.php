@@ -11,6 +11,7 @@ use application\service\AccessTokenService;
 use application\service\RoleService;
 use application\util\AppUtil;
 use application\util\ControllerUtil;
+use application\util\DateUtils;
 use application\util\FilterUtils;
 use application\util\i18next;
 use application\util\MessageUtils;
@@ -206,7 +207,7 @@ class UserController extends AppController
                     'salt' => $randomSalt
                 ], ['id' => $jsonData->user_id]);
                 if ($effectRow) {
-                    $this->accessTokenService->logoutAllAction();
+                    $this->accessTokenService->update(['revoked' => 1, 'updated_at' => DateUtils::getDateNow()], ['user' => $jsonData->user_id, 'revoked' => 0]);
                     $this->pushDataToView = $this->setResponseStatus([], true, i18next::getTranslation(('success.update_succesfull')));
                 }
             }

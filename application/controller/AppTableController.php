@@ -772,14 +772,15 @@ class AppTableController extends BaseController
     {
         $fieldType = BaseModel::TYPE_STRING;
 
-        if ($colunmMeta['vType'] == 'date' || $colunmMeta['vType'] == 'datetime') {
+        if ($colunmMeta['vType'] == 'date') {
             $fieldType = BaseModel::TYPE_DATE;
-            $veeValidateRules = null;
+        }
+        if ($colunmMeta['vType'] == 'datetime') {
+            $fieldType = BaseModel::TYPE_DATE_TIME;
         } else if ($colunmMeta['vType'] == 'text') {
             $fieldType = BaseModel::TYPE_TEXT_AREA;
         } else if ($colunmMeta['vType'] == 'tinyint' || $field == 'status') {
             $fieldType = BaseModel::TYPE_BOOLEAN;
-            $veeValidateRules = null;
         } else if ($colunmMeta['vType'] == 'int') {
             $fieldType = BaseModel::TYPE_INTEGER;
         } else if ($field == 'img_name') {
@@ -814,7 +815,7 @@ class AppTableController extends BaseController
         $t .= "" . "\r\n";
 
         $t .= "    <base-wee-sketlon-loader" . "\r\n";
-        $t .= "      :loading=\"loading\"" . "\r\n";
+        $t .= "      :loading=\"state.loading\"" . "\r\n";
         $t .= "      type=\"table-heading, table-thead, table-tbody, table-tfoot\"" . "\r\n";
         $t .= "      :no=\"1\"" . "\r\n";
         $t .= "    />" . "\r\n";
@@ -822,7 +823,7 @@ class AppTableController extends BaseController
 
         $t .= "    <!-- Table  -->" . "\r\n";
         $t .= "    <wee-simple-table" . "\r\n";
-        $t .= "      v-if=\"!loading\"" . "\r\n";
+        $t .= "      v-if=\"!state.loading\"" . "\r\n";
         $t .= "      :headers=\"fillableHeaders\"" . "\r\n";
         $t .= "      :title=\"$" . "t('model.$appTable->app_table_name.$appTable->app_table_name')\"" . "\r\n";
         $t .= "      :tr-list=\"filteredList\"" . "\r\n";
@@ -841,7 +842,7 @@ class AppTableController extends BaseController
         $t .= "    </wee-simple-table>" . "\r\n";
         $t .= "" . "\r\n";
 
-        $t .= "    <" . AppUtil::genComponentNameFormat($appTable->app_table_name) . "-form v-model=\"entity\" :open=\"openNewForm\" :processing=\"isProcessing\" @close=\"openNewForm = false\" @save=\"onSave\"/>" . "\r\n";
+        $t .= "    <" . AppUtil::genComponentNameFormat($appTable->app_table_name) . "-form v-model=\"entity\" :edit-mode=\"editMode\" :open=\"openNewForm\" :processing=\"isProcessing\" @close=\"openNewForm = false\" @save=\"onSave\"/>" . "\r\n";
 
         $t .= "    <wee-confirm ref=\"weeConfirmRef\"></wee-confirm>" . "\r\n";
         $t .= "    <wee-toast ref=\"weeToastRef\"></wee-toast>" . "\r\n";
@@ -855,6 +856,10 @@ class AppTableController extends BaseController
 
         //Import section
         $t .= "import { vLog } from \"@/plugins/util\";" . "\r\n";
+        if ($this->isHaveDateType()) {
+            $t .= "import { getDateWithDefaultFormat } from \"@/plugins/dateUtil\";" . "\r\n";
+        }
+
         $t .= "//service" . "\r\n";
         $t .= "import $this->appTableModuleName" . "Service from \"@/api/" . $this->appTableModuleName . "Service\";" . "\r\n";
         $t .= "import useCrudApi from \"@/composition/UseCrudApi\";" . "\r\n";
@@ -875,7 +880,7 @@ class AppTableController extends BaseController
         $t .= "  setup(props, { refs, root }) {" . "\r\n";
         $t .= "    const " . $this->appTableModuleSubName . "Service = new " . $this->appTableModuleName . "Service();" . "\r\n";
         //table header filter
-        $t .= "//column, label, searchable, sortable, fillable, image, status, date, avatar " . "\r\n";
+        $t .= "//column, label, searchable, sortable, fillable, image, avatar status, date, datetime " . "\r\n";
         $t .= "    const tableHeaders = [" . "\r\n";
         foreach ($this->appTableColunmMetaData as $colunmMeta) {
             $field = $colunmMeta['Field'];
@@ -888,11 +893,14 @@ class AppTableController extends BaseController
                 $t .= "        searchable: true," . "\r\n";
                 $t .= "        sortable: true," . "\r\n";
                 $t .= "        fillable: true," . "\r\n";
-                if (fieldType == BaseModel::TYPE_BOOLEAN) {
+                if ($fieldType == BaseModel::TYPE_BOOLEAN) {
                     $t .= "    status: true," . "\r\n";
                 }
-                if (fieldType == BaseModel::TYPE_DATE) {
+                if ($fieldType == BaseModel::TYPE_DATE) {
                     $t .= "    date: true," . "\r\n";
+                }
+                if ($fieldType == BaseModel::TYPE_DATE_TIME) {
+                    $t .= "    datetime: true," . "\r\n";
                 }
 
                 $t .= "        //linkable: {external: true}," . "\r\n";
@@ -911,47 +919,31 @@ class AppTableController extends BaseController
         $t .= "    const initialItem = {" . "\r\n";
         foreach ($this->appTableColunmMetaData as $colunmMeta) {
             $field = $colunmMeta['Field'];
-            if (!in_array($field, $appTable->getTableBaseField())) {
-                $fieldType = $this->getFieldType($colunmMeta, $field);
-                switch ($fieldType) {
-                    case BaseModel::TYPE_IMAGE:
-                        $t .= "      $field:''," . "\r\n";
-                        break;
-                    case BaseModel::TYPE_BOOLEAN:
-                        $t .= "      $field: false," . "\r\n";
-                        break;
-                    case BaseModel::TYPE_DATE:
-                        $t .= "      $field: getDateWithDefaultFormat()," . "\r\n";
-                        break;
-                    case BaseModel::TYPE_INTEGER:
-                        $t .= "      $field: 0," . "\r\n";
-                        break;
-                    default:
-                        $t .= "      $field: ''," . "\r\n";
-                }
+//            if (!in_array($field, $appTable->getTableBaseField())) {
+            $fieldType = $this->getFieldType($colunmMeta, $field);
+            switch ($fieldType) {
+                case BaseModel::TYPE_IMAGE:
+                    $t .= "      $field:''," . "\r\n";
+                    break;
+                case BaseModel::TYPE_BOOLEAN:
+                    $t .= "      $field: false," . "\r\n";
+                    break;
+                case BaseModel::TYPE_DATE:
+                    $t .= "      $field: getDateWithDefaultFormat()," . "\r\n";
+                    break;
+                case BaseModel::TYPE_INTEGER:
+                    $t .= "      $field: 0," . "\r\n";
+                    break;
+                default:
+                    $t .= "      $field: ''," . "\r\n";
             }
+//            }
         }
         $t .= "    };" . "\r\n";
         $t .= "" . "\r\n";
         //use crudapi composition
         $t .= "    const {" . "\r\n";
-        $t .= "      state," . "\r\n";
-        $t .= "      sort," . "\r\n";
-        $t .= "      pages," . "\r\n";
-        $t .= "      filteredList," . "\r\n";
-        $t .= "      entity," . "\r\n";
-        $t .= "      isProcessing," . "\r\n";
-        $t .= "      searchTxt," . "\r\n";
-        $t .= "      fillableHeaders," . "\r\n";
-        $t .= "      //method" . "\r\n";
-        $t .= "      fetchData," . "\r\n";
-        $t .= "      openNewForm," . "\r\n";
-        $t .= "      onItemClick," . "\r\n";
-        $t .= "      onOpenNewForm," . "\r\n";
-        $t .= "      onBeforeDeleteItem," . "\r\n";
-        $t .= "      onSave," . "\r\n";
-        $t .= "      advanceSearch," . "\r\n";
-        $t .= "      onReload" . "\r\n";
+        $t .= "      crud" . "\r\n";
         $t .= "    } = useCrudApi(refs, root, " . $this->appTableModuleSubName . "Service, initialItem, tableHeaders);" . "\r\n";
         $t .= "" . "\r\n";
         //sort colunm
@@ -966,23 +958,7 @@ class AppTableController extends BaseController
         $t .= "" . "\r\n";
 
         $t .= "    return {" . "\r\n";
-        $t .= "      ...toRefs(state)," . "\r\n";
-        $t .= "      sort," . "\r\n";
-        $t .= "      pages," . "\r\n";
-        $t .= "      filteredList," . "\r\n";
-        $t .= "      entity," . "\r\n";
-        $t .= "      isProcessing," . "\r\n";
-        $t .= "      searchTxt," . "\r\n";
-        $t .= "      fillableHeaders," . "\r\n";
-        $t .= "      //method" . "\r\n";
-        $t .= "      fetchData," . "\r\n";
-        $t .= "      openNewForm," . "\r\n";
-        $t .= "      onItemClick," . "\r\n";
-        $t .= "      onOpenNewForm," . "\r\n";
-        $t .= "      onBeforeDeleteItem," . "\r\n";
-        $t .= "      onSave," . "\r\n";
-        $t .= "      advanceSearch," . "\r\n";
-        $t .= "      onReload" . "\r\n";
+        $t .= "      ...toRefs(crud)," . "\r\n";
         $t .= "    };" . "\r\n";
         $t .= "  }" . "\r\n";
         $t .= "};" . "\r\n";
@@ -1022,7 +998,8 @@ class AppTableController extends BaseController
         $t .= "          >" . "\r\n";
         $t .= "            <v-icon>mdi-keyboard-backspace</v-icon>" . "\r\n";
         $t .= "          </v-btn>" . "\r\n";
-        $t .= "          <v-toolbar-title>{{" . "$" . "t('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "')}}</v-toolbar-title>" . "\r\n";
+        $t .= "        <v-toolbar-title>{{" . "$" . "t('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "') +' ('+(!editMode ?  $" . "t('base.addNew') : $" . "t('base.edit'))+')'}} </v-toolbar-title>" . "\r\n";
+//        $t .= "          <v-toolbar-title>{{" . "$" . "t('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "')}}</v-toolbar-title>" . "\r\n";
         $t .= "          <v-spacer></v-spacer>" . "\r\n";
 
 //        $t .= "            <v-btn" . "\r\n";
@@ -1090,6 +1067,7 @@ class AppTableController extends BaseController
                 }
                 if ($colunmMeta['vType'] == 'int') {
                     $fieldType = $this->getFieldType($colunmMeta, $field);
+                    $veeValidateRules = $veeValidateRules != null ? $veeValidateRules . "|numeric:" : "numeric";
                 }
                 if ($field == 'img_name') {
                     $fieldType = $this->getFieldType($colunmMeta, $field);
@@ -1192,6 +1170,10 @@ class AppTableController extends BaseController
         $t .= "      type: Boolean," . "\r\n";
         $t .= "      default: false" . "\r\n";
         $t .= "    }," . "\r\n";
+        $t .= "    editMode: {" . "\r\n";
+        $t .= "      type: Boolean," . "\r\n";
+        $t .= "      default: false" . "\r\n";
+        $t .= "    }," . "\r\n";
         $t .= "    processing: {" . "\r\n";
         $t .= "      type: Boolean," . "\r\n";
         $t .= "      default: false" . "\r\n";
@@ -1253,7 +1235,7 @@ class AppTableController extends BaseController
         $t .= "                  { text: \"nav.dashboard\", href: \"/\", disabled: false }," . "\r\n";
         $t .= "                  { text: \"model.$appTable->app_table_name.$appTable->app_table_name\", href: \"\", disabled: true }" . "\r\n";
         $t .= "                ]," . "\r\n";
-        $t .= "                pageTitle: { text: \"nav.$appTable->app_table_name.$appTable->app_table_name\"}" . "\r\n";
+        $t .= "                pageTitle: { text: \"model.$appTable->app_table_name.$appTable->app_table_name\", icon: \"mdi-api\"}" . "\r\n";
         $t .= "              }" . "\r\n";
         $t .= "            }," . "\r\n";
         $t .= "*/" . "\r\n";

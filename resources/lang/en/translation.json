@@ -208,6 +208,27 @@
         "status": "status",
         "img_name": "Image"
       },
+      "edr_colleage": {
+        "edr_colleage": "College",
+        "id": "id",
+        "ipaddress": "Ipaddress",
+        "domain": "Domain",
+        "school_id": "School id",
+        "college_code": "College code",
+        "name_th": "Name thai",
+        "name_en": "Name english",
+        "java_ipaddress": "Java ipaddress",
+        "php_ipaddress": "Php ipaddress",
+        "sockets_path": "Sockets ipaddress",
+        "use_std_api": "Use std2018 api",
+        "ssl_expire": "SSL expire",
+        "storage": "Storage",
+        "ram": "Ram",
+        "cpu": "Cpu",
+        "status": "Status"
+      },
+
+
       "edr_youtube_mapper": {
         "no": "No",
         "edr_youtube_mapper": "Youtube link manager",
@@ -215,6 +236,13 @@
         "actiive": "Active",
         "youtube_link": "Youtube link",
         "edr_link": "Edr link"
+      },
+      "edr_std_mapper": {
+        "edr_std_mapper": "Edr VS std field map",
+        "id": "id",
+        "function_name": "Function name",
+        "std": "Std2018",
+        "edr": "Edr"
       }
     },
     "httpStatus": {

@@ -25,12 +25,48 @@ class TestController extends AppController
 
     public function index()
     {
+        $command = "sudo service tomcat7 stop";
+        //system($command);
+        //exec("whoami", $output);
+        //$exec = "echo @Dev@137Edr | /usr/bin/sudo -S whoami";
+        //$exec = "/usr/bin/sudo /usr/bin/service tomcat7 stop";
+        //$exec = "/usr/bin/sudo /usr/bin/service tomcat7 restart";
+        //$exec = "cp /tmp/robots.txt /tmp/test/robots_copy.txt";
+        //$exec = "curl -o /tmp/test/edr20200602.zip https://cdn.appedr.com/war/edr20200602.zip";
+
+        $execTestFolder = "(mkdir /tmp/test && mkdir /tmp/deploy)";
+        exec($execTestFolder, $testFolder);
+
+        $execStopTomcat = "(/usr/bin/sudo /usr/bin/service tomcat7 stop)";
+        exec($execStopTomcat, $stopTomcat);
+
+        $execRmOldEdrApp = "(rm /tmp/deploy/edr.war && rm -rf /tmp/deploy/edr/ )";
+        exec($execRmOldEdrApp, $rmOldEdrApp);
+
+        $execDownloadApp = "(cd /tmp/test/ && curl -O https://cdn.appedr.com/war/edr20200604.zip && unzip edr20200604.zip)";
+        exec($execDownloadApp,$downloadApp);
+
+        $execCpNewApp = "(cp /tmp/test/edr.war /tmp/deploy )";
+        exec($execCpNewApp, $cpNewApp);
+
+        $execRestartMysql = "(/usr/bin/sudo /usr/bin/service mysql restart)";
+        exec($execRestartMysql, $restartMysql);
+
+        $execStartTomcat = "(/usr/bin/sudo /usr/bin/service tomcat7 start)";
+        exec($execStartTomcat, $startTomcat);
+
+
+
         jsonResponse([
-            'profilePicture' =>UploadUtil::getProfilePicApi('1_1590998310_V7hQJ.jpg','2020-04-27 11:23:19', false),
-            'profilePictureDefault' =>UploadUtil::getProfilePicApi('xxxxxxxx.jpg','2020-04-27 11:23:19', false),
-            'pictureApi' =>UploadUtil::getImageApi('xxxxxxxx.jpg','2020-04-27 11:23:19', false),
-            'hashPwd' => ControllerUtil::hashSha512('P@ssw0rd')
+            'testFolder' => $testFolder,
+            'stopTomcat' => $stopTomcat,
+            'rmOldEdrApp' => $rmOldEdrApp,
+            'downloadApp' => $downloadApp,
+            'cpNewApp' => $cpNewApp,
+            'restartMysql' => $restartMysql,
+            'startTomcat' => $startTomcat,
         ]);
+
     }
     private function env($key = null)
     {

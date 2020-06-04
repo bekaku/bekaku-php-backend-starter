@@ -40,8 +40,8 @@ class AppController
     public $metaKeyword;
     public $reqPlatform = "windows";
 
-    //history connection
-    public $historyConnection;
+    //edr connection
+    public $edrConnection;
 
     public function loadView($viewPath = null, $_V_DATA_TO_VIEW = array())
     {
@@ -53,21 +53,35 @@ class AppController
         }
     }
 
-    //history connection
-    public function openHistoryConnection()
+    //edr connection
+    public function openEdrConnection($host)
     {
-        $historyDbConf = MessageUtils::getConfig('mysql_wim_history');
-        $this->historyConnection = new DataBaseConnectionUtil($historyDbConf);
-        $this->historyConnection->openMysqlConnection();
+        $dbConfig = MessageUtils::getConfig('mysql_edr');
+        $dbConfig['host'] = $host;
+        $this->edrConnection = new DataBaseConnectionUtil($dbConfig);
+        $this->edrConnection->openMysqlConnection();
     }
 
     /**
      * @return mixed
      */
-    public function getHistoryConnection()
+    public function getEdrConnection()
     {
-        return $this->historyConnection;
+        return $this->edrConnection;
     }
+
+    /**
+     * @param mixed $edrConnection
+     */
+    public function setEdrConnection($edrConnection)
+    {
+        $this->edrConnection = $edrConnection;
+    }
+
+    /**
+     * @return mixed
+     */
+
     //end history connection
 
 
@@ -189,7 +203,7 @@ class AppController
     public function getDefaultResponse($isOk = true)
     {
         if ($isOk) {
-            return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('success.success'));
+            return array(SystemConstant::SERVER_STATUS_ATT => true, SystemConstant::SERVER_MSG_ATT => null);
         }
         return array(SystemConstant::SERVER_STATUS_ATT => false, SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.error_something_wrong'));
     }
