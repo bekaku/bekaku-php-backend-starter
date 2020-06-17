@@ -39,3 +39,6 @@ RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/$ index.php?module=$1&module_param2
 #SetEnv PROJECT_DATA_HOME D:/php_htdocs/github/php/bekaku-php-rest-api-starter/data
 #PROJECT_DATA_DISPLAY is path for access from public
 #SetEnv PROJECT_DATA_DISPLAY /github/php/bekaku-php-rest-api-starter/data
+<Files ".env">  
+  Require all denied
+</Files>
