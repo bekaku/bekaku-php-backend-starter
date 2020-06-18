@@ -32,7 +32,7 @@ $routListGen = (!empty($_V_DATA_TO_VIEW) && isset($_V_DATA_TO_VIEW['routListGen'
             Generate Starter Template
         </h1>
         <p class="subtitle">
-            My Php Backend <strong>Starter</strong>!
+            Generate Backend Starter Resource<strong></strong>!
         </p>
 
         <div class="columns">
