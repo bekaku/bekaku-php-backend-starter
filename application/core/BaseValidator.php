@@ -15,7 +15,7 @@ use application\util\i18next;
 class BaseValidator
 {
     protected $objToValidate = null;
-    private $validationErrors = null;
+    private $validationErrors = array();
     private $defaultErrorMsg = null;
 
     // types of predefined validators:
@@ -109,7 +109,8 @@ class BaseValidator
 //            $fieldName => $message,
 //        );
 //        array_push($this->validationErrors, $addErrorMsg);
-        $this->validationErrors[$fieldName] = $message;
+//        $this->validationErrors[$fieldName] = $message;
+        array_push($this->validationErrors, ['field' => $fieldName, 'message' => $message]);
     }
 
     /**
@@ -121,7 +122,7 @@ class BaseValidator
      */
     public function getValidationErrors()
     {
-        return $this->validationErrors ? ['errors' => $this->validationErrors] : null;
+        return count($this->validationErrors) > 0 ? ['errors' => $this->validationErrors] : array();
     }
 
     public static function getColunmValidatorByMysqlType($type)

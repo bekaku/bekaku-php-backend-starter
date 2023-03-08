@@ -3,6 +3,7 @@
 namespace application\service;
 
 use application\core\BaseDatabaseSupport;
+use application\model\User;
 use application\serviceInterface\UserServiceInterface;
 use application\util\UploadUtil;
 
@@ -30,7 +31,7 @@ class UserService extends BaseDatabaseSupport implements UserServiceInterface
         //$query .= "WHERE user.custom_field =:customParam ";
 
         //gen additional query and sort order
-        $additionalParam = $this->genAdditionalParamAndWhereForListPage($q_parameter, $this->tableName);
+        $additionalParam = $this->genAdditionalParamAndWhereForListPageV2($q_parameter,new User());
         if (!empty($additionalParam)) {
             if (!empty($additionalParam['additional_query'])) {
                 $query .= $additionalParam['additional_query'];

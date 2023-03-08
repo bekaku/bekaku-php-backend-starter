@@ -19,6 +19,7 @@ use application\util\AppUtil as AppUtils;
 use application\util\ControllerUtil as ControllerUtils;
 use application\util\DateUtils;
 use application\util\FilterUtils as FilterUtil;
+use application\util\MessageUtils;
 use application\util\SystemConstant;
 use application\validator\AppTableValidator;
 
@@ -180,7 +181,7 @@ class AppTableController extends BaseController
                 $msgJsonGen = $this->createMsgFile($appTable);
             }
             if ($isCreateRoute) {
-                $this->routePath = __SITE_PATH . '/application/core/initRoutes.php';
+                $this->routePath = __SITE_PATH . '/application/route/api.php';
 //                $this->createRouteFile($appTable);
                 $routListGen = $this->createRouteFile($appTable);
             }
@@ -193,8 +194,84 @@ class AppTableController extends BaseController
             $this->pushDataToView['msgJsonGen'] = $msgJsonGen;
             $this->pushDataToView['routListGen'] = $routListGen;
             $this->pushDataToView['appTable'] = $appTable;
+
+
             $this->loadView($this->APP_TABLE_ADD_VIEW, $this->pushDataToView);
         }
+    }
+
+    public function addApi()
+    {
+        $productionMode = MessageUtils::getConfig('production_mode');
+        if (!$productionMode) {
+            $jsonData = $this->getJsonData(false);
+            $appTable = new AppTable($jsonData);
+            $validator = new AppTableValidator($appTable);
+            if ($validator->getValidationErrors()) {
+                jsonResponse($validator->getValidationErrors());
+            } else {
+                $isCreateModel = isset($jsonData->model) ? $jsonData->model : false;
+                $isCreateService = isset($jsonData->service) ? $jsonData->service : false;
+                $isValidator = isset($jsonData->validator) ? $jsonData->validator : false;
+                $isCreateControler = isset($jsonData->controller) ? $jsonData->controller : false;
+                $isCreateMsg = isset($jsonData->message) ? $jsonData->message : false;
+                $isCreateRoute = isset($jsonData->route) ? $jsonData->route : false;
+                $isCreateCrudPermission = isset($jsonData->crudPermission) ? $jsonData->crudPermission : false;
+                $this->isRequireAuditInfo = isset($jsonData->auditInfo) ? $jsonData->auditInfo : false;;
+
+                $this->appTableName = $appTable->app_table_name;
+                $this->appTableBaseField = $appTable->getTableBaseField();
+                $this->appTableColunm = $this->appTableService->getTableColunm($this->appTableName);
+                $this->appTableColunmMetaData = $this->appTableService->getTableColunmMetaData($this->appTableName);
+
+                if (count($this->appTableColunm) > 0) {
+                    $this->appTableColunmCount = count($this->appTableColunmMetaData);
+                    $this->appTableModuleName = AppUtils::genPublicMethodName($this->appTableName);
+                    $this->appTableModuleSubName = AppUtils::genModuleNameFormat($this->appTableName);
+                    $msgJsonGen = null;
+                    $routListGen = null;
+
+
+//                    if ($isCreateModel) {
+//                        $this->modelPath = __SITE_PATH . '/application/model/' . $this->appTableModuleName . '.php';
+//                        $this->createModelFile($appTable);
+//                    }
+//                    if ($isCreateService) {
+//                        $this->serviceInterfacePath = __SITE_PATH . '/application/serviceInterface/' . $this->appTableModuleName . 'ServiceInterface.php';
+//                        $this->createServiceInterfaceFile();
+//
+//                        $this->servicePath = __SITE_PATH . '/application/service/' . $this->appTableModuleName . 'Service.php';
+//                        $this->createServiceFile($appTable);
+//                    }
+//                    if ($isValidator) {
+//                        $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
+//                        $this->createValidatorFile();
+//                    }
+//                    if ($isCreateControler) {
+//                        $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
+//                        $this->createControllerFile($appTable, $isCreateCrudPermission);
+//                    }
+
+
+                    if ($isCreateMsg) {
+                        $msgJsonGen = $this->createMsgFileApi($appTable);
+                    }
+                    if ($isCreateRoute) {
+                        $this->routePath = __SITE_PATH . '/application/route/api.php';
+                        $routListGen = $this->createRouteFileApi($appTable, $isCreateCrudPermission);
+                    }
+                    //create crud permission
+                    if ($isCreateCrudPermission) {
+                        $this->permssionService->createCrudPermission($this->appTableName);
+                    }
+                    //test
+                    $this->pushDataToView['msgJsonGen'] = $msgJsonGen;
+                    $this->pushDataToView['routListGen'] = $routListGen;
+                    jsonResponse($this->pushDataToView);
+                }
+            }
+        }
+        jsonResponse($this->getDefaultResponse(false));
     }
 
     private function isThisFileCanOverwrite($filename)
@@ -346,7 +423,7 @@ class AppTableController extends BaseController
 
             $t .= "use application\\core\\BaseDatabaseSupport;" . "\r\n";
             $t .= "use application\\serviceInterface\\" . $this->appTableModuleName . "ServiceInterface;" . "\r\n";
-//            $t .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
+            $t .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
             $t .= "class " . $this->appTableModuleName . "Service extends BaseDatabaseSupport implements " . $this->appTableModuleName . "ServiceInterface" . "\r\n";
             $t .= "{" . "\r\n";
 
@@ -388,7 +465,8 @@ class AppTableController extends BaseController
             $t .= "       //$" . "query .= \"WHERE " . $appTable->app_table_name . ".custom_field =:customParam \";" . "\r\n";
             $t .= "" . "\r\n";
             $t .= "        //gen additional query and sort order" . "\r\n";
-            $t .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPage($" . "q_parameter, $" . "this->tableName);" . "\r\n";
+//            $t .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPage($" . "q_parameter, $" . "this->tableName);" . "\r\n";
+            $t .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPageV2($" . "q_parameter, new " . $this->appTableModuleName . "());" . "\r\n";
             $t .= "       if(!empty($" . "additionalParam)){" . "\r\n";
             $t .= "           if(!empty($" . "additionalParam['additional_query'])){" . "\r\n";
             $t .= "               $" . "query .= $" . "additionalParam['additional_query'];" . "\r\n";
@@ -606,7 +684,7 @@ class AppTableController extends BaseController
         }
     }
 
-    private function createControllerFile(AppTable $appTable)
+    private function createControllerFile(AppTable $appTable, $isHaveValidator = true)
     {
         if ($this->isThisFileCanOverwrite($this->controllerlPath)) {
             $objFopen = fopen($this->controllerlPath, 'w');
@@ -629,7 +707,10 @@ class AppTableController extends BaseController
 
             $t .= "use application\\model\\" . $this->appTableModuleName . ";" . "\r\n";
             $t .= "use application\\service\\" . $this->appTableModuleName . "Service " . ";" . "\r\n";
-            $t .= "use application\\validator\\" . $this->appTableModuleName . "Validator " . ";" . "\r\n";
+            if ($isHaveValidator) {
+                $t .= "use application\\validator\\" . $this->appTableModuleName . "Validator " . ";" . "\r\n";
+            }
+
             $t .= "class " . $this->appTableModuleName . "Controller extends  AppController" . "\r\n";
             $t .= "{" . "\r\n";
             $t .= "    /**" . "\r\n";
@@ -677,16 +758,21 @@ class AppTableController extends BaseController
             $t .= "" . "\r\n";
             $t .= "        if(!empty($" . "jsonData) && !empty($" . "uid)) {" . "\r\n";
             $t .= "           $" . "entity = new " . $this->appTableModuleName . "($" . "jsonData, $" . "uid, false);" . "\r\n";
-            $t .= "           $" . "validator = new " . $this->appTableModuleName . "Validator($" . "entity);" . "\r\n";
-            $t .= "           if ($" . "validator->getValidationErrors()) {" . "\r\n";
-            $t .= "               jsonResponse($" . "this->setResponseStatus($" . "validator->getValidationErrors(), false, null), 400);" . "\r\n";
-            $t .= "           } else {" . "\r\n";
+            if ($isHaveValidator) {
+                $t .= "           $" . "validator = new " . $this->appTableModuleName . "Validator($" . "entity);" . "\r\n";
+
+                $t .= "           if ($" . "validator->getValidationErrors()) {" . "\r\n";
+                $t .= "               jsonResponse($" . "this->setResponseStatus($" . "validator->getValidationErrors(), false, null), 400);" . "\r\n";
+                $t .= "           } else {" . "\r\n";
+            }
             $t .= "               $" . "lastInsertId = $" . "this->" . $this->appTableModuleSubName . "Service->createByObject($" . "entity);" . "\r\n";
             $t .= "               if ($" . "lastInsertId) {" . "\r\n";
 //            $t .= "                   $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
             $t .= "                    $" . "this->pushDataToView = $" . "this->setResponseStatus([SystemConstant::ENTITY_ATT => $" . "this->" . $this->appTableModuleSubName . "Service->findById($" . "lastInsertId)], true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
             $t .= "                }" . "\r\n";
-            $t .= "           }" . "\r\n";
+            if ($isHaveValidator) {
+                $t .= "           }" . "\r\n";
+            }
             $t .= "        }" . "\r\n";
             $t .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
             $t .= "" . "\r\n";
@@ -721,18 +807,23 @@ class AppTableController extends BaseController
             $t .= "		" . "\r\n";
             $t .= "        if(!empty($" . "jsonData) && !empty($" . "uid)) {" . "\r\n";
             $t .= "           $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "($" . "jsonData, $" . "uid, true);" . "\r\n";
-            $t .= "           $" . "validator = new " . $this->appTableModuleName . "Validator($" . $this->appTableModuleSubName . ");" . "\r\n";
-            $t .= "           if ($" . "validator->getValidationErrors()) {" . "\r\n";
-            $t .= "               jsonResponse($" . "this->setResponseStatus($" . "validator->getValidationErrors(), false, null), 400);" . "\r\n";
-            $t .= "           } else {" . "\r\n";
+            if ($isHaveValidator) {
+                $t .= "           $" . "validator = new " . $this->appTableModuleName . "Validator($" . $this->appTableModuleSubName . ");" . "\r\n";
+                $t .= "           if ($" . "validator->getValidationErrors()) {" . "\r\n";
+                $t .= "               jsonResponse($" . "this->setResponseStatus($" . "validator->getValidationErrors(), false, null), 400);" . "\r\n";
+                $t .= "           } else {" . "\r\n";
+            }
             $t .= "                if (isset($" . $this->appTableModuleSubName . "->id)) {" . "\r\n";
             $t .= "                   $" . "effectRow = $" . "this->" . $this->appTableModuleSubName . "Service->updateByObject($" . $this->appTableModuleSubName . ", array('id' => $" . $this->appTableModuleSubName . "->id));" . "\r\n";
             $t .= "                   if ($" . "effectRow) {" . "\r\n";
             $t .= "                       $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.update_succesfull')));" . "\r\n";
             $t .= "                   }" . "\r\n";
             $t .= "               }" . "\r\n";
-            $t .= "           }" . "\r\n";
+            if ($isHaveValidator) {
+                $t .= "           }" . "\r\n";
+            }
             $t .= "       }" . "\r\n";
+
             $t .= "        jsonResponse($" . "this->pushDataToView);" . "\r\n";
             $t .= "    }" . "\r\n";
             //end crudEditProcess
@@ -1252,6 +1343,18 @@ class AppTableController extends BaseController
         fclose($objFopen);
     }
 
+    private function createMsgFileApi(AppTable $appTable)
+    {
+        $msg = new \stdClass();
+        $child = new \stdClass();
+        foreach ($this->appTableColunmMetaData as $colunmMeta) {
+            $child->{$colunmMeta['Field']} = $colunmMeta['Field'];
+        }
+        $msg->{$appTable->app_table_name} = $child;
+
+        return $msg;
+    }
+
     private function createMsgFile(AppTable $appTable)
     {
 
@@ -1300,6 +1403,16 @@ class AppTableController extends BaseController
 //        fwrite($objFopen, $t);
 //        fclose($objFopen);
 
+    }
+
+    private function createRouteFileApi(AppTable $appTable, $haveCrudPermission = true)
+    {
+        $t = "Route::get(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudList'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_list'."'" : 'null') . ");";
+        $t .= "Route::post(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudAdd'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_add'."'" : 'null') . ");";
+        $t .= "Route::get(['AuthApi'], '" . $this->appTableModuleSubName . "ReadSingle', '" . $this->appTableModuleName . "Controller', 'crudReadSingle'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_view'."'" : 'null') . ");";
+        $t .= "Route::put(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudEdit'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_edit'."'" : 'null') . ");";
+        $t .= "Route::delete(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudDelete'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_delete'."'" : 'null') . ");";
+        return $t;
     }
 
     private function createRouteFile(AppTable $appTable)

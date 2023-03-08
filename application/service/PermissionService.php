@@ -3,6 +3,7 @@
 namespace application\service;
 
 use application\core\BaseDatabaseSupport;
+use application\model\Permission;
 use application\serviceInterface\PermissionServiceInterface;
 use application\util\i18next;
 
@@ -33,7 +34,7 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
         //$query .= "WHERE permission.custom_field =:customParam ";
 
         //gen additional query and sort order
-        $additionalParam = $this->genAdditionalParamAndWhereForListPage($q_parameter, $this->tableName);
+        $additionalParam = $this->genAdditionalParamAndWhereForListPageV2($q_parameter, new Permission());
         if (!empty($additionalParam)) {
             if (!empty($additionalParam['additional_query'])) {
                 $query .= $additionalParam['additional_query'];
@@ -68,6 +69,21 @@ class PermissionService extends BaseDatabaseSupport implements PermissionService
             array_push($list, $t);
         }
         return $list;
+    }
+
+    public function findAllByPaging($currentPage = 0, $perPage = 10)
+    {
+        $startingPosition = 0;
+        if ($currentPage > 0) {
+            $startingPosition = ($currentPage - 1) * $perPage;
+        }
+        $query = "SELECT *  ";
+        $query .= "FROM permission AS permission ";
+        $query .= " ORDER BY permission.`name` asc ";
+        $query .= " LIMIT $startingPosition, " . $perPage;
+
+        $this->query($query);
+        return $this->list();
     }
 
     public function findById($id)

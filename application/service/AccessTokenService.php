@@ -3,6 +3,7 @@
 namespace application\service;
 
 use application\core\BaseDatabaseSupport;
+use application\model\AccessToken;
 use application\serviceInterface\AccessTokenServiceInterface;
 use application\util\DateUtils;
 use application\util\FilterUtils;
@@ -40,7 +41,7 @@ class AccessTokenService extends BaseDatabaseSupport implements AccessTokenServi
         //$query .= "WHERE access_token.custom_field =:customParam ";
 
         //gen additional query and sort order
-        $additionalParam = $this->genAdditionalParamAndWhereForListPage($q_parameter, $this->tableName);
+        $additionalParam = $this->genAdditionalParamAndWhereForListPageV2($q_parameter, new AccessToken());
         if (!empty($additionalParam)) {
             if (!empty($additionalParam['additional_query'])) {
                 $query .= $additionalParam['additional_query'];

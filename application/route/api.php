@@ -23,13 +23,17 @@ Route::get([], "index", "IndexController", "index");
 |--------------------------------------------------------------------------
 */
 Route::get([], "generateStarter", "AppTableController", "crudAdd");
+Route::get([], "generateStarter", "AppTableController", "crudAdd");
 Route::post([], "generateStarter", "AppTableController", "crudAddProcess");
+Route::post([], "generateStarterApi", "AppTableController", "addApi");
 /*
 |--------------------------------------------------------------------------
 | PermissionController
 |--------------------------------------------------------------------------
 */
 Route::get(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudList", "permission_list");
+Route::get(['AuthApi'], "findAllPermissionByPaging", "PermissionController", "findAllByPaging");
+
 Route::post(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudAdd", "permission_add");
 Route::get(['AuthApi', 'PermissionGrant'], "permissionReadSingle", "PermissionController", "crudReadSingle", "permission_view");
 Route::put(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudEdit", "permission_edit");
@@ -91,44 +95,6 @@ Route::post(['AuthApi'], "userCheckAuth", "AuthController", "userCheckAuth");
 
 
 //Application
-
-/*
-|--------------------------------------------------------------------------
-| EdrYoutubeMapperController
-|--------------------------------------------------------------------------
-*/
-Route::get(['AuthApi', 'PermissionGrant'], "edrYoutubeMapper", "EdrYoutubeMapperController", "crudList", "edr_youtube_mapper_list");
-Route::post(['AuthApi', 'PermissionGrant'], "edrYoutubeMapper", "EdrYoutubeMapperController", "crudAdd", "edr_youtube_mapper_add");
-Route::get(['AuthApi', 'PermissionGrant'], "edrYoutubeMapperReadSingle", "EdrYoutubeMapperController", "crudReadSingle", "edr_youtube_mapper_view");
-Route::put(['AuthApi', 'PermissionGrant'], "edrYoutubeMapper", "EdrYoutubeMapperController", "crudEdit", "edr_youtube_mapper_edit");
-Route::delete(['AuthApi', 'PermissionGrant'], "edrYoutubeMapper", "EdrYoutubeMapperController", "crudDelete", "edr_youtube_mapper_delete");
-
-Route::get([], "check-youtube-api", "EdrYoutubeMapperController", "checkYtLink");
-/*
-|--------------------------------------------------------------------------
-| EdrStdMapperController
-|--------------------------------------------------------------------------
-*/
-Route::get(['AuthApi', 'PermissionGrant'], "edrStdMapper", "EdrStdMapperController", "crudList", "edr_std_mapper_list");
-Route::post(['AuthApi', 'PermissionGrant'], "edrStdMapper", "EdrStdMapperController", "crudAdd", "edr_std_mapper_add");
-Route::get(['AuthApi', 'PermissionGrant'], "edrStdMapperReadSingle", "EdrStdMapperController", "crudReadSingle", "edr_std_mapper_view");
-Route::put(['AuthApi', 'PermissionGrant'], "edrStdMapper", "EdrStdMapperController", "crudEdit", "edr_std_mapper_edit");
-Route::delete(['AuthApi', 'PermissionGrant'], "edrStdMapper", "EdrStdMapperController", "crudDelete", "edr_std_mapper_delete");
-Route::get([], "edrStdMapperApi", "EdrStdMapperController", "edrStdMapperApi");
-/*
-|--------------------------------------------------------------------------
-| EdrColleageController
-|--------------------------------------------------------------------------
-*/
-Route::get(['AuthApi', 'PermissionGrant'], "edrColleage", "EdrColleageController", "crudList", "edr_colleage_list");
-Route::post(['AuthApi', 'PermissionGrant'], "edrColleage", "EdrColleageController", "crudAdd", "edr_colleage_add");
-Route::get(['AuthApi', 'PermissionGrant'], "edrColleageReadSingle", "EdrColleageController", "crudReadSingle", "edr_colleage_view");
-Route::put(['AuthApi', 'PermissionGrant'], "edrColleage", "EdrColleageController", "crudEdit", "edr_colleage_edit");
-Route::delete(['AuthApi', 'PermissionGrant'], "edrColleage", "EdrColleageController", "crudDelete", "edr_colleage_delete");
-
-Route::get([], "testEdrServerConection", "EdrColleageController", "testEdrServerConection");
-//End
-
 
 /*
 |--------------------------------------------------------------------------

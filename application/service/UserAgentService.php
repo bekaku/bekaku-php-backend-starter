@@ -3,6 +3,7 @@
 namespace application\service;
 
 use application\core\BaseDatabaseSupport;
+use application\model\UserAgent;
 use application\serviceInterface\UserAgentServiceInterface;
 class UserAgentService extends BaseDatabaseSupport implements UserAgentServiceInterface
 {
@@ -26,7 +27,7 @@ class UserAgentService extends BaseDatabaseSupport implements UserAgentServiceIn
        //$query .= "WHERE user_agent.custom_field =:customParam ";
 
         //gen additional query and sort order
-       $additionalParam = $this->genAdditionalParamAndWhereForListPage($q_parameter, $this->tableName);
+       $additionalParam = $this->genAdditionalParamAndWhereForListPageV2($q_parameter, new UserAgent());
        if(!empty($additionalParam)){
            if(!empty($additionalParam['additional_query'])){
                $query .= $additionalParam['additional_query'];

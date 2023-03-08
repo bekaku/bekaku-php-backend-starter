@@ -12,6 +12,7 @@ use application\core\AppController;
 use application\util\AppUtil;
 use application\util\ControllerUtil;
 use application\util\FilterUtils;
+use application\util\i18next;
 use application\util\JWT;
 use application\util\SystemConstant;
 use application\util\UploadUtil;
@@ -25,52 +26,15 @@ class TestController extends AppController
 
     public function index()
     {
-        $command = "sudo service tomcat7 stop";
-        //system($command);
-        //exec("whoami", $output);
-        //$exec = "echo @Dev@137Edr | /usr/bin/sudo -S whoami";
-        //$exec = "/usr/bin/sudo /usr/bin/service tomcat7 stop";
-        //$exec = "/usr/bin/sudo /usr/bin/service tomcat7 restart";
-        //$exec = "cp /tmp/robots.txt /tmp/test/robots_copy.txt";
-        //$exec = "curl -o /tmp/test/edr20200602.zip https://cdn.appedr.com/war/edr20200602.zip";
-
-        $execTestFolder = "(mkdir /tmp/test && mkdir /tmp/deploy)";
-        exec($execTestFolder, $testFolder);
-
-        $execStopTomcat = "(/usr/bin/sudo /usr/bin/service tomcat7 stop)";
-        exec($execStopTomcat, $stopTomcat);
-
-        $execRmOldEdrApp = "(rm /tmp/deploy/edr.war && rm -rf /tmp/deploy/edr/ )";
-        exec($execRmOldEdrApp, $rmOldEdrApp);
-
-        $execDownloadApp = "(cd /tmp/test/ && curl -O https://cdn.appedr.com/war/edr20200604.zip && unzip edr20200604.zip)";
-        exec($execDownloadApp,$downloadApp);
-
-        $execCpNewApp = "(cp /tmp/test/edr.war /tmp/deploy )";
-        exec($execCpNewApp, $cpNewApp);
-
-        $execRestartMysql = "(/usr/bin/sudo /usr/bin/service mysql restart)";
-        exec($execRestartMysql, $restartMysql);
-
-        $execStartTomcat = "(/usr/bin/sudo /usr/bin/service tomcat7 start)";
-        exec($execStartTomcat, $startTomcat);
-
-
-
         jsonResponse([
-            'testFolder' => $testFolder,
-            'stopTomcat' => $stopTomcat,
-            'rmOldEdrApp' => $rmOldEdrApp,
-            'downloadApp' => $downloadApp,
-            'cpNewApp' => $cpNewApp,
-            'restartMysql' => $restartMysql,
-            'startTomcat' => $startTomcat,
+            'title' => i18next::getTranslation('app.system_name')
         ]);
 
     }
+
     private function env($key = null)
     {
-        if(!$key){
+        if (!$key) {
             return null;
         }
         $parsed = parse_ini_file(__SITE_PATH . '/.env');

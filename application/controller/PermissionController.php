@@ -49,6 +49,12 @@ class PermissionController extends AppController
         $this->pushDataToView[SystemConstant::APP_PAGINATION_ATT] = $this->permissionService->getTotalPaging();
         jsonResponse($this->pushDataToView);
     }
+    public function findAllByPaging()
+    {
+        $page = FilterUtils::filterGetInt(SystemConstant::PAGE_ATT) > 0 ? FilterUtils::filterGetInt(SystemConstant::PAGE_ATT) : 0;
+        $perPage = FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) > 0 ? FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) : 0;
+        jsonResponse($this->permissionService->findAllByPaging($page, $perPage));
+    }
 
     public function permissionsCrudtbl()
     {
@@ -92,10 +98,12 @@ class PermissionController extends AppController
             if ($validator->getValidationErrors()) {
                 jsonResponse($this->setResponseStatus($validator->getValidationErrors(), false, null), 400);
             } else {
+
                 $lastInsertId = $this->permissionService->createByObject($entity);
                 if ($lastInsertId) {
                     $this->pushDataToView = $this->setResponseStatus([SystemConstant::ENTITY_ATT => $this->permissionService->findById($lastInsertId)], true, i18next::getTranslation(('success.insert_succesfull')));
                 }
+
             }
         }
         jsonResponse($this->pushDataToView);

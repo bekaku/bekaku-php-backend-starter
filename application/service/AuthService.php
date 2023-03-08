@@ -42,8 +42,8 @@ class AuthService extends BaseDatabaseSupport
 //        $this->bind(":username", $userName);
 
         $userData = $this->userService->findForAuthenByEmail($email);
-        if ($this->userService->rowCount() == 1) {
 
+        if ($this->userService->rowCount() == 1) {
             $userIdInDb = $userData->id;
             $userSaltInDb = $userData->salt;
             $hashPasswordInDb = $userData->password;

@@ -186,7 +186,13 @@ class AppController
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
     }
 
-    public function getJsonData($assoc = false)
+    /**
+     * @param bool $assoc
+     * @return mixed
+     * $assoc =true $jsonData['abc'],
+     * $assoc =false $jsonData->abc,
+     */
+    public function getJsonData($assoc = false)//
     {
         if ($assoc) {
             return json_decode(file_get_contents('php://input'), true);

@@ -18,6 +18,6 @@ class AppTableValidator extends BaseValidator
         parent::__construct();
         $this->objToValidate = $appTable;
         $this->validateField('app_table_name', self::VALIDATE_REQUIRED);
-        $this->validateField('description', self::VALIDATE_REQUIRED);
+//        $this->validateField('description', self::VALIDATE_REQUIRED);
     }
 }

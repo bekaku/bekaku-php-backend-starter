@@ -69,6 +69,7 @@ class AuthController extends AppController
             $userpwd = FilterUtils::filterVarString($jsonData->_p);
 
             $data = $this->authService->signin($email, $userpwd);
+
             if ($data->status && $data->apiKey != null) {
                 $appuserData = $this->userService->findByEmail($email);
                 if ($appuserData) {

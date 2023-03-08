@@ -57,6 +57,7 @@ class SystemConstant
     const USER_API_KEY_ATT = "apiKey";
     const JWT_USER_ID_ATT = "uid";
 
+    const PAGE_ATT = 'page';
     const PER_PAGE_ATT = 'perPage';
     const DATA_LIST_ATT = 'dataList';
     const ENTITY_ATT = 'entity';

@@ -19,7 +19,7 @@ class BaseDatabaseSupport
     //paging
     private $pagingLink;
 
-    private $totalPaging=0;
+    private $totalPaging = 0;
 
     /**
      * @return int
@@ -89,6 +89,7 @@ class BaseDatabaseSupport
             return false;
         }
     }
+
     public function list()
     {
         $this->execute();
@@ -101,6 +102,7 @@ class BaseDatabaseSupport
             return [];
         }
     }
+
     public function single()
     {
         $this->execute();
@@ -597,6 +599,7 @@ class BaseDatabaseSupport
         }
         $this->pagingLink = $pageLink;
     }
+
     public function setTotalPages($total_no_of_records, $records_per_page)
     {
         $total_no_of_pages = 0;
@@ -605,14 +608,15 @@ class BaseDatabaseSupport
         }
         $this->setTotalPaging($total_no_of_pages);
     }
-    public function genAdditionalParamAndWhereForListPage($q_parameter = array(), $ariasTableName=null, $manualSort= false, $defaultSortOrder = "DESC", $defaultSortField = "id")
+
+    public function genAdditionalParamAndWhereForListPage($q_parameter = array(), $ariasTableName = null, $manualSort = false, $defaultSortOrder = "DESC", $defaultSortField = "id")
     {
 
         $return = null;
         $query = "";
         $sortField = "";
         $sortOrder = "";
-        if(!$manualSort){
+        if (!$manualSort) {
             $sortField = " ORDER BY " . $ariasTableName . ".`" . $defaultSortField . "` ";
             $sortOrder = " " . $defaultSortOrder . " ";
         }
@@ -643,6 +647,74 @@ class BaseDatabaseSupport
 
         return $return;
 
+    }
+
+    public function genAdditionalParamAndWhereForListPageV2($q_parameter = array(), $tableObject = null, $manualSort = false, $defaultSortOrder = "DESC", $defaultSortField = "id")
+    {
+        if (empty($tableObject)) {
+            return "";
+        }
+        $ariasTableName = $tableObject::$tableName;
+        $tableFiedArray = $tableObject->getTableField();
+
+        $return = null;
+        $query = "";
+        $sortField = "";
+        $sortOrder = "";
+        if (!$manualSort) {
+            $sortField = " ORDER BY " . $ariasTableName . ".`" . $defaultSortField . "` ";
+            $sortOrder = " " . $defaultSortOrder . " ";
+        }
+
+
+        $data_bind_where = null;
+
+        if (!empty($q_parameter)) {
+            foreach ($q_parameter AS $qKey => $qValue) {
+
+                if ($qKey != 'sortMode' && $qKey != 'sortField') {
+                    $fieldNameArr = explode("q_", $qKey);
+                    $fieldName = (count($fieldNameArr) > 0) ? $fieldNameArr[1] : "";
+
+                    $fieldDetail = $this->findFieldDetailFromList($tableFiedArray, $fieldName);
+                    if ($fieldDetail) {
+                        if ($fieldDetail['type'] === BaseModel::TYPE_BOOLEAN) {
+                            $query .= " AND " . $ariasTableName . ".`" . $fieldName . "` =:" . $qKey . "  ";
+                            $data_bind_where[$qKey] = $qValue;//bind param for like query
+                        } else {
+                            $query .= " AND " . $ariasTableName . ".`" . $fieldName . "` LIKE :" . $qKey . "  ";
+                            $data_bind_where[$qKey] = "%" . $qValue . "%";//bind param for like query
+                        }
+
+                    }
+
+                } else if ($qKey == 'sortField') {
+                    $sortField = " ORDER BY " . $ariasTableName . ".`" . $qValue . "` ";
+                } else if ($qKey == 'sortMode') {
+                    $sortOrder = " " . $qValue . " ";
+                }
+            }
+        }
+
+        $return['additional_query'] = $query . $sortField . $sortOrder;
+        $return['where_bind'] = $data_bind_where;
+
+        return $return;
+    }
+
+    private function findFieldDetailFromList($tableFiedArray, $field)
+    {
+        $item = null;
+        foreach ($tableFiedArray as $key => $dataType) {
+            if ($key == $field) {
+                $item = [
+                    'field' => $key,
+                    'type' => $dataType,
+                ];
+                break;
+            }
+        }
+        return $item;
     }
 
     public function genBindParamAndWhereForListPage($where_array = array())
