@@ -23,7 +23,6 @@ front/jspm_packages
 
 # Optional npm cache directory
 .npm
-.env
 # Optional REPL history
 .node_repl_history
 
@@ -32,3 +31,4 @@ front/node_modules/
 front/dist/
 front/npm-debug.log
 front/www/
+.env
