@@ -105,7 +105,9 @@
       "permissionDeny": "Users do not have permission to access this information.",
       "err_404": "Page not found.",
       "duplicateEmail": "The email __email__ has already been taken. Please choose different email.",
-      "duplicateUsername": "The username __username__ has already been taken. Please choose different username."
+      "duplicateUsername": "The username __username__ has already been taken. Please choose different username.",
+      "emptyError": "Data __data__ can't be null.",
+      "duplicateError": "Data __data__ exist please rewise your data."
     },
     "success": {
       "success": "Success",

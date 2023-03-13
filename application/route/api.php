@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Bekaku
@@ -16,6 +17,7 @@ use application\core\Route as Route;
 | IndexController
 |--------------------------------------------------------------------------
 */
+
 Route::get([], "index", "IndexController", "index");
 /*
 |--------------------------------------------------------------------------
@@ -32,12 +34,16 @@ Route::post([], "generateStarterApi", "AppTableController", "addApi");
 |--------------------------------------------------------------------------
 */
 Route::get(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudList", "permission_list");
-Route::get(['AuthApi'], "findAllPermissionByPaging", "PermissionController", "findAllByPaging");
-
 Route::post(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudAdd", "permission_add");
-Route::get(['AuthApi', 'PermissionGrant'], "permissionReadSingle", "PermissionController", "crudReadSingle", "permission_view");
 Route::put(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudEdit", "permission_edit");
 Route::delete(['AuthApi', 'PermissionGrant'], "permission", "PermissionController", "crudDelete", "permission_delete");
+Route::get(['AuthApi', 'PermissionGrant'], "permissionReadSingle", "PermissionController", "crudReadSingle", "permission_view");
+
+
+
+
+
+Route::get(['AuthApi'], "findAllPermissionByPaging", "PermissionController", "findAllByPaging");
 Route::get([], "permissionsCrudtbl", "PermissionController", "permissionsCrudtbl");
 /*
 |--------------------------------------------------------------------------
@@ -109,3 +115,20 @@ Route::get([], "getSiteMetadata", "UtilController", "getSiteMetadata");
 Route::get([], "test", "TestController", "index");
 Route::get(['AuthApi'], "test-uri", "TestController", "index");
 Route::post(['AuthApi'], "test", "TestController", "index");
+
+
+
+Route::get([], "demo", "DemoController", "index");
+
+Route::get(['AuthApi'], 'student', 'StudentController', 'crudList', null);
+Route::post(['AuthApi'], 'student', 'StudentController', 'crudAdd', null);
+Route::post(['AuthApi'], 'studentV2', 'StudentController', 'crudAddV2', null);
+Route::get(['AuthApi'], 'studentReadSingle', 'StudentController', 'crudReadSingle', null);
+Route::put(['AuthApi'], 'student', 'StudentController', 'crudEdit', null);
+Route::delete(['AuthApi'], 'student', 'StudentController', 'crudDelete', null);
+
+Route::get(['AuthApi'], 'major', 'MajorController', 'crudList', null);
+Route::post(['AuthApi'], 'major', 'MajorController', 'crudAdd', null);
+Route::get(['AuthApi'], 'majorReadSingle', 'MajorController', 'crudReadSingle', null);
+Route::put(['AuthApi'], 'major', 'MajorController', 'crudEdit', null);
+Route::delete(['AuthApi'], 'major', 'MajorController', 'crudDelete', null);

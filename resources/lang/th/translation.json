@@ -2,7 +2,7 @@
   "th": {
     "version": "1.0",
     "app": {
-      "system_name": "Bekaku Php Back End System",
+      "system_name": "ยินดีต้อนรับ",
       "system_name_monogram": "bekaku"
     },
     "base": {
@@ -105,7 +105,9 @@
       "permissionDeny": "ผู้ใช้ไม่ได้รับสิทธิ์ในการเข้าถึงข้อมูลนี้",
       "err_404": "ไม่พบหน้าที่ต้องการ",
       "duplicateEmail": "อีเมล์ __email__ มีคนใช้แล้ว กรุณาเปลี่ยนอีเมล์และลองอีกครั้ง",
-      "duplicateUsername": "ชื่อผู้ใช้ __username__ มีคนใช้แล้ว กรุณาเปลี่ยนชื่อผู้ใช้และลองอีกครั้ง"
+      "duplicateUsername": "ชื่อผู้ใช้ __username__ มีคนใช้แล้ว กรุณาเปลี่ยนชื่อผู้ใช้และลองอีกครั้ง",
+      "emptyError": "ข้อมูล __data__ ต้องไม่เป็นค่าว่าง",
+      "duplicateError": "ข้อมูล __data__ มีแล้วในระบบกรุณาตรวจสอบ"
     },
     "success": {
       "success": "ดำเนินการสำเร็จ",

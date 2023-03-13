@@ -18,6 +18,7 @@ use application\model\Permission;
 use application\service\PermissionService;
 use application\validator\PermissionValidator;
 
+
 class PermissionController extends AppController
 {
     /**
@@ -40,6 +41,7 @@ class PermissionController extends AppController
 
     public function crudList()
     {
+        
         $perPage = FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) > 0 ? FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) : 0;
         $this->setRowPerPage($perPage);
         $q_parameter = $this->initSearchParam(new Permission());

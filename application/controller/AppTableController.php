@@ -232,25 +232,25 @@ class AppTableController extends BaseController
                     $routListGen = null;
 
 
-//                    if ($isCreateModel) {
-//                        $this->modelPath = __SITE_PATH . '/application/model/' . $this->appTableModuleName . '.php';
-//                        $this->createModelFile($appTable);
-//                    }
-//                    if ($isCreateService) {
-//                        $this->serviceInterfacePath = __SITE_PATH . '/application/serviceInterface/' . $this->appTableModuleName . 'ServiceInterface.php';
-//                        $this->createServiceInterfaceFile();
-//
-//                        $this->servicePath = __SITE_PATH . '/application/service/' . $this->appTableModuleName . 'Service.php';
-//                        $this->createServiceFile($appTable);
-//                    }
-//                    if ($isValidator) {
-//                        $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
-//                        $this->createValidatorFile();
-//                    }
-//                    if ($isCreateControler) {
-//                        $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
-//                        $this->createControllerFile($appTable, $isCreateCrudPermission);
-//                    }
+                   if ($isCreateModel) {
+                       $this->modelPath = __SITE_PATH . '/application/model/' . $this->appTableModuleName . '.php';
+                       $this->createModelFile($appTable);
+                   }
+                   if ($isCreateService) {
+                       $this->serviceInterfacePath = __SITE_PATH . '/application/serviceInterface/' . $this->appTableModuleName . 'ServiceInterface.php';
+                       $this->createServiceInterfaceFile();
+
+                       $this->servicePath = __SITE_PATH . '/application/service/' . $this->appTableModuleName . 'Service.php';
+                       $this->createServiceFile($appTable);
+                   }
+                   if ($isValidator) {
+                       $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
+                       $this->createValidatorFile();
+                   }
+                   if ($isCreateControler) {
+                       $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
+                       $this->createControllerFile($appTable, $isCreateCrudPermission);
+                   }
 
 
                     if ($isCreateMsg) {
