@@ -25,11 +25,14 @@ class TestController extends AppController
 
     public function index()
     {
+        // $this->testSendLineNoti();
     }
     private function testSendLineNoti()
     {
         $this->sendNotify([
-            'message' => 'เดี๋ยววันจันทร์พี่จะเลื่อนมาเทรนพวกเราจากวันพุธนะ ไว้พี่จะสอนการส่ง Notify ผ่าน Line Bot เข้ากลุ่ม Line',
+            'message' => 'ส่งข้อความพร้อมรูปภาพ',
+            'imageThumbnail' => 'https://fastly.picsum.photos/id/866/240/240.jpg?hmac=1-kEHESN2M0RdXKLwe1esbZk7zUhVNrW8Tvg8IRnZWs',
+            'imageFullsize' => 'https://fastly.picsum.photos/id/866/600/800.jpg?hmac=7MjLDCug0s7JWRVrJz0nn-YuyW4PezXyfryEaOTgJx0',
         ]);
     }
     private function sendNotify($queryData)

@@ -79,7 +79,6 @@ class RestApi
             'Content-Type: application/json; charset=utf-8',
             'Accept: application/json'
         );
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header ? $header : $defaultHeader);
