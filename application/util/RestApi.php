@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: developers
@@ -31,9 +32,9 @@ class RestApi
          */
 
         $response = null;
-//        $data = array(// data u want to post
-//            "username" => "test"
-//        );
+        //        $data = array(// data u want to post
+        //            "username" => "test"
+        //        );
 
         $defaultHeader = array(
             SystemConstant::CONTENT_TYPE_APPLICATION_JSON,
@@ -49,9 +50,9 @@ class RestApi
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-//        curl_setopt($ch, CURLOPT_USERPWD, $api_key.':'.$password);
+        //        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        //        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        //        curl_setopt($ch, CURLOPT_USERPWD, $api_key.':'.$password);
 
         $errors = curl_error($ch);
         $result = curl_exec($ch);
@@ -66,6 +67,45 @@ class RestApi
         $response[SystemConstant::SERVER_RESPONSE_DATA] = $data;
         return $response;
     }
+    public static function callApiV2($url, $params = array(), $methodType = SystemConstant::METHOD_GET, $header = null, $isJson = true, $paramsText = "")
+    {
+
+        $response = null;
+        //        $data = array(// data u want to post
+        //            "username" => "test"
+        //        );
+
+        $defaultHeader = array(
+            'Content-Type: application/json; charset=utf-8',
+            'Accept: application/json'
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header ? $header : $defaultHeader);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0); //The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $methodType);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $isJson ? json_encode($params) : $paramsText);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        //        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        //        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        //        curl_setopt($ch, CURLOPT_USERPWD, $api_key.':'.$password);
+
+        $errors = curl_error($ch);
+        $result = curl_exec($ch);
+
+        $data = json_decode($result, true);
+        $returnCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $response[SystemConstant::SERVER_STATUS_CODE_ATT] = $returnCode;
+        $response[SystemConstant::SERVER_MSG_ATT] = self::getHttpStatusMessage($returnCode);;
+        $response['errorMessage'] = $errors;
+        $response[SystemConstant::SERVER_RESPONSE_DATA] = $data;
+        return $response;
+    }
 
     public static function getHttpStatusMessage($status)
     {
@@ -75,10 +115,10 @@ class RestApi
 
     public static function callRestApiGetContent($url, $params = array(), $methodType = SystemConstant::METHOD_GET, $header = null)
     {
-//        $params = array(
-//            '_classDate' => '01/11/2561',
-//            'xxx' => '01/11/2561',
-//        );
+        //        $params = array(
+        //            '_classDate' => '01/11/2561',
+        //            'xxx' => '01/11/2561',
+        //        );
         $defaultHeader = array(
             SystemConstant::CONTENT_TYPE_APPLICATION_URLENCODED,
             SystemConstant::ACCECP_CONTENT_TYPE_APPLICATION_JSON
@@ -121,15 +161,16 @@ class RestApi
 
 
     //
-    public static function callApiStd($url, $params = array(), $methodType = SystemConstant::METHOD_GET, $header=null){
+    public static function callApiStd($url, $params = array(), $methodType = SystemConstant::METHOD_GET, $header = null)
+    {
 
 
         $response = null;
-//        $data = array(// data u want to post
-//            "username" => "test"
-//        );
+        //        $data = array(// data u want to post
+        //            "username" => "test"
+        //        );
 
-        $defaultHeader=array(
+        $defaultHeader = array(
             SystemConstant::CONTENT_TYPE_APPLICATION_JSON,
             SystemConstant::ACCECP_CONTENT_TYPE_APPLICATION_JSON
         );
@@ -141,8 +182,8 @@ class RestApi
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-//        curl_setopt($ch, CURLOPT_USERPWD, $api_key.':'.$password);
+        //        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        //        curl_setopt($ch, CURLOPT_USERPWD, $api_key.':'.$password);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header ? $header : $defaultHeader);
@@ -154,10 +195,10 @@ class RestApi
         $returnCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        $response[SystemConstant::SERVER_STATUS_CODE_ATT]=$returnCode;
-        $response[SystemConstant::SERVER_MSG_ATT]=self::getHttpStatusMessage($returnCode);;
-        $response['errorMessage']=$errors;
-        $response[SystemConstant::SERVER_RESPONSE_DATA]=$data;
+        $response[SystemConstant::SERVER_STATUS_CODE_ATT] = $returnCode;
+        $response[SystemConstant::SERVER_MSG_ATT] = self::getHttpStatusMessage($returnCode);;
+        $response['errorMessage'] = $errors;
+        $response[SystemConstant::SERVER_RESPONSE_DATA] = $data;
         return $response;
     }
 }

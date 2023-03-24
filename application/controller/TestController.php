@@ -10,18 +10,11 @@
 namespace application\controller;
 
 use application\core\AppController;
-use application\util\AppUtil;
-use application\util\ControllerUtil;
 use application\util\FilterUtils;
-use application\util\i18next;
 use application\util\JWT;
 use application\util\SystemConstant;
-use application\util\MailUtil;
-use application\model\MailContent;
+use application\util\RestApi;
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 class TestController extends AppController
 {
@@ -32,50 +25,28 @@ class TestController extends AppController
 
     public function index()
     {
-        self::sendGmail();
     }
-    public function sendGmail()
+    private function testSendLineNoti()
     {
-
-        //Create an instance; passing `true` enables exceptions
-        $mail = new PHPMailer(true);
-        try {
-            //Server settings
-            $mail->isSMTP();
-            $mail->Mailer = "smtp";                             //Send using SMTP
-            $mail->SMTPDebug  = 1;
-            $mail->SMTPAuth   = TRUE;
-            $mail->SMTPSecure = "ssl";
-            $mail->Port       = 465;
-            $mail->Host       = "smtp.gmail.com";
-            $mail->Username   = "edr.grandats@gmail.com";
-            $mail->Password   = "D4YZBPYxs26umyP";                                 //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
-            //Recipients
-            $mail->setFrom('from@example.com', 'Mailer');
-            $mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
-            $mail->addAddress('ellen@example.com');               //Name is optional
-            $mail->addReplyTo('info@example.com', 'Information');
-            $mail->addCC('cc@example.com');
-            $mail->addBCC('bcc@example.com');
-
-            //Attachments
-            // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-            // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
-
-            //Content
-            $mail->isHTML(true);                                  //Set email format to HTML
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-            $mail->send();
-            echo 'Message has been sent';
-        } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-        }
+        $this->sendNotify([
+            'message' => 'เดี๋ยววันจันทร์พี่จะเลื่อนมาเทรนพวกเราจากวันพุธนะ ไว้พี่จะสอนการส่ง Notify ผ่าน Line Bot เข้ากลุ่ม Line',
+        ]);
     }
-
+    private function sendNotify($queryData)
+    {
+        $postData = http_build_query($queryData, '', '&');
+        return RestApi::callApiV2(
+            'https://notify-api.line.me/api/notify',
+            null,
+            SystemConstant::METHOD_POST,
+            [
+                'Content-type: application/x-www-form-urlencoded',
+                'Authorization: Bearer 3p0acbWfinxF2CVxS2XeCuHqczFkM2FekZc7Y3pdXrH'
+            ],
+            false,
+            $postData
+        );
+    }
     private function env($key = null)
     {
         if (!$key) {
