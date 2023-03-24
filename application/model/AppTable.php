@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Bekaku
@@ -9,9 +10,13 @@
 namespace application\model;
 
 use application\core\BaseModel;
+
 class AppTable extends BaseModel
 {
     public static $tableName = 'app_table';
+
+    public $app_table_name;
+    public $id;
 
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
     {
@@ -33,5 +38,10 @@ class AppTable extends BaseModel
         ));
 
         $this->populate($jsonData, $this, $uid, $isUpdate);
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 }

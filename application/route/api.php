@@ -119,6 +119,7 @@ Route::post(['AuthApi'], "test", "TestController", "index");
 
 
 Route::get([], "demo", "DemoController", "index");
+Route::post([], "testUploadImage", "DemoController", "testUploadImage");
 
 Route::get(['AuthApi'], 'student', 'StudentController', 'crudList', null);
 Route::post(['AuthApi'], 'student', 'StudentController', 'crudAdd', null);
@@ -126,9 +127,18 @@ Route::post(['AuthApi'], 'studentV2', 'StudentController', 'crudAddV2', null);
 Route::get(['AuthApi'], 'studentReadSingle', 'StudentController', 'crudReadSingle', null);
 Route::put(['AuthApi'], 'student', 'StudentController', 'crudEdit', null);
 Route::delete(['AuthApi'], 'student', 'StudentController', 'crudDelete', null);
+Route::post([], "studentUploadImage", "StudentController", "studentUploadImage");
+Route::post([], "studentUploadMultiImage", "StudentController", "studentUploadMultiImage");
+
 
 Route::get(['AuthApi'], 'major', 'MajorController', 'crudList', null);
 Route::post(['AuthApi'], 'major', 'MajorController', 'crudAdd', null);
 Route::get(['AuthApi'], 'majorReadSingle', 'MajorController', 'crudReadSingle', null);
 Route::put(['AuthApi'], 'major', 'MajorController', 'crudEdit', null);
 Route::delete(['AuthApi'], 'major', 'MajorController', 'crudDelete', null);
+
+Route::get(['AuthApi'], 'studentImage', 'StudentImageController', 'crudList', null);
+Route::post(['AuthApi'], 'studentImage', 'StudentImageController', 'crudAdd', null);
+Route::get(['AuthApi'], 'studentImageReadSingle', 'StudentImageController', 'crudReadSingle', null);
+Route::put(['AuthApi'], 'studentImage', 'StudentImageController', 'crudEdit', null);
+Route::delete(['AuthApi'], 'studentImage', 'StudentImageController', 'crudDelete', null);

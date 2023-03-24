@@ -233,6 +233,7 @@ class UserController extends AppController
                     $effectRow = $this->userService->update([
                         'image' => $imagName
                     ], ['id' => $uid]);
+
                     if ($effectRow) {
                         $this->pushDataToView = $this->setResponseStatus([
                             'picture' => UploadUtil::getProfilePicApi($imagName, $user->created_at)

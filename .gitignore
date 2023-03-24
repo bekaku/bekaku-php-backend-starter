@@ -32,3 +32,5 @@ front/dist/
 front/npm-debug.log
 front/www/
 *.env
+vendor/
+data/img/

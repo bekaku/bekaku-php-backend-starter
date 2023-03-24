@@ -250,11 +250,11 @@ class UploadUtil
 
             $imgFolder = $displayPath . "/img";
             $checkFolder = $uploadPath . "/img";
-            $filePath = "";
-            $checkPath = "";
+            $filePath = $imgFolder . "/";
+            $checkPath = $checkFolder . "/";
             if ($dateCreate) {
-                $filePath .= $imgFolder . "/" . DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
-                $checkPath .= $checkFolder . "/" . DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
+                $filePath .= DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
+                $checkPath .= DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
             }
             return [
                 'path' => self::isFileExist($checkPath . $imgName) ? ($isUpload ? $checkPath . $imgName : $filePath . $imgName) : self::defaultImage($displayPath, $isUpload)['path'],
@@ -481,6 +481,7 @@ class UploadUtil
         ob_flush();
         flush();
     }
+
     //Thailand Post
     public static function uploadApiFiles($files, $yearMonthFolder = null, $fileName = null)
     {

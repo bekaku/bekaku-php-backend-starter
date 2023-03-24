@@ -1,6 +1,7 @@
 <?php
 
 /** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
+
 /**
  * Created by Bekaku Php Back End System.
  * Date: 2023-03-09 13:11:10
@@ -16,25 +17,34 @@ use application\util\SecurityUtil;
 
 use application\model\Student;
 use application\service\StudentService;
+use application\service\StudentImageService;
+use application\util\DateUtils;
+use application\util\UploadUtil;
 
-class StudentController extends  AppController
+class StudentController extends AppController
 {
     /**
      * @var StudentService
      */
     private $studentService;
 
+    private $studentImageService;
+
 
     public function __construct($databaseConnection)
     {
         $this->setDbConn($databaseConnection);
         $this->studentService = new StudentService($this->getDbConn());
+        $this->studentImageService = new StudentImageService($this->getDbConn());
     }
+
     public function __destruct()
     {
         $this->setDbConn(null);
         unset($this->studentService);
+        unset($this->studentImageService);
     }
+
     public function crudList()
     {
         $perPage = FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) > 0 ? FilterUtils::filterGetInt(SystemConstant::PER_PAGE_ATT) : 0;
@@ -62,6 +72,7 @@ class StudentController extends  AppController
         }
         jsonResponse($this->pushDataToView);
     }
+
     private function validateData($jsonData)
     {
 
@@ -85,7 +96,7 @@ class StudentController extends  AppController
         $this->validateData($jsonData);
         if (!empty($jsonData) && !empty($uid)) {
 
-            $lastInsertId =  $this->studentService->createByArray([
+            $lastInsertId = $this->studentService->createByArray([
                 'std_code' => $jsonData->std_code,
                 'name' => $jsonData->name,
                 'surname' => $jsonData->surname,
@@ -136,6 +147,7 @@ class StudentController extends  AppController
         }
         jsonResponse($this->pushDataToView);
     }
+
     public function crudEditV2()
     {
         $uid = SecurityUtil::getAppuserIdFromJwtPayload();
@@ -153,7 +165,6 @@ class StudentController extends  AppController
         }
         jsonResponse($this->pushDataToView);
     }
-
 
 
     public function crudDelete()
@@ -174,5 +185,88 @@ class StudentController extends  AppController
             }
         }
         jsonResponse($this->pushDataToView);
+    }
+
+
+    public function studentUploadImage()
+    {
+        //get studentId
+        $studentId = $_POST["studentId"];
+        //get user's id from JWT Token who change student's image.
+        $uid = SecurityUtil::getAppuserIdFromJwtPayload();
+        //check is user upload file or not
+        if (isset($_FILES['fileName']) && is_uploaded_file($_FILES['fileName']['tmp_name'])) {
+            // get student data by id
+            $student = $this->studentService->findById($studentId);
+            if (!empty($student)) {
+                //delete old student's image before upload new one
+                if (!empty($student->image_name)) {
+                    UploadUtil::delImgfileFromYearMonthFolder($student->image_name, null);
+                }
+            }
+            //generate random unique name for this image
+            $newName = UploadUtil::getUploadFileName($uid);
+            //upload process if upload cuccess it will return image name
+            $imagName = UploadUtil::uploadImgFiles($_FILES['fileName'], null, 0, $newName);
+            if ($imagName) {
+                //update this student's image_name in db by id
+                $this->studentService->update([
+                    'image_name' => $imagName
+                ], ['id' => $studentId]);
+                //return image name to frontend
+                jsonResponse([
+                    'imageName' => $imagName,
+                ]);
+            }
+        }
+        //return error message if upload fail
+        jsonResponse([
+            'error' => i18next::getTranslation('error.oops'),
+        ]);
+    }
+
+    public function studentUploadMultiImage()
+    {
+        //get studentId
+        $studentId = $_POST["studentId"];
+        $totalFiles = $_POST["totalFile"];
+        //get user's id from JWT Token who change student's image.
+        $uid = SecurityUtil::getAppuserIdFromJwtPayload();
+        $imgList = array();
+        if (!empty($uid) && !empty($studentId) && $totalFiles > 0) {
+
+            for ($i = 0; $i < $totalFiles; $i++) {
+
+                $fileUploadName = 'fileName_' . $i;
+                if (is_uploaded_file($_FILES[$fileUploadName]['tmp_name'])) {
+                    //generate random unique name for this image
+                    $newName = UploadUtil::getUploadFileName($studentId . '_' . $uid);
+                    //upload process if upload cuccess it will return image name
+                    $imagName = UploadUtil::uploadImgFiles($_FILES[$fileUploadName], null, 0, $newName);
+                    if ($imagName) {
+                        // insert this image to student_image table
+                        $this->studentImageService->createByArray(
+                            [
+                                'student_id' => $studentId,
+                                'image_name' => $imagName,
+                                'upload_user' => $uid,
+                                'upload_date' => DateUtils::getDateNow()
+                            ]
+                        );
+
+                        //push new image to list
+                        array_push($imgList, $imagName);
+                    }
+                }
+            }
+            //return list of upload images
+            jsonResponse([
+                'images' => $imgList
+            ]);
+        }
+        //return error message if upload fail
+        jsonResponse([
+            'error' => i18next::getTranslation('error.oops'),
+        ]);
     }
 }

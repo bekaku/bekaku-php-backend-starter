@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: developers
@@ -16,24 +17,25 @@ use application\util\PHPMailer\PHPMailer;
 class MailUtil
 {
 
-    public static function sendGmail(MailContent $content){
+    public static function sendGmail(MailContent $content)
+    {
 
 
-        if(!empty($content)){
-//            echoln('getFromMail='.$content->getFromMail());
-//            echoln('getFromName='.$content->getFromName());
-//            echoln('getReplyTo='.$content->getReplyTo());
-//            echoln('getReplyToName='.$content->getReplyToName());
-//            echoln('getAddress');
-//            $addressList = $content->getAddress();
-//            if(count($addressList)>0){
-//                foreach ($addressList AS $address){
-//                    echoln('address='.$address['address'].', name='.$address['name']);
-//                }
-//            }
-//            echoln('isHtml='.$content->isHtml());
-//            echoln('getSubject='.$content->getSubject());
-//            echoln('getBody='.$content->getBody());
+        if (!empty($content)) {
+            // echoln('getFromMail=' . $content->getFromMail());
+            // echoln('getFromName=' . $content->getFromName());
+            // echoln('getReplyTo=' . $content->getReplyTo());
+            // echoln('getReplyToName=' . $content->getReplyToName());
+            // echoln('getAddress');
+            // $addressList = $content->getAddress();
+            // if (count($addressList) > 0) {
+            //     foreach ($addressList as $address) {
+            //         echoln('address=' . $address['address'] . ', name=' . $address['name']);
+            //     }
+            // }
+            // echoln('isHtml=' . $content->isHtml());
+            // echoln('getSubject=' . $content->getSubject());
+            // echoln('getBody=' . $content->getBody());
 
             $gmail = MessageUtils::getConfig('gmail');
             $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
@@ -42,7 +44,7 @@ class MailUtil
                 /**/
                 $mail->SMTPDebug = 0;                                 // 2 Enable verbose debug output
                 $mail->isSMTP();                                      // Set mailer to use SMTP
-                $mail->CharSet="UTF-8";
+                $mail->CharSet = "UTF-8";
                 $mail->isSMTP();
                 $mail->Host = $gmail['host'];  //gmail SMTP server
                 $mail->SMTPAuth = $gmail['smtp_auth'];
@@ -51,7 +53,8 @@ class MailUtil
                         'verify_peer' => false,
                         'verify_peer_name' => false,
                         'allow_self_signed' => true
-                    ));
+                    )
+                );
                 $mail->Username = $gmail['username'];                 // SMTP username
                 $mail->Password = $gmail['password'];                           // SMTP password
                 $mail->SMTPSecure = $gmail['smtp_secure'];
@@ -63,8 +66,8 @@ class MailUtil
                 $mail->addReplyTo($content->getReplyTo(), $content->getReplyToName());
 
                 $addressList = $content->getAddress();
-                if(count($addressList)>0){
-                    foreach ($addressList AS $address){
+                if (count($addressList) > 0) {
+                    foreach ($addressList as $address) {
                         $mail->addAddress($address['address'], $address['address']);     // Add a recipient
                     }
                 }
@@ -77,19 +80,20 @@ class MailUtil
                 //$mail->addAttachment('files/1.png', 'new.jpg');    // Optional name
 
                 //Content
-                $mail->isHTML($content->isHtml());// Set email format to HTML
+                $mail->isHTML($content->isHtml()); // Set email format to HTML
                 $mail->Subject = $content->getSubject();
                 $mail->Body    = $content->getBody();
-//                $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+                //                $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
                 $mail->send();
-//                echo 'Message has been sent';
+                //                echo 'Message has been sent';
             } catch (Exception $e) {
-//                echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+                //                echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
             }
         }
     }
-    private function sendGmailTest(){
+    private function sendGmailTest()
+    {
 
 
 
@@ -161,5 +165,4 @@ class MailUtil
         }
         */
     }
-
 }

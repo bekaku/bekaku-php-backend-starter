@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Bekaku
@@ -151,8 +152,8 @@ class AppTableController extends BaseController
             //create frontend vue
             $frontendPath = __SITE_PATH . '/application/views/' . $this->postTheme . '/vue-template/' . $this->appTableName;
             if ($isCreateList) {
-//                $this->listPath = __SITE_PATH . '/application/views/' . $this->postTheme . '/vue-template/' . $this->appTableModuleName . '.vue';
-//                $this->listPath = __SITE_PATH . '/application/views/' . $this->postTheme . '/vue-template/' . $this->appTableName . '/' . $this->appTableModuleName . '.vue';
+                //                $this->listPath = __SITE_PATH . '/application/views/' . $this->postTheme . '/vue-template/' . $this->appTableModuleName . '.vue';
+                //                $this->listPath = __SITE_PATH . '/application/views/' . $this->postTheme . '/vue-template/' . $this->appTableName . '/' . $this->appTableModuleName . '.vue';
 
                 $this->listPath = $frontendPath . '/' . $this->appTableModuleName . '.vue';
 
@@ -177,12 +178,12 @@ class AppTableController extends BaseController
             //End
 
             if ($isCreateMsg) {
-//                $this->msgPath =  __SITE_PATH.'/resources/lang/th/model.php';
+                //                $this->msgPath =  __SITE_PATH.'/resources/lang/th/model.php';
                 $msgJsonGen = $this->createMsgFile($appTable);
             }
             if ($isCreateRoute) {
                 $this->routePath = __SITE_PATH . '/application/route/api.php';
-//                $this->createRouteFile($appTable);
+                //                $this->createRouteFile($appTable);
                 $routListGen = $this->createRouteFile($appTable);
             }
 
@@ -232,25 +233,25 @@ class AppTableController extends BaseController
                     $routListGen = null;
 
 
-                   if ($isCreateModel) {
-                       $this->modelPath = __SITE_PATH . '/application/model/' . $this->appTableModuleName . '.php';
-                       $this->createModelFile($appTable);
-                   }
-                   if ($isCreateService) {
-                       $this->serviceInterfacePath = __SITE_PATH . '/application/serviceInterface/' . $this->appTableModuleName . 'ServiceInterface.php';
-                       $this->createServiceInterfaceFile();
+                    if ($isCreateModel) {
+                        $this->modelPath = __SITE_PATH . '/application/model/' . $this->appTableModuleName . '.php';
+                        $this->createModelFile($appTable);
+                    }
+                    if ($isCreateService) {
+                        $this->serviceInterfacePath = __SITE_PATH . '/application/serviceInterface/' . $this->appTableModuleName . 'ServiceInterface.php';
+                        $this->createServiceInterfaceFile();
 
-                       $this->servicePath = __SITE_PATH . '/application/service/' . $this->appTableModuleName . 'Service.php';
-                       $this->createServiceFile($appTable);
-                   }
-                   if ($isValidator) {
-                       $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
-                       $this->createValidatorFile();
-                   }
-                   if ($isCreateControler) {
-                       $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
-                       $this->createControllerFile($appTable, $isCreateCrudPermission);
-                   }
+                        $this->servicePath = __SITE_PATH . '/application/service/' . $this->appTableModuleName . 'Service.php';
+                        $this->createServiceFile($appTable);
+                    }
+                    if ($isValidator) {
+                        $this->validatorPath = __SITE_PATH . '/application/validator/' . $this->appTableModuleName . 'Validator.php';
+                        $this->createValidatorFile();
+                    }
+                    if ($isCreateControler) {
+                        $this->controllerlPath = __SITE_PATH . '/application/controller/' . $this->appTableModuleName . 'Controller.php';
+                        $this->createControllerFile($appTable, $isCreateCrudPermission);
+                    }
 
 
                     if ($isCreateMsg) {
@@ -357,7 +358,6 @@ class AppTableController extends BaseController
                     } else {
                         $t .= "            'status' => self::TYPE_BOOLEAN," . "\r\n";
                     }
-
                 }
             }
             if ($this->isRequireAuditInfo) {
@@ -386,11 +386,10 @@ class AppTableController extends BaseController
             $t .= "        return self::$" . "tableName;" . "\r\n";
             $t .= "    }" . "\r\n";
             $t .= "" . "\r\n";
-            $t .= "}";//end of file
+            $t .= "}"; //end of file
             fwrite($objFopen, $t);
             fclose($objFopen);
         }
-
     }
 
     private function createServiceInterfaceFile()
@@ -405,7 +404,7 @@ class AppTableController extends BaseController
             $t .= "interface " . $this->appTableModuleName . "ServiceInterface extends AppBaseInterface" . "\r\n";
             $t .= "{" . "\r\n";
             $t .= "    //public function manualMethodList($" . "param);" . "\r\n";
-            $t .= "}";//end of file
+            $t .= "}"; //end of file
 
             fwrite($objFopen, $t);
             fclose($objFopen);
@@ -438,21 +437,21 @@ class AppTableController extends BaseController
             /* findAll */
             $t .= "    public function findAll($" . "perpage=0, $" . "q_parameter=array())" . "\r\n";
             $t .= "    {" . "\r\n";
-//        $t .= "        $"."query = \"SELECT * FROM \".$"."this->tableName;"."\r\n";
+            //        $t .= "        $"."query = \"SELECT * FROM \".$"."this->tableName;"."\r\n";
 
             $t .= "        //if have param" . "\r\n";
             $t .= "        $" . "data_bind_where = null;" . "\r\n";
             $t .= "" . "\r\n";
 
             $isFirst = false;
-//            foreach ($this->appTableColunm as $field) {
-//                if (!$isFirst) {
-//                    $t .= "        $" . "query = \"SELECT " . $appTable->app_table_name . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
-//                    $isFirst = true;
-//                } else {
-//                    $t .= "        $" . "query .=\"," . $appTable->app_table_name . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
-//                }
-//            }
+            //            foreach ($this->appTableColunm as $field) {
+            //                if (!$isFirst) {
+            //                    $t .= "        $" . "query = \"SELECT " . $appTable->app_table_name . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
+            //                    $isFirst = true;
+            //                } else {
+            //                    $t .= "        $" . "query .=\"," . $appTable->app_table_name . ".`" . $field . "` AS `" . $field . "` \";" . "\r\n";
+            //                }
+            //            }
             $t .= "        $" . "query = \"SELECT *  \";" . "\r\n";
 
             $t .= "" . "\r\n";
@@ -465,7 +464,7 @@ class AppTableController extends BaseController
             $t .= "       //$" . "query .= \"WHERE " . $appTable->app_table_name . ".custom_field =:customParam \";" . "\r\n";
             $t .= "" . "\r\n";
             $t .= "        //gen additional query and sort order" . "\r\n";
-//            $t .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPage($" . "q_parameter, $" . "this->tableName);" . "\r\n";
+            //            $t .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPage($" . "q_parameter, $" . "this->tableName);" . "\r\n";
             $t .= "       $" . "additionalParam = $" . "this->genAdditionalParamAndWhereForListPageV2($" . "q_parameter, new " . $this->appTableModuleName . "());" . "\r\n";
             $t .= "       if(!empty($" . "additionalParam)){" . "\r\n";
             $t .= "           if(!empty($" . "additionalParam['additional_query'])){" . "\r\n";
@@ -509,24 +508,24 @@ class AppTableController extends BaseController
             $t .= "        $" . "this->genBindParamAndWhereForListPage($" . "data_bind_where);" . "\r\n";
             $t .= "" . "\r\n";
 
-//            $t .= "        //Return as Object Class" . "\r\n";
-//            $t .= "        /*" . "\r\n";
-//            $t .= "        $" . "resaultList =  $" . "this->resultset();" . "\r\n";
-//            $t .= "		if (is_array($" . "resaultList) || is_object($" . "resaultList)){" . "\r\n";
-//            $t .= "            $" . "findList = array();" . "\r\n";
-//            $t .= "            foreach($" . "resaultList as $" . "obj){" . "\r\n";
-//            $t .= "                $" . "singleObj = null;" . "\r\n";
-//            $t .= "                $" . "singleObj = new " . $this->appTableModuleName . "($" . "obj);" . "\r\n";
-//            $t .= "                array_push($" . "findList, $" . "singleObj);" . "\r\n";
-//            $t .= "            }" . "\r\n";
-//            $t .= "            return $" . "findList;" . "\r\n";
-//            $t .= "        }" . "\r\n";
-//            $t .= "        */" . "\r\n";
+            //            $t .= "        //Return as Object Class" . "\r\n";
+            //            $t .= "        /*" . "\r\n";
+            //            $t .= "        $" . "resaultList =  $" . "this->resultset();" . "\r\n";
+            //            $t .= "		if (is_array($" . "resaultList) || is_object($" . "resaultList)){" . "\r\n";
+            //            $t .= "            $" . "findList = array();" . "\r\n";
+            //            $t .= "            foreach($" . "resaultList as $" . "obj){" . "\r\n";
+            //            $t .= "                $" . "singleObj = null;" . "\r\n";
+            //            $t .= "                $" . "singleObj = new " . $this->appTableModuleName . "($" . "obj);" . "\r\n";
+            //            $t .= "                array_push($" . "findList, $" . "singleObj);" . "\r\n";
+            //            $t .= "            }" . "\r\n";
+            //            $t .= "            return $" . "findList;" . "\r\n";
+            //            $t .= "        }" . "\r\n";
+            //            $t .= "        */" . "\r\n";
 
             //cast tinyint(1) to boolean
             $boolTypeCast = "";
             foreach ($this->appTableColunmMetaData as $colunmMeta) {
-                if ($colunmMeta['Type'] == 'tinyint(1)') {//assume as boolean type
+                if ($colunmMeta['Type'] == 'tinyint(1)') { //assume as boolean type
                     $boolTypeCast .= "            $" . "t->" . $colunmMeta['Field'] . " = boolval($" . "t->" . $colunmMeta['Field'] . ");" . "\r\n";
                 }
             }
@@ -549,16 +548,16 @@ class AppTableController extends BaseController
             /* findById */
             $t .= "    public function findById($" . "id)" . "\r\n";
             $t .= "    {" . "\r\n";
-//        $t .= "        $"."query = \"SELECT * FROM \".$"."this->tableName.\" WHERE id=:id\";"."\r\n";
+            //        $t .= "        $"."query = \"SELECT * FROM \".$"."this->tableName.\" WHERE id=:id\";"."\r\n";
             $isFirst = false;
-//            foreach ($this->appTableColunm as $findByField) {
-//                if (!$isFirst) {
-//                    $t .= "        $" . "query = \"SELECT " . $appTable->app_table_name . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
-//                    $isFirst = true;
-//                } else {
-//                    $t .= "        $" . "query .=\"," . $appTable->app_table_name . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
-//                }
-//            }
+            //            foreach ($this->appTableColunm as $findByField) {
+            //                if (!$isFirst) {
+            //                    $t .= "        $" . "query = \"SELECT " . $appTable->app_table_name . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
+            //                    $isFirst = true;
+            //                } else {
+            //                    $t .= "        $" . "query .=\"," . $appTable->app_table_name . ".`" . $findByField . "` AS `" . $findByField . "` \";" . "\r\n";
+            //                }
+            //            }
             $t .= "        $" . "query = \"SELECT *  \";" . "\r\n";
             $t .= "" . "\r\n";
             $t .= "        $" . "query .=\"FROM " . $appTable->app_table_name . " AS " . $appTable->app_table_name . " \";" . "\r\n";
@@ -570,14 +569,14 @@ class AppTableController extends BaseController
             $t .= "        $" . "this->bind(\":id\", (int)$" . "id);" . "\r\n";
 
 
-//            $t .= "        //Return as Object Class" . "\r\n";
-//            $t .= "        /*" . "\r\n";
-//            $t .= "        $" . "result =  $" . "this->single();" . "\r\n";
-//            $t .= "		if (is_array($" . "result) || is_object($" . "result)){" . "\r\n";
-//            $t .= "            $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "($" . "result);" . "\r\n";
-//            $t .= "            return $" . "$this->appTableModuleSubName;" . "\r\n";
-//            $t .= "        }" . "\r\n";
-//            $t .= "        */" . "\r\n";
+            //            $t .= "        //Return as Object Class" . "\r\n";
+            //            $t .= "        /*" . "\r\n";
+            //            $t .= "        $" . "result =  $" . "this->single();" . "\r\n";
+            //            $t .= "		if (is_array($" . "result) || is_object($" . "result)){" . "\r\n";
+            //            $t .= "            $" . $this->appTableModuleSubName . " = new " . $this->appTableModuleName . "($" . "result);" . "\r\n";
+            //            $t .= "            return $" . "$this->appTableModuleSubName;" . "\r\n";
+            //            $t .= "        }" . "\r\n";
+            //            $t .= "        */" . "\r\n";
 
             if ($boolTypeCast) {
                 $t .= "        $" . "t = $" . "this->single();" . "\r\n";
@@ -625,7 +624,7 @@ class AppTableController extends BaseController
             $t .= "    }" . "\r\n";
             $t .= "" . "\r\n";
 
-            $t .= "}";//end of file
+            $t .= "}"; //end of file
 
             fwrite($objFopen, $t);
             fclose($objFopen);
@@ -659,7 +658,7 @@ class AppTableController extends BaseController
                     $typeValidate = BaseValidator::getColunmValidatorByMysqlType($colunmMeta['vType']);
                     if (!AppUtils::isEmpty($typeValidate)) {
 
-                        if ($colunmMeta['Type'] == 'tinyint(1)') {//assume as boolean type
+                        if ($colunmMeta['Type'] == 'tinyint(1)') { //assume as boolean type
                             $typeValidate = "self::VALIDATE_BOOLEAN";
                         }
 
@@ -677,7 +676,7 @@ class AppTableController extends BaseController
 
             $t .= "    }" . "\r\n";
 
-            $t .= "}";//end of file
+            $t .= "}"; //end of file
 
             fwrite($objFopen, $t);
             fclose($objFopen);
@@ -767,7 +766,7 @@ class AppTableController extends BaseController
             }
             $t .= "               $" . "lastInsertId = $" . "this->" . $this->appTableModuleSubName . "Service->createByObject($" . "entity);" . "\r\n";
             $t .= "               if ($" . "lastInsertId) {" . "\r\n";
-//            $t .= "                   $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
+            //            $t .= "                   $" . "this->pushDataToView = $" . "this->setResponseStatus($" . "this->pushDataToView, true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
             $t .= "                    $" . "this->pushDataToView = $" . "this->setResponseStatus([SystemConstant::ENTITY_ATT => $" . "this->" . $this->appTableModuleSubName . "Service->findById($" . "lastInsertId)], true, i18next::getTranslation(('success.insert_succesfull')));" . "\r\n";
             $t .= "                }" . "\r\n";
             if ($isHaveValidator) {
@@ -852,7 +851,7 @@ class AppTableController extends BaseController
             //end crudDelete
 
             $t .= "" . "\r\n";
-            $t .= "}";//end of controller file
+            $t .= "}"; //end of controller file
 
             fwrite($objFopen, $t);
             fclose($objFopen);
@@ -895,7 +894,7 @@ class AppTableController extends BaseController
     private function createListFile(AppTable $appTable)
     {
 
-//        if ($this->isThisFileCanOverwrite($this->listPath)) {
+        //        if ($this->isThisFileCanOverwrite($this->listPath)) {
         $objFopen = fopen($this->listPath, 'w');
         //Start template
         $t = "<template>" . "\r\n";
@@ -1010,7 +1009,7 @@ class AppTableController extends BaseController
         $t .= "    const initialItem = {" . "\r\n";
         foreach ($this->appTableColunmMetaData as $colunmMeta) {
             $field = $colunmMeta['Field'];
-//            if (!in_array($field, $appTable->getTableBaseField())) {
+            //            if (!in_array($field, $appTable->getTableBaseField())) {
             $fieldType = $this->getFieldType($colunmMeta, $field);
             switch ($fieldType) {
                 case BaseModel::TYPE_IMAGE:
@@ -1028,7 +1027,7 @@ class AppTableController extends BaseController
                 default:
                     $t .= "      $field: ''," . "\r\n";
             }
-//            }
+            //            }
         }
         $t .= "    };" . "\r\n";
         $t .= "" . "\r\n";
@@ -1058,13 +1057,13 @@ class AppTableController extends BaseController
 
         fwrite($objFopen, $t);
         fclose($objFopen);
-//        }
+        //        }
 
     }
 
     private function createViewFile(AppTable $appTable)
     {
-//        if ($this->isThisFileCanOverwrite($this->viewPath)) {
+        //        if ($this->isThisFileCanOverwrite($this->viewPath)) {
         $objFopen = fopen($this->viewPath, 'w');
         $t = "<template>" . "\r\n";
         $t .= "    <!--      Start  Form -->" . "\r\n";
@@ -1090,21 +1089,21 @@ class AppTableController extends BaseController
         $t .= "            <v-icon>mdi-keyboard-backspace</v-icon>" . "\r\n";
         $t .= "          </v-btn>" . "\r\n";
         $t .= "        <v-toolbar-title>{{" . "$" . "t('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "') +' ('+(!editMode ?  $" . "t('base.addNew') : $" . "t('base.edit'))+')'}} </v-toolbar-title>" . "\r\n";
-//        $t .= "          <v-toolbar-title>{{" . "$" . "t('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "')}}</v-toolbar-title>" . "\r\n";
+        //        $t .= "          <v-toolbar-title>{{" . "$" . "t('model." . $appTable->app_table_name . "." . $appTable->app_table_name . "')}}</v-toolbar-title>" . "\r\n";
         $t .= "          <v-spacer></v-spacer>" . "\r\n";
 
-//        $t .= "            <v-btn" . "\r\n";
-//        $t .= "              text" . "\r\n";
-//        $t .= "              @click=\"close\"" . "\r\n";
-//        $t .= "              :disabled=\"processing\"" . "\r\n";
-//        $t .= "            > {" . "{" . "$" . "t('base.cancel') }" . "}" . "\r\n";
-//        $t .= "            </v-btn>" . "\r\n";
-//        $t .= "            <v-btn" . "\r\n";
-//        $t .= "              text" . "\r\n";
-//        $t .= "              @click=\"onSave\"" . "\r\n";
-//        $t .= "              :disabled=\"processing\"" . "\r\n";
-//        $t .= "            ><v-icon>mdi-lead-pencil</v-icon> {" . "{" . "$" . "t('base.save') }" . "}" . "\r\n";
-//        $t .= "            </v-btn>" . "\r\n";
+        //        $t .= "            <v-btn" . "\r\n";
+        //        $t .= "              text" . "\r\n";
+        //        $t .= "              @click=\"close\"" . "\r\n";
+        //        $t .= "              :disabled=\"processing\"" . "\r\n";
+        //        $t .= "            > {" . "{" . "$" . "t('base.cancel') }" . "}" . "\r\n";
+        //        $t .= "            </v-btn>" . "\r\n";
+        //        $t .= "            <v-btn" . "\r\n";
+        //        $t .= "              text" . "\r\n";
+        //        $t .= "              @click=\"onSave\"" . "\r\n";
+        //        $t .= "              :disabled=\"processing\"" . "\r\n";
+        //        $t .= "            ><v-icon>mdi-lead-pencil</v-icon> {" . "{" . "$" . "t('base.save') }" . "}" . "\r\n";
+        //        $t .= "            </v-btn>" . "\r\n";
 
 
         $t .= "        </v-toolbar>" . "\r\n";
@@ -1124,19 +1123,19 @@ class AppTableController extends BaseController
             $field = $colunmMeta['Field'];
             if (!in_array($field, $this->appTableBaseField)) {
 
-//                $isRequire = false;
-//                $limitTextLenght = 0;
-//                $typeDateClass = false;
-//                $isTextArea = false;
-//                $isBoolean = false;
-//                $isNumber = false;
+                //                $isRequire = false;
+                //                $limitTextLenght = 0;
+                //                $typeDateClass = false;
+                //                $isTextArea = false;
+                //                $isBoolean = false;
+                //                $isNumber = false;
 
                 $fieldType = BaseModel::TYPE_STRING;
 
 
                 $veeValidateRules = null;
                 if ($colunmMeta['Null'] == 'NO') {
-//                    $isRequire = true;
+                    //                    $isRequire = true;
                     $veeValidateRules = "required";
                 }
 
@@ -1213,7 +1212,6 @@ class AppTableController extends BaseController
                         $t .= "                  :placeholder=\"$" . "t('model." . $appTable->app_table_name . "." . $field . "')\"" . "\r\n";
                         $t .= "                  :label=\"$" . "t('model." . $appTable->app_table_name . "." . $field . "')\"" . "\r\n";
                         $t .= "                ></v-text-field>" . "\r\n";
-
                 }
 
                 if ($veeValidateRules) {
@@ -1289,7 +1287,7 @@ class AppTableController extends BaseController
 
         fwrite($objFopen, $t);
         fclose($objFopen);
-//        }
+        //        }
     }
 
     private function createFrontendFile(AppTable $appTable, $frontendPath)
@@ -1365,53 +1363,53 @@ class AppTableController extends BaseController
         $i = 0;
         foreach ($this->appTableColunmMetaData as $colunmMeta) {
             $i = $i + 1;
-//            if (!in_array($colunmMeta['Field'], $this->appTableBaseField)) {
+            //            if (!in_array($colunmMeta['Field'], $this->appTableBaseField)) {
             $msgString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"" . $colunmMeta['Field'] . "\": \"" . $colunmMeta['Field'] . "\"," . "<br>";
-//            }
+            //            }
         }
         $msgString .= "}" . "<br>";
         return $msgString;
 
         // load the data and delete the line from the array
-//        $filename=$this->msgPath;
-//        $fp = fopen($filename, 'r+');
-//        $pos = filesize($filename);
-//        while ($pos > 0) {
-//            $pos = max($pos - 1024, 0);
-//            fseek($fp, $pos);
-//            $tmp = fread($fp, 1024);
-//            $tmppos = strrpos($tmp, "\n");
-//            if ($tmppos !== false) {
-//                ftruncate($fp, $pos + $tmppos);
-//                break;
-//            }
-//        }
-//        fclose($fp);
+        //        $filename=$this->msgPath;
+        //        $fp = fopen($filename, 'r+');
+        //        $pos = filesize($filename);
+        //        while ($pos > 0) {
+        //            $pos = max($pos - 1024, 0);
+        //            fseek($fp, $pos);
+        //            $tmp = fread($fp, 1024);
+        //            $tmppos = strrpos($tmp, "\n");
+        //            if ($tmppos !== false) {
+        //                ftruncate($fp, $pos + $tmppos);
+        //                break;
+        //            }
+        //        }
+        //        fclose($fp);
 
-//        $objFopen = fopen($this->msgPath, 'a');//'w' replace all file of old file ; 'a'  write the end of old file http://php.net/manual/en/function.fopen.php
-//        $t = ""."\r\n";
-//        $t .="    /*". " \r\n";
-//        $t .="    |--------------------------------------------------------------------------". " \r\n";
-//        $t .="    | ".$appTable->app_table_name." \r\n";
-//        $t .="    |--------------------------------------------------------------------------". " \r\n";
-//        $t .="    */". " \r\n";
-//        $t .="    'model_".$appTable->app_table_name."' => '".$appTable->app_table_name."',". " \r\n";
-//        foreach($this->appTableColunm as $field) {
-//            $t .= "    'model_".$appTable->app_table_name."_".$field."' => '".$field."'," . " \r\n";
-//        }
-//        $t .= ");";
-//        fwrite($objFopen, $t);
-//        fclose($objFopen);
+        //        $objFopen = fopen($this->msgPath, 'a');//'w' replace all file of old file ; 'a'  write the end of old file http://php.net/manual/en/function.fopen.php
+        //        $t = ""."\r\n";
+        //        $t .="    /*". " \r\n";
+        //        $t .="    |--------------------------------------------------------------------------". " \r\n";
+        //        $t .="    | ".$appTable->app_table_name." \r\n";
+        //        $t .="    |--------------------------------------------------------------------------". " \r\n";
+        //        $t .="    */". " \r\n";
+        //        $t .="    'model_".$appTable->app_table_name."' => '".$appTable->app_table_name."',". " \r\n";
+        //        foreach($this->appTableColunm as $field) {
+        //            $t .= "    'model_".$appTable->app_table_name."_".$field."' => '".$field."'," . " \r\n";
+        //        }
+        //        $t .= ");";
+        //        fwrite($objFopen, $t);
+        //        fclose($objFopen);
 
     }
 
     private function createRouteFileApi(AppTable $appTable, $haveCrudPermission = true)
     {
-        $t = "Route::get(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudList'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_list'."'" : 'null') . ");";
-        $t .= "Route::post(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudAdd'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_add'."'" : 'null') . ");";
-        $t .= "Route::get(['AuthApi'], '" . $this->appTableModuleSubName . "ReadSingle', '" . $this->appTableModuleName . "Controller', 'crudReadSingle'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_view'."'" : 'null') . ");";
-        $t .= "Route::put(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudEdit'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_edit'."'" : 'null') . ");";
-        $t .= "Route::delete(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudDelete'," . ($haveCrudPermission ? "'".$appTable->app_table_name . '_delete'."'" : 'null') . ");";
+        $t = "Route::get(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudList'," . ($haveCrudPermission ? "'" . $appTable->app_table_name . '_list' . "'" : 'null') . ");";
+        $t .= "Route::post(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudAdd'," . ($haveCrudPermission ? "'" . $appTable->app_table_name . '_add' . "'" : 'null') . ");";
+        $t .= "Route::get(['AuthApi'], '" . $this->appTableModuleSubName . "ReadSingle', '" . $this->appTableModuleName . "Controller', 'crudReadSingle'," . ($haveCrudPermission ? "'" . $appTable->app_table_name . '_view' . "'" : 'null') . ");";
+        $t .= "Route::put(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudEdit'," . ($haveCrudPermission ? "'" . $appTable->app_table_name . '_edit' . "'" : 'null') . ");";
+        $t .= "Route::delete(['AuthApi'], '" . $this->appTableModuleSubName . "', '" . $this->appTableModuleName . "Controller', 'crudDelete'," . ($haveCrudPermission ? "'" . $appTable->app_table_name . '_delete' . "'" : 'null') . ");";
         return $t;
     }
 
@@ -1419,21 +1417,21 @@ class AppTableController extends BaseController
     {
 
 
-//        $objFopen = fopen($this->routePath, 'a');//'w' replace all file of old file ; 'a'  write the end of old file http://php.net/manual/en/function.fopen.php
-//        $t = ""."\r\n";
-//        $t .="/*". " \r\n";
-//        $t .="|--------------------------------------------------------------------------". " \r\n";
-//        $t .="| ".$this->appTableModuleName."Controller \r\n";
-//        $t .="|--------------------------------------------------------------------------". " \r\n";
-//        $t .="*/". " \r\n";
-//        $t .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."list\",\"".$this->appTableModuleName."\",\"crudList\",\"".$appTable->app_table_name."_list\");"."\r\n";
-//        $t .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."add\",\"".$this->appTableModuleName."\",\"crudAdd\",\"".$appTable->app_table_name."_add\");"."\r\n";
-//        $t .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."add\",\"".$this->appTableModuleName."\",\"crudAddProcess\",\"".$appTable->app_table_name."_add\");"."\r\n";
-//        $t .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."edit\",\"".$this->appTableModuleName."\",\"crudEdit\",\"".$appTable->app_table_name."_edit\");"."\r\n";
-//        $t .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."edit\",\"".$this->appTableModuleName."\",\"crudEditProcess\",\"".$appTable->app_table_name."_edit\");"."\r\n";
-//        $t .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."delete\",\"".$this->appTableModuleName."\",\"crudDelete\",\"".$appTable->app_table_name."_delete\");";
-//        fwrite($objFopen, $t);
-//        fclose($objFopen);
+        //        $objFopen = fopen($this->routePath, 'a');//'w' replace all file of old file ; 'a'  write the end of old file http://php.net/manual/en/function.fopen.php
+        //        $t = ""."\r\n";
+        //        $t .="/*". " \r\n";
+        //        $t .="|--------------------------------------------------------------------------". " \r\n";
+        //        $t .="| ".$this->appTableModuleName."Controller \r\n";
+        //        $t .="|--------------------------------------------------------------------------". " \r\n";
+        //        $t .="*/". " \r\n";
+        //        $t .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."list\",\"".$this->appTableModuleName."\",\"crudList\",\"".$appTable->app_table_name."_list\");"."\r\n";
+        //        $t .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."add\",\"".$this->appTableModuleName."\",\"crudAdd\",\"".$appTable->app_table_name."_add\");"."\r\n";
+        //        $t .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."add\",\"".$this->appTableModuleName."\",\"crudAddProcess\",\"".$appTable->app_table_name."_add\");"."\r\n";
+        //        $t .= "Route::get(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."edit\",\"".$this->appTableModuleName."\",\"crudEdit\",\"".$appTable->app_table_name."_edit\");"."\r\n";
+        //        $t .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."edit\",\"".$this->appTableModuleName."\",\"crudEditProcess\",\"".$appTable->app_table_name."_edit\");"."\r\n";
+        //        $t .= "Route::post(\"".AppUtils::getUrlFromTableName($appTable->app_table_name)."delete\",\"".$this->appTableModuleName."\",\"crudDelete\",\"".$appTable->app_table_name."_delete\");";
+        //        fwrite($objFopen, $t);
+        //        fclose($objFopen);
 
         $t = "/*" . " <br>";
         $t .= "|--------------------------------------------------------------------------" . " <br>";
@@ -1476,7 +1474,7 @@ class AppTableController extends BaseController
         }
         $appTable = new AppTable();
         $appTable->populatePostData();
-        $appTable->setId($id);
+        // $appTable->setId($id);
 
         $validator = new AppTableValidator($appTable);
         $errors = $validator->getValidationErrors();

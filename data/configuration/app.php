@@ -42,8 +42,8 @@ return array(
     'gmail' => array(
         'host' => 'smtp.googlemail.com',
         'smtp_auth' => true,
-        'username' => '',
-        'password' => '',
+        'username' => 'edr.grandats@gmail.com',
+        'password' => 'D4YZBPYxs26umyP',
         'smtp_secure' => 'ssl',
         'port' => 465,
     ),
@@ -111,8 +111,8 @@ return array(
     'fopen_mode' => array(
         'fopen_read' => 'rb',
         'fopen_read_write' => 'r+b',
-        'fopen_write_create_destructive' => 'wb',// truncates existing file data, use with care
-        'fopen_read_write_create_destructive' => 'w+b',// truncates existing file data, use with care
+        'fopen_write_create_destructive' => 'wb', // truncates existing file data, use with care
+        'fopen_read_write_create_destructive' => 'w+b', // truncates existing file data, use with care
         'fopen_write_create' => 'ab',
         'fopen_read_write_create' => 'a+b',
         'fopen_write_create_strict' => 'xb',
@@ -126,7 +126,7 @@ return array(
     |mod_rewrite enable in AppServ\Apache2.2\conf and restart Apache
     */
     'url_rewriting' => true,
-    'url_rewriting_extension' => '',//eg .do, .htm
+    'url_rewriting_extension' => '', //eg .do, .htm
 
     /*
     |--------------------------------------------------------------------------
@@ -151,12 +151,12 @@ return array(
         'charset' => 'utf8',
         'collation' => 'utf8_general_ci',
         'prefix' => '',
-        'port' => get_env('DB_PORT'),//3306, 13537
+        'port' => get_env('DB_PORT'), //3306, 13537
         'strict' => false,
     ),
     'sqlite' => array(
         'driver' => 'sqlite',
-        'database' => 'D:/database.sqlite',//path of sqlite
+        'database' => 'D:/database.sqlite', //path of sqlite
         'prefix' => '',
     ),
     'pgsql' => array(
@@ -195,11 +195,11 @@ return array(
     | If you are using an HTTPS connection, change this to TRUE
     */
     'secure' => false,
-    'url' => 'localhost',//your server's domain or ip
-    'url_port' => '80',//your http port
-    'ssl_port' => '443',//your https port
-    'url_rewriting_project_path' => get_env('PROJECT_HOME')."/",
-    'base_project_path' => get_env('PROJECT_HOME')."/",
+    'url' => 'localhost', //your server's domain or ip
+    'url_port' => '80', //your http port
+    'ssl_port' => '443', //your https port
+    'url_rewriting_project_path' => get_env('PROJECT_HOME') . "/",
+    'base_project_path' => get_env('PROJECT_HOME') . "/",
     'base_project_resources_path' => get_env('PROJECT_HOME') . '/resources',
 
     /*
