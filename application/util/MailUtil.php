@@ -11,8 +11,9 @@ namespace application\util;
 
 
 use application\model\MailContent;
-use application\util\PHPMailer\Exception;
-use application\util\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 class MailUtil
 {
@@ -38,12 +39,11 @@ class MailUtil
             // echoln('getBody=' . $content->getBody());
 
             $gmail = MessageUtils::getConfig('gmail');
-            $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+            $mail = new PHPMailer(true);                             // Passing `true` enables exceptions
             try {
                 //Server settings
                 /**/
-                $mail->SMTPDebug = 0;                                 // 2 Enable verbose debug output
-                $mail->isSMTP();                                      // Set mailer to use SMTP
+                $mail->SMTPDebug = SMTP::DEBUG_SERVER;;                                 // 2 Enable verbose debug output
                 $mail->CharSet = "UTF-8";
                 $mail->isSMTP();
                 $mail->Host = $gmail['host'];  //gmail SMTP server
@@ -94,9 +94,6 @@ class MailUtil
     }
     private function sendGmailTest()
     {
-
-
-
         $gmail = new MailContent();
         $gmail->setFromMail('wct.thaioil@gmail.com');
         $gmail->setFromName('Warehouse Contents Tracking');
