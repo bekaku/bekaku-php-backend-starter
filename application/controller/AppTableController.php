@@ -321,7 +321,9 @@ class AppTableController extends BaseController
 
             /* attribute */
             $t .= "    public static $" . "tableName = '" . $appTable->app_table_name . "';" . "\r\n";
-
+            foreach ($this->appTableColunmMetaData as $colunmMeta) {
+                $t .= "    public $" . $colunmMeta['Field'] . ";\r\n";
+            }
             /* __construct */
             $t .= "    public function __construct(\stdClass $" . "jsonData = null, $" . "uid = null, $" . "isUpdate = false)" . "\r\n";
             $t .= "    {" . " \r\n";

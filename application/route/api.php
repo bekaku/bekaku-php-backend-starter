@@ -110,6 +110,7 @@ Route::post(['AuthApi'], "userCheckAuth", "AuthController", "userCheckAuth");
 Route::get([], "jsonGetServerDateAndTime", "UtilController", "jsonGetServerDateAndTime");
 Route::get([], "jsongetuniqetoken", "UtilController", "jsonGetUniqeToken");
 Route::get([], "getSiteMetadata", "UtilController", "getSiteMetadata");
+Route::post([], "uploadImageApi", "UtilController", "uploadImageApi");
 
 /* TestContronller*/
 Route::get([], "test", "TestController", "index");
@@ -129,6 +130,7 @@ Route::put(['AuthApi'], 'student', 'StudentController', 'crudEdit', null);
 Route::delete(['AuthApi'], 'student', 'StudentController', 'crudDelete', null);
 Route::post([], "studentUploadImage", "StudentController", "studentUploadImage");
 Route::post([], "studentUploadMultiImage", "StudentController", "studentUploadMultiImage");
+Route::get([], "testChartData", "StudentController", "testChartData");
 
 
 Route::get(['AuthApi'], 'major', 'MajorController', 'crudList', null);

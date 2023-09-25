@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by Bekaku Php Back End System.
  * Date: 2020-05-04 15:28:09
@@ -111,7 +112,7 @@ class UserController extends AppController
 
             //delete old
             $this->roleService->deleteUserRoleByUserId($uid);
-            foreach ($userRoles AS $r) {
+            foreach ($userRoles as $r) {
                 $role = $this->roleService->findById($r);
                 if ($role) {
                     $this->roleService->createUserRoleByArray([
@@ -200,7 +201,7 @@ class UserController extends AppController
         if (!empty($jsonData) && !empty($uid)) {
             $user = $this->userService->findUserDataById($jsonData->user_id);
             if ($user) {
-                $newPwd = ControllerUtil::hashSha512(get_env("APP_DEFAULT_PASSWORD"));
+                $newPwd = get_env("APP_DEFAULT_PASSWORD");
                 $randomSalt = ControllerUtil::getRadomSault();
                 $effectRow = $this->userService->update([
                     'password' => ControllerUtil::genHashPassword($newPwd, $randomSalt),
@@ -248,10 +249,10 @@ class UserController extends AppController
     public function crudDelete()
     {
         $this->pushDataToView = $this->getDefaultResponse(true);
-        $idParams = FilterUtils::filterGetString(SystemConstant::ID_PARAMS);//paramiter format : idOfNo1_idOfNo2_idOfNo3_idOfNo4 ...
+        $idParams = FilterUtils::filterGetString(SystemConstant::ID_PARAMS); //paramiter format : idOfNo1_idOfNo2_idOfNo3_idOfNo4 ...
         $idArray = explode(SystemConstant::UNDER_SCORE, $idParams);
         if (count($idArray) > 0) {
-            foreach ($idArray AS $id) {
+            foreach ($idArray as $id) {
                 $entity = $this->userService->findById($id);
                 if ($entity) {
                     $effectRow = $this->userService->deleteById($id);
@@ -264,5 +265,4 @@ class UserController extends AppController
         }
         jsonResponse($this->pushDataToView);
     }
-
 }

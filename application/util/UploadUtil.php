@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Bekaku
@@ -63,7 +64,7 @@ class UploadUtil
         $upload = new Upload($files);
         if ($upload->uploaded) {
 
-//            echoln('original file name > '.$upload->file_src_name);
+            //            echoln('original file name > '.$upload->file_src_name);
 
             $upload->file_new_name_body = $imagNameGenerate;
             $upload->image_resize = true;
@@ -94,7 +95,6 @@ class UploadUtil
                 if (!$upload->processed) {
                     ControllerUtils::setErrorMessage($upload->error);
                 }
-
             }
 
             //end thumnail create
@@ -246,7 +246,11 @@ class UploadUtil
         if ($imgName) {
             $splitFileName = explode(".", $imgName);
             $filePreName = $splitFileName[0];
-            $thumbName = $filePreName . MessageUtil::getConfig('upload_image.create_thumbnail_exname') . '.jpg';
+            $preThumbName = $filePreName . MessageUtil::getConfig('upload_image.create_thumbnail_exname');
+            $thumbName = $preThumbName  . '.jpg';
+
+            $imgNamePng = $filePreName . '.png';
+            $thumbNamePng = $preThumbName  . '.png';
 
             $imgFolder = $displayPath . "/img";
             $checkFolder = $uploadPath . "/img";
@@ -256,10 +260,34 @@ class UploadUtil
                 $filePath .= DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
                 $checkPath .= DateUtil::getYearAndMonthFromDate($dateCreate) . "/";
             }
+
+            $defaultImg = self::defaultImage($displayPath, $isUpload);
+            $pathFinal = $defaultImg['path'];
+            $pathThumbFinal = $defaultImg['thumbnail'];
+
+            if (self::isFileExist($checkPath . $imgName)) {
+                $pathFinal = $isUpload ? $checkPath . $imgName : $filePath . $imgName;
+            } else if (self::isFileExist($checkPath . $imgNamePng)) {
+                $pathFinal = $isUpload ? $checkPath . $imgNamePng : $filePath . $imgNamePng;
+            }
+            if (self::isFileExist($checkPath . $thumbName)) {
+                $pathThumbFinal = $isUpload ? $checkPath . $thumbName : $filePath . $thumbName;
+            } else if (self::isFileExist($checkPath . $thumbNamePng)) {
+                $pathThumbFinal = $isUpload ? $checkPath . $thumbNamePng : $filePath . $thumbNamePng;
+            }
+
+
             return [
-                'path' => self::isFileExist($checkPath . $imgName) ? ($isUpload ? $checkPath . $imgName : $filePath . $imgName) : self::defaultImage($displayPath, $isUpload)['path'],
-                'thumbnail' => self::isFileExist($checkPath . $thumbName) ? ($isUpload ? $checkPath . $thumbName : $filePath . $thumbName) : self::defaultImage($displayPath, $isUpload)['thumbnail'],
+                'path' => $pathFinal,
+                'thumbnail' => $pathThumbFinal,
             ];
+            // return [
+            //     'path' => self::isFileExist($checkPath . $imgName) ? ($isUpload ? $checkPath . $imgName : $filePath . $imgName) :
+            //         self::defaultImage($displayPath, $isUpload)['path'],
+
+            //     'thumbnail' => self::isFileExist($checkPath . $thumbName) ? ($isUpload ? $checkPath . $thumbName : $filePath . $thumbName) :
+            //         self::defaultImage($displayPath, $isUpload)['thumbnail'],
+            // ];
         } else {
             return self::defaultImage($displayPath, $isUpload);
         }
@@ -361,7 +389,7 @@ class UploadUtil
     }
 
     public static function getFileExtension($fileName)
-    {//param $_FILES["file"]
+    { //param $_FILES["file"]
         $path_parts = pathinfo($fileName["name"]);
         return $path_parts['extension'];
     }
@@ -379,7 +407,6 @@ class UploadUtil
         } else {
             return false;
         }
-
     }
 
     //not work in ubuntu
@@ -403,30 +430,30 @@ class UploadUtil
 
     public static function isFileExitFromUrl($url)
     {
-//        $headers=@get_headers($url);
-//        return @stripos($headers[0],"200 OK") ? true : false;
+        //        $headers=@get_headers($url);
+        //        return @stripos($headers[0],"200 OK") ? true : false;
 
 
-//        $isExits = @file_get_contents($url,0,null,0,1);
+        //        $isExits = @file_get_contents($url,0,null,0,1);
 
 
         $isExits = (bool)@preg_match('~HTTP/1\.\d\s+200\s+OK~', @current(@get_headers($url)));
 
-//        $isExits = true;
+        //        $isExits = true;
 
-//        $isExits = @strstr(@current(@get_headers($url)), "200");
-//
-//        if($isExits){
-//            echoln($url.' TRUE');
-//        }else{
-//            echoln($url.' FASLE');
-//        }
+        //        $isExits = @strstr(@current(@get_headers($url)), "200");
+        //
+        //        if($isExits){
+        //            echoln($url.' TRUE');
+        //        }else{
+        //            echoln($url.' FASLE');
+        //        }
         return $isExits;
     }
 
     public static function isFileExitFromUrl_OK($url)
     {
-//        return strpos(@get_headers($url)[0],'200') === false ? false : true; //error in php 5.3
+        //        return strpos(@get_headers($url)[0],'200') === false ? false : true; //error in php 5.3
         return false;
     }
 
@@ -452,7 +479,7 @@ class UploadUtil
                     header("Content-type: application/vnd.ms-excel");
                     header("Content-Disposition: attachment; filename=\"" . $path_parts["basename"] . "\""); // use 'attachment' to force a file download
                     break;
-                // add more headers for other content types here
+                    // add more headers for other content types here
                 default;
                     header("Content-type: application/octet-stream");
                     header("Content-Disposition: filename=\"" . $path_parts["basename"] . "\"");

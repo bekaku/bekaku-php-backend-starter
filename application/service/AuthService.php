@@ -24,7 +24,6 @@ class AuthService extends BaseDatabaseSupport
     {
         $this->setDbh($dbConn);
         $this->userService = new UserService($this->getDbh());
-
     }
 
     public function signin($email, $password, $newSalt = false)
@@ -36,10 +35,10 @@ class AuthService extends BaseDatabaseSupport
         $result->message = i18next::getTranslation('error.err_username_or_passwd_notfound');
 
         $loginKeyHash = null;
-//        $query = "SELECT id, username, login_password, salt
-//					  FROM user WHERE username=:username LIMIT 1";
-//        $this->query($query);
-//        $this->bind(":username", $userName);
+        //        $query = "SELECT id, username, login_password, salt
+        //					  FROM user WHERE username=:username LIMIT 1";
+        //        $this->query($query);
+        //        $this->bind(":username", $userName);
 
         $userData = $this->userService->findForAuthenByEmail($email);
 
@@ -66,7 +65,6 @@ class AuthService extends BaseDatabaseSupport
                     $result->apiKey = ControllerUtil::genHashPassword(ControllerUtil::getRadomSault(), $hashUserDescription);
                     $result->message = i18next::getTranslation('success.loginSuccess');
                     $result->status = true;
-
                 } else {
                     $this->updateLoginFail($userIdInDb);
                 }
@@ -84,7 +82,8 @@ class AuthService extends BaseDatabaseSupport
             'user',
             ['salt' => $randomSalt, 'password' => $pwdHash],
             ['id' => $userId],
-            'AND');
+            'AND'
+        );
         if ($status) {
             return $pwdHash;
         }

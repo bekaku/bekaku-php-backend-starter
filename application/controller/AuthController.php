@@ -62,7 +62,7 @@ class AuthController extends AppController
             ], 401);
         }
 
-        $jsonData = $this->getJsonData();//past true for convert object class to objec array
+        $jsonData = $this->getJsonData(); //past true for convert object class to objec array
         $data = $this->setResponseStatus([], false, i18next::getTranslation('error.err_username_or_passwd_notfound'));
         if ($jsonData) {
             $email = FilterUtils::filterVarString($jsonData->_u);
@@ -83,7 +83,6 @@ class AuthController extends AppController
             }
         }
         jsonResponse($data);
-
     }
 
     public function userLogout()
@@ -91,14 +90,14 @@ class AuthController extends AppController
         $this->accessTokenService->logoutAction();
         jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => true,
-            SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('error.logoutSuccess'),
+            SystemConstant::SERVER_MSG_ATT => i18next::getTranslation('success.logoutSuccess'),
         ]);
     }
 
     public function userCheckAuth()
     {
         $uid = SecurityUtil::getAppuserIdFromJwtPayload();
-//        jsonResponse($this->userService->findUserDataById($uid));
+        //        jsonResponse($this->userService->findUserDataById($uid));
         jsonResponse([
             SystemConstant::SERVER_STATUS_ATT => true,
             'userData' => $this->userService->findUserDataById($uid),
@@ -138,7 +137,7 @@ class AuthController extends AppController
                 } else {
                     $this->pushDataToView = $this->setResponseStatus([], false, i18next::getTranslation('error.error_something_wrong'));
                 }
-            }else{
+            } else {
                 $this->pushDataToView = $this->setResponseStatus([], false, i18next::getTranslation('error.passwordCurrentWrong'));
             }
         }

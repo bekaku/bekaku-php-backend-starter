@@ -67,6 +67,14 @@ class StudentController extends AppController
             $entity = new Student($jsonData, $uid, false);
             $lastInsertId = $this->studentService->createByObject($entity);
             if ($lastInsertId) {
+
+                // if upload multiple file 
+                if (isset($jsonData->imageNameList) && count($jsonData->imageNameList) > 0) {
+                    foreach ($jsonData->imageNameList as $imgName) {
+                    }
+                }
+
+
                 $this->pushDataToView = $this->setResponseStatus([SystemConstant::ENTITY_ATT => $this->studentService->findById($lastInsertId)], true, i18next::getTranslation(('success.insert_succesfull')));
             }
         }
@@ -139,6 +147,19 @@ class StudentController extends AppController
         if (!empty($jsonData) && !empty($uid)) {
             $student = new Student($jsonData, $uid, true);
             if (isset($student->id)) {
+
+                // if this update has new image upload then delete old image before update this data
+                if ($jsonData->haveNewImage) {
+                    $studentOld = $this->studentService->findById($student->id);
+                    if (!empty($studentOld)) {
+                        //delete old student's image before upload new one
+                        if (!empty($studentOld->image_name)) {
+                            UploadUtil::delImgfileFromYearMonthFolder($studentOld->image_name, null);
+                        }
+                    }
+                }
+
+
                 $effectRow = $this->studentService->updateByObject($student, array('id' => $student->id));
                 if ($effectRow) {
                     $this->pushDataToView = $this->setResponseStatus($this->pushDataToView, true, i18next::getTranslation(('success.update_succesfull')));
@@ -267,6 +288,21 @@ class StudentController extends AppController
         //return error message if upload fail
         jsonResponse([
             'error' => i18next::getTranslation('error.oops'),
+        ]);
+    }
+
+    public function testChartData()
+    {
+        $series = array();
+        $cates = array("Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct");
+        array_push($series, [
+            'name' => 'chart 1',
+            'data' => array(44, 55, 57, 56, 61, 58, 63, 60, 66)
+        ]);
+
+        jsonResponse([
+            'cates' => $cates,
+            'series' => $series
         ]);
     }
 }

@@ -1,12 +1,22 @@
 <?php
+
 namespace application\model;
 
 use application\core\BaseModel;
+
 class AccessToken extends BaseModel
 {
     public static $tableName = 'access_token';
+    public $user_agent;
+    public $token;
+    public $api_client;
+    public $user;
+    public $revoked;
+    public $created_at;
+    public $expires_at;
+    public $updated_at;
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
-    { 
+    {
         /* init data type for field*/
         $this->setTableField(array(
             'id' => self::TYPE_AUTO_INCREMENT,
@@ -18,8 +28,8 @@ class AccessToken extends BaseModel
             'created_at' => self::TYPE_DATE_TIME,
             'expires_at' => self::TYPE_DATE_TIME,
             'updated_at' => self::TYPE_DATE_TIME,
-        )); 
- 
+        ));
+
         /* init data type for field use in update mode*/
         $this->setTableFieldForEdit(array(
             'user_agent' => self::TYPE_STRING,
@@ -44,5 +54,4 @@ class AccessToken extends BaseModel
     {
         return self::$tableName;
     }
-
 }

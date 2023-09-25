@@ -9,6 +9,12 @@ use application\core\BaseModel;
 class Student extends BaseModel
 {
     public static $tableName = 'student';
+    public $std_code;
+    public $name;
+    public $surname;
+    public $birth_date;
+    public $image_name;
+    public $major_id;
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
     {
         //not use audit info 

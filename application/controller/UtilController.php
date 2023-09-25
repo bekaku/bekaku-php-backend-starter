@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Bekaku
@@ -13,6 +14,9 @@ use application\util\AppUtil;
 use application\util\ControllerUtil;
 use application\util\DateUtils;
 use application\util\FilterUtils;
+use application\util\UploadUtil;
+use application\util\i18next;
+use application\util\SecurityUtil;
 
 class UtilController extends AppController
 {
@@ -36,5 +40,28 @@ class UtilController extends AppController
     public function getSiteMetadata()
     {
         jsonResponse(AppUtil::getSiteMetaData(FilterUtils::filterGetString('uri')));
+    }
+
+    public function uploadImageApi()
+    {
+        //get user's id from JWT Token who change student's image.
+        $uid = SecurityUtil::getAppuserIdFromJwtPayload();
+        //check is user upload file or not
+        if (isset($_FILES['fileName']) && is_uploaded_file($_FILES['fileName']['tmp_name'])) {
+            //generate random unique name for this image
+            $newName = UploadUtil::getUploadFileName($uid);
+            //upload process if upload cuccess it will return image name
+            $imagName = UploadUtil::uploadImgFiles($_FILES['fileName'], null, 0, $newName);
+            if ($imagName) {
+                //return image name to frontend
+                jsonResponse([
+                    'imageName' => $imagName,
+                ]);
+            }
+        }
+        //return error message if upload fail
+        jsonResponse([
+            'error' => i18next::getTranslation('error.oops'),
+        ]);
     }
 }

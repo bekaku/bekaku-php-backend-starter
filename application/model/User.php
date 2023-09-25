@@ -3,11 +3,22 @@
 namespace application\model;
 
 use application\core\BaseModel;
+
 class User extends BaseModel
 {
     public static $tableName = 'user';
+    public $username;
+    public $salt;
+    public $email;
+    public $image;
+    public $password;
+    public $status;
+    public $created_at;
+    public $updated_at;
+    public $created_user;
+    public $updated_user;
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
-    { 
+    {
         /* init data type for field*/
         $this->setTableField(array(
             'id' => self::TYPE_AUTO_INCREMENT,
@@ -22,8 +33,8 @@ class User extends BaseModel
             'updated_at' => self::TYPE_DATE_TIME,
             'created_user' => self::TYPE_STRING,
             'updated_user' => self::TYPE_STRING,
-        )); 
- 
+        ));
+
         /* init data type for field use in update mode*/
         $this->setTableFieldForEdit(array(
             'username' => self::TYPE_STRING,
@@ -47,5 +58,4 @@ class User extends BaseModel
     {
         return self::$tableName;
     }
-
 }

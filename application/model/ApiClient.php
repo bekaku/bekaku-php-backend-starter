@@ -1,14 +1,24 @@
 <?php
+
 /** ### Generated File. If you need to change this file manually, you must remove or change or move position this message, otherwise the file will be overwritten. ### **/
 
 namespace application\model;
 
 use application\core\BaseModel;
+
 class ApiClient extends BaseModel
 {
     public static $tableName = 'api_client';
+    public $api_name;
+    public $api_token;
+    public $by_pass;
+    public $status;
+    public $created_at;
+    public $updated_at;
+    public $updated_user;
+    public $created_user;
     public function __construct(\stdClass $jsonData = null, $uid = null, $isUpdate = false)
-    { 
+    {
         /* init data type for field*/
         $this->setTableField(array(
             'id' => self::TYPE_AUTO_INCREMENT,
@@ -20,8 +30,8 @@ class ApiClient extends BaseModel
             'updated_at' => self::TYPE_DATE_TIME,
             'updated_user' => self::TYPE_INTEGER,
             'created_user' => self::TYPE_INTEGER,
-        )); 
- 
+        ));
+
         /* init data type for field use in update mode*/
         $this->setTableFieldForEdit(array(
             'api_name' => self::TYPE_STRING,
@@ -44,5 +54,4 @@ class ApiClient extends BaseModel
     {
         return self::$tableName;
     }
-
 }

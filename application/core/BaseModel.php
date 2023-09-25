@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Bekaku
@@ -45,7 +46,7 @@ class BaseModel
     private $tableOptionalField = array();
 
     private $auditInfo = true;
-
+    public $id;
 
     public function populate($jsonData = null, $object = null, $uid = null, $isUpdate = false)
     {
@@ -78,8 +79,6 @@ class BaseModel
                     }
                 }
             }
-
-
         }
     }
 
